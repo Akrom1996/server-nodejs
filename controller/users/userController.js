@@ -1,0 +1,350 @@
+const connection = require("../../module/database")
+const {
+    minioClient
+} = require('../../module/minio');
+const mailer = require("nodemailer");
+const path = require("path")
+const uuid = require("uuid").v4;
+const userModel = require('../../module/User');
+const mongoose = require("mongoose")
+require('dotenv').config();
+const Multer = require("multer");
+
+
+exports.registrate = async (req, res) => {
+
+    const user = new userModel(req.body);
+
+    try {
+        const users = await userModel.find({
+            "phoneNumber": req.body.phoneNumber
+        }, (err) => {
+            if (err) {
+                return res.status(400).json({
+                    error: err.message,
+                    errorCode: "1",
+                    message: "BAD_REQUEST"
+                })
+            }
+        })
+        console.log(users);
+        if (users.length == 0) {
+            await user.save();
+            return res.status(200).json({
+                error: null,
+                errorCode: "0",
+                message: "SUCCESS"
+            });
+        } else {
+            return res.status(403).json({
+                error: "BAD_REQUEST",
+                errorCode: "1",
+                message: "Ushbu raqam ro'yxatdan o'tgan"
+            })
+        }
+
+    } catch (error) {
+        res.status(400).json({
+            error: error,
+            errorCode: "1",
+            message: "BAD_REQUEST"
+        });
+    }
+
+}
+
+exports.deleteUser = async (req, res) => {
+    const {
+        phoneNumber
+    } = req.params;
+    try {
+
+        await userModel.findOneAndRemove({
+            "phoneNumber": phoneNumber
+        }, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    error: err.message,
+                    errorCode: "1",
+                    message: "BAD_REQUEST"
+                })
+            } else if (results === null) {
+                return res.status(403).json({
+                    error: "BAD_REQUEST",
+                    errorCode: "1",
+                    message: "Ushbu foydalanuvchi tarmoqda mavjud emas"
+                })
+            }
+            return res.status(200).json({
+                error: null,
+                errorCode: "0",
+                message: "SUCCESS",
+                data: results
+            });
+        })
+
+    } catch (error) {
+        return res.status(400).json({
+            error: error,
+            errorCode: "1",
+            message: "BAD_REQUEST"
+        })
+
+    }
+}
+
+exports.getUserInfo = async (req, res) => {
+    console.log(req.params);
+    const {
+        phoneNumber
+    } = req.params;
+    let SQL = "SELECT * FROM users WHERE phone_number=?";
+    try {
+
+        await userModel.findOne({
+            "phoneNumber": phoneNumber
+        }, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    error: err.message,
+                    errorCode: "1",
+                    message: "BAD_REQUEST"
+                })
+            } else if (results === null) {
+                return res.status(403).json({
+                    error: "BAD_REQUEST",
+                    errorCode: "1",
+                    message: "Ushbu foydalanuvchi tarmoqda mavjud emas"
+                })
+            }
+            return res.status(200).json({
+                error: null,
+                errorCode: "0",
+                message: "SUCCESS",
+                data: results
+            });
+        })
+    } catch (error) {
+        return res.status(400).json({
+            error: error,
+            errorCode: "1",
+            message: "BAD_REQUEST"
+        })
+    }
+}
+
+exports.updateUserInfo = async (req, res) => {
+    const {
+        phoneNumber
+    } = req.params;
+
+    // let SQL = "UPDATE users SET user_name = ?, address=?, image=? WHERE phone_number=?"
+    try {
+
+        await userModel.findOneAndUpdate({
+            "phoneNumber": phoneNumber
+        }, req.body, {
+            upsert: true
+        }, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    error: err.message,
+                    errorCode: "1",
+                    message: "BAD_REQUEST"
+                })
+            } else if (results === null) {
+                return res.status(403).json({
+                    error: "BAD_REQUEST",
+                    errorCode: "1",
+                    message: "Ushbu foydalanuvchi tarmoqda mavjud emas"
+                })
+            }
+            return res.status(200).json({
+                error: null,
+                errorCode: "0",
+                message: "SUCCESS",
+                data: results
+            });
+        })
+    } catch (error) {
+        return res.status(400).json({
+            error: error,
+            errorCode: "1",
+            message: "BAD_REQUEST"
+        })
+
+    }
+}
+var upload = Multer({
+    storage: Multer.memoryStorage(),
+    limits: {
+        fileSize: 10000000
+    },
+    fileFilter: function (req, file, cb) {
+        checkFileType(file, cb);
+    }
+}).single("upload");
+
+
+function checkFileType(file, cb) {
+    // Allowed ext
+    const filetypes = /jpeg|jpg|png|gif/;
+    // Check ext
+    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+    // Check mime
+    // const mimetype = filetypes.test(file.mimetype);
+    if (extname) {
+        return cb(null, true);
+    } else {
+        cb("Error: Images Only!");
+    }
+}
+
+exports.uploadProfileImageAndInfo = async (req, res) => {
+    upload(req, res, function (error) {
+        if (error instanceof Multer.MulterError) {
+            // A Multer error occurred when uploading.
+            return res.status(500).json({
+                error
+            })
+        } else if (error) {
+            // An unknown error occurred when uploading.
+            console.log(error)
+            return res.status(500).json({
+                error
+            })
+        }
+
+        // Everything went fine.
+
+        console.log(req.file);
+        let file_name;
+        const {
+            phoneNumber
+        } = req.params;
+
+        file_name = "/images/profile-images/" + uuid() + path.extname(req.file.originalname);
+        console.log(file_name);
+        minioClient.putObject("p2p-market",
+            file_name, req.file.buffer,
+            async (error, etag) => {
+                if (error) {
+                    return res.status(400).json({
+                        error: err.message,
+                        errorCode: "1",
+                        message: "BAD_REQUEST"
+                    })
+                }
+
+                console.log(file_name);
+                await userModel.findOneAndUpdate({
+                    "phoneNumber": phoneNumber
+                }, {
+                    "image": file_name
+                }, {
+                    upsert: true
+                }, (err, results) => {
+                    if (err) {
+                        return res.status(400).json({
+                            error: err.message,
+                            errorCode: "1",
+                            message: "BAD_REQUEST"
+                        })
+                    }
+                    return res.status(200).json({
+                        error: null,
+                        errorCode: "0",
+                        message: "SUCCESS",
+                        data: results
+                    });
+                });
+            })
+    })
+
+    try {
+
+
+    } catch (error) {
+
+
+    }
+}
+
+
+
+// let SQL = "INSERT INTO users VALUES(NULL, ?,NOW())";
+// try {
+//     connection.query("SELECT * FROM users WHERE phone_number = ?",[phoneNumber], (err,results)=>{
+//         if(err){
+//             return res.status(400).json({error:err.message,errorCode:"1",message:"BAD_REQUEST"})
+//         }
+//         else if(results.length>0){
+//             return res.status(409).json({error:null,errorCode:"1",message:"Ushbu raqam ro'yxatdan o'tgan"})
+
+//         }else{
+//             connection.query(SQL,[[userName,phoneNumber,address,image]],(err, results)=>{
+//             if(err){
+//                 return res.status(400).json({error:err.message,errorCode:"1",message:"BAD_REQUEST"})
+//             }
+//             return res.status(200).json({error:null,errorCode:"0",message:"SUCCESS"})
+//         })
+//         }
+//     })
+
+// } catch (error) {
+//     return res.status(400).json({error:error,errorCode:"1",message:"BAD_REQUEST"})
+// }
+
+
+// let SQL = "DELETE FROM users WHERE phone_number=? LIMIT 1"
+
+// connection.query(SQL,[phoneNumber],(err,results)=>{
+//     if(err){
+//         return res.status(400).json({error:err.message,errorCode:"1",message:"BAD_REQUEST"})
+//     }
+//     return res.status(200).json({error:null,errorCode:"0",message:"SUCCESS"})
+
+// })
+
+// connection.query(SQL, [phoneNumber], (err, results) => {
+//     if (err) {
+//         return res.status(400).json({
+//             error: err.message,
+//             errorCode: "1",
+//             message: "BAD_REQUEST"
+//         })
+//     }
+//     console.log(results);
+//     return res.status(200).json({
+//         error: null,
+//         errorCode: "0",
+//         message: "SUCCESS",
+//         data: results[0]
+//     })
+// })
+
+// connection.query(SQL, [userName, address, image, phoneNumber], (err, results) => {
+//     if (err) {
+//         return res.status(400).json({
+//             error: err.message,
+//             errorCode: "1",
+//             message: "BAD_REQUEST"
+//         })
+//     }
+//     console.log(results);
+//     return res.status(200).json({
+//         error: null,
+//         errorCode: "0",
+//         message: "SUCCESS"
+//     })
+
+// })
+
+// let sql = "UPDATE user SET profile_image = ?, full_name = ? WHERE email = ?;";
+// connection.query(sql,[file_name,userName, email], (error, results)=>{
+//     if(error){
+//         console.log(err);
+//         return res.status(500).json({error})
+//     }
+//     // console.log(results);
+// })
