@@ -12,10 +12,10 @@ const Multer = require("multer");
 
 
 exports.registrate = async (req, res) => {
-
-    const user = new userModel(req.body);
-
+console.log(req.body);
     try {
+        const user = new userModel(req.body);
+
         const users = await userModel.find({
             "phoneNumber": req.body.phoneNumber
         }, (err) => {

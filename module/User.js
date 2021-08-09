@@ -10,6 +10,7 @@ const UserSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  position:{type:Object},
   address: {
     type: String,
     required: true,
@@ -23,7 +24,7 @@ const UserSchema = new mongoose.Schema({
       default:false
   },
   registeredTime: {
-    type: String,
+    type: Date,
     required: true,
   },
   items: [{type: mongoose.Schema.Types.ObjectId, ref: "items"}]
