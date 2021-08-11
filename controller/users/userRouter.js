@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const path = require("path")
-const {saveEmail, registrate, getUserInfo, deleteUser, uploadProfileImageAndInfo, uploadItemImages,updateUserInfo} = require("./userController")
+const {saveEmail, registrate, getUserInfo, deleteUser, uploadProfileImage, uploadItemImages,updateUserInfo} = require("./userController")
 
 // Saving User Email  
 // router.post('/saveEmail', saveEmail)
@@ -15,7 +15,7 @@ router.get('/getUser/:phoneNumber',getUserInfo);
 router.put("/update-user-info/:phoneNumber",updateUserInfo);
 
 // Upload user image
-router.post('/upload-profile-image/:phoneNumber', uploadProfileImageAndInfo);
+router.post('/upload-profile-image/:phoneNumber', uploadProfileImage);
 // Upload item images
 // router.post('upload-item-images/:email', Multer({
 //     storage: Multer.memoryStorage(),

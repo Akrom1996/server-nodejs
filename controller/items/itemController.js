@@ -50,22 +50,20 @@ exports.getItemInfo = async (req, res) => {
 
 exports.postItem = async (req, res) => {
     console.log(req.params);
-    const userId = await User.findOne({
+    const user = await User.findOne({
         "phoneNumber": req.params.phoneNumber
     })
-    console.log(userId._id);
-    // for (key in input) {
-    //     if (input.hasOwnProperty(key)) {
-    //         console.log(key + " = " + input[key]);
-    //     }
-    // }    
+    console.log(user._id);   
     var input = req.body;
-    input.user = userId._id;
+    input.user = user._id;
     input.location = req.params.currentLocation;
     console.log(input);
     const item = new itemModel(input);
     try {
-        await item.save();
+        var result = await item.save();
+        console.log(result);
+        user.items.push(result._id);
+        await user.save();
         return res.status(200).json({
             error: null,
             errorCode: "0",
@@ -86,6 +84,7 @@ exports.getItemsByLocation = async (req, res) => {
     const {
         currentLocation
     } = req.params;
+    console.log(currentLocation);
     try {
         await itemModel.find({
             "location": currentLocation

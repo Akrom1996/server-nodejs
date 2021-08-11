@@ -200,7 +200,7 @@ function checkFileType(file, cb) {
     }
 }
 
-exports.uploadProfileImageAndInfo = async (req, res) => {
+exports.uploadProfileImage = async (req, res) => {
     upload(req, res, function (error) {
         if (error instanceof Multer.MulterError) {
             // A Multer error occurred when uploading.
@@ -224,19 +224,16 @@ exports.uploadProfileImageAndInfo = async (req, res) => {
         } = req.params;
 
         file_name = "/images/profile-images/" + uuid() + path.extname(req.file.originalname);
-        console.log(file_name);
         minioClient.putObject("p2p-market",
             file_name, req.file.buffer,
             async (error, etag) => {
                 if (error) {
                     return res.status(400).json({
-                        error: err.message,
+                        error: error.message,
                         errorCode: "1",
                         message: "BAD_REQUEST"
                     })
                 }
-
-                console.log(file_name);
                 await userModel.findOneAndUpdate({
                     "phoneNumber": phoneNumber
                 }, {
@@ -251,23 +248,19 @@ exports.uploadProfileImageAndInfo = async (req, res) => {
                             message: "BAD_REQUEST"
                         })
                     }
+                    console.log(results);
+
                     return res.status(200).json({
                         error: null,
                         errorCode: "0",
                         message: "SUCCESS",
-                        data: results
+                        data: file_name
                     });
                 });
             })
     })
 
-    try {
-
-
-    } catch (error) {
-
-
-    }
+    
 }
 
 

@@ -27,7 +27,12 @@ const UserSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-  items: [{type: mongoose.Schema.Types.ObjectId, ref: "items"}]
+  manner:{
+    type: Array,
+    default: null
+  },
+  items: [{type: mongoose.Schema.Types.ObjectId, ref: "items"}],
+  
 });
 
 const User = mongoose.model("users", UserSchema);
