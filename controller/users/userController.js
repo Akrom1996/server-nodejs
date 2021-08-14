@@ -138,6 +138,8 @@ exports.updateUserInfo = async (req, res) => {
         phoneNumber
     } = req.params;
 console.log(req.body);
+console.log(req.params);
+
     // let SQL = "UPDATE users SET user_name = ?, address=?, image=? WHERE phone_number=?"
     try {
 
