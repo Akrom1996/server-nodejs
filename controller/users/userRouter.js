@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const path = require("path")
-const {saveEmail, registrate, getUserInfo, deleteUser, uploadProfileImage, uploadItemImages,updateUserInfo} = require("./userController")
+const {saveEmail, registrate, getUserInfo, deleteUser, uploadProfileImage, uploadItemImages,updateUserInfo,getUserById} = require("./userController")
 
 // Saving User Email  
 // router.post('/saveEmail', saveEmail)
@@ -11,9 +11,10 @@ router.post('/registrate', registrate);
 router.delete('/deleteUser/:phoneNumber',deleteUser);
 // Get user info
 router.get('/getUser/:phoneNumber',getUserInfo);
+//Get user by id
+router.get('/getUserById/:userId',getUserById);
 // Update user info
 router.put("/update-user-info/:phoneNumber",updateUserInfo);
-
 // Upload user image
 router.post('/upload-profile-image/:phoneNumber', uploadProfileImage);
 // Upload item images

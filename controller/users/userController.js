@@ -133,6 +133,42 @@ exports.getUserInfo = async (req, res) => {
     }
 }
 
+exports.getUserById=async(req,res)=>{
+    console.log(req.params);
+    try {
+
+        await userModel.findOne({
+            "_id": req.params.userId
+        }, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    error: err.message,
+                    errorCode: "1",
+                    message: "BAD_REQUEST"
+                })
+            } else if (results === null) {
+                return res.status(403).json({
+                    error: "BAD_REQUEST",
+                    errorCode: "1",
+                    message: "Ushbu foydalanuvchi tarmoqda mavjud emas"
+                })
+            }
+            return res.status(200).json({
+                error: null,
+                errorCode: "0",
+                message: "SUCCESS",
+                data: results
+            });
+        })
+    } catch (error) {
+        return res.status(400).json({
+            error: error,
+            errorCode: "1",
+            message: "BAD_REQUEST"
+        })
+    }
+}
+
 exports.updateUserInfo = async (req, res) => {
     const {
         phoneNumber
