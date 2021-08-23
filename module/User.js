@@ -29,7 +29,7 @@ const UserSchema = new mongoose.Schema({
   },
   manner:{
     type: Array,
-    default: null
+    default: 36.6
   },
   items: [{type: mongoose.Schema.Types.ObjectId, ref: "items"}],
   
