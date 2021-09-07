@@ -133,7 +133,7 @@ exports.getUserInfo = async (req, res) => {
     }
 }
 
-exports.getUserById=async(req,res)=>{
+exports.getUserById = async (req, res) => {
     console.log(req.params);
     try {
 
@@ -173,8 +173,8 @@ exports.updateUserInfo = async (req, res) => {
     const {
         phoneNumber
     } = req.params;
-console.log(req.body);
-console.log(req.params);
+    console.log(req.body);
+    console.log(req.params);
 
     // let SQL = "UPDATE users SET user_name = ?, address=?, image=? WHERE phone_number=?"
     try {
@@ -239,66 +239,68 @@ function checkFileType(file, cb) {
 }
 
 exports.uploadProfileImage = async (req, res) => {
-    try {    
-        
-                upload(req, res, function (error) {
-                    if (error instanceof Multer.MulterError) {
-                        // A Multer error occurred when uploading.
-                        return res.status(500).json({
-                            error
-                        })
-                    } else if (error) {
-                        // An unknown error occurred when uploading.
-                        console.log(error)
-                        return res.status(500).json({
-                            error
+    try {
+
+        upload(req, res, function (error) {
+            if (error instanceof Multer.MulterError) {
+                // A Multer error occurred when uploading.
+                return res.status(500).json({
+                    error
+                })
+            } else if (error) {
+                // An unknown error occurred when uploading.
+                console.log(error)
+                return res.status(500).json({
+                    error
+                })
+            }
+
+
+            // Everything went fine.
+            console.log(req.file);
+            let file_name;
+            const {
+                phoneNumber
+            } = req.params;
+
+            file_name = "/images/profile-images/" + uuid() + path.extname(req.file.originalname);
+            minioClient.putObject("p2p-market",
+                file_name, req.file.buffer,
+                async (error, etag) => {
+                    if (error) {
+                        return res.status(400).json({
+                            error: error,
+                            errorCode: "1",
+                            message: "BAD_REQUEST"
                         })
                     }
+                    await userModel.findOneAndUpdate({
+                        "phoneNumber": phoneNumber
+                    }, {
+                        "image": file_name
+                    }, {
+                        upsert: true
+                    }, (err, results) => {
+                        if (err) {
+                            return res.status(400).json({
+                                error: err,
+                                errorCode: "1",
+                                message: "BAD_REQUEST"
+                            })
+                        }
+                        console.log(results);
 
+                        return res.status(200).json({
+                            error: null,
+                            errorCode: "0",
+                            message: "SUCCESS",
+                            data: results
+                        });
+                    });
 
-                    // Everything went fine.
-                    console.log(req.file);
-                    let file_name;
-                    const {
-                        phoneNumber
-                    } = req.params;
-
-                    file_name = "/images/profile-images/" + uuid() + path.extname(req.file.originalname);
-                    minioClient.putObject("p2p-market",
-                        file_name, req.file.buffer,
-                        async (error, etag) => {
-                            if (error) {
-                                return res.status(400).json({
-                                    error: error,
-                                    errorCode: "1",
-                                    message: "BAD_REQUEST"
-                                })
-                            }
-                            await userModel.findOneAndUpdate({
-                                "phoneNumber": phoneNumber
-                            }, {
-                                "image": file_name
-                            }, {
-                                upsert: true
-                            }, (err, results) => {
-                                if (err) {
-                                    return res.status(400).json({
-                                        error: err,
-                                        errorCode: "1",
-                                        message: "BAD_REQUEST"
-                                    })                                }
-                                console.log(results);
-
-                                return res.status(200).json({
-                                    error: null,
-                                    errorCode: "0",
-                                    message: "SUCCESS",
-                                    data: results
-                                });                            });
-
-                        })
                 })
-            
+        })
+
     } catch (error) {
         return res.status(400).json({
             error: error,

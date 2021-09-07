@@ -48,38 +48,7 @@ exports.getItemInfo = async (req, res) => {
     }
 }
 
-exports.postItem = async (req, res) => {
-    console.log(req.params);
-    const user = await User.findOne({
-        "phoneNumber": req.params.phoneNumber
-    })
-    console.log(user._id);   
-    var input = req.body;
-    input.user = user._id;
-    input.location = req.params.currentLocation;
-    console.log(input);
-    const item = new itemModel(input);
-    try {
-        var result = await item.save();
-        console.log(result);
-        user.items.push(result._id);
-        await user.save();
-        return res.status(200).json({
-            error: null,
-            errorCode: "0",
-            message: "SUCCESS"
-        });
-
-    } catch (error) {
-        res.status(400).json({
-            error: error,
-            errorCode: "1",
-            message: "BAD_REQUEST"
-        });
-    }
-
-}
-
+// 
 exports.getItemsByLocation = async (req, res) => {
     const {
         currentLocation
@@ -88,7 +57,7 @@ exports.getItemsByLocation = async (req, res) => {
     try {
         await itemModel.find({
             "location": currentLocation
-        }, (err, results) => {
+        }).sort({"postTime":-1}).exec((err, results) => {
             if (err) {
                 return res.status(400).json({
                     error: err.message,
@@ -239,3 +208,86 @@ exports.incDecLikes = async (req, res) => {
         })
     }
 }
+
+exports.uploadItemImages = async (req, res) => {
+    console.log(req.files);
+    let file_name = [];
+    try {
+        req.files.map((file) => {
+            file_name.push("/images/item-images/" + uuid() + path.extname(file.originalname));
+            console.log(file_name);
+            minioClient.putObject("p2p-market", file_name[file_name.length - 1], file.buffer, function (error, etag) {
+                if (error) {
+                    console.log(error);
+                    return res.status(500).json({
+                        error
+                    })
+                }
+                // console.log(etag);
+
+            });
+        });
+        // var uploadedFilePath = []
+        // req.files.map((file) => uploadedFilePath.push(file.originalname));
+        console.log(req.params);
+        const user = await User.findOne({
+            "phoneNumber": req.params.phoneNumber
+        })
+        console.log(user._id);
+        var input = req.body;
+        input.user = user._id;
+        input.images = file_name;
+        input.location = req.params.currentLocation;
+        console.log(input);
+        const item = new itemModel(input);
+        var result = await item.save();
+        console.log(result);
+        user.items.push(result._id);
+        await user.save();
+        return res.status(200).json({
+            error: null,
+            errorCode: "0",
+            message: "SUCCESS"
+        });
+
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            error
+        })
+
+    }
+}
+
+// exports.postItem = async (req, res) => {
+    //     console.log(req.params);
+    //     const user = await User.findOne({
+    //         "phoneNumber": req.params.phoneNumber
+    //     })
+    //     console.log(user._id);
+    //     var input = req.body;
+    //     input.user = user._id;
+    //     input.location = req.params.currentLocation;
+    //     console.log(input);
+    //     const item = new itemModel(input);
+    //     try {
+    //         var result = await item.save();
+    //         console.log(result);
+    //         user.items.push(result._id);
+    //         await user.save();
+    //         return res.status(200).json({
+    //             error: null,
+    //             errorCode: "0",
+    //             message: "SUCCESS"
+    //         });
+    
+    //     } catch (error) {
+    //         res.status(400).json({
+    //             error: error,
+    //             errorCode: "1",
+    //             message: "BAD_REQUEST"
+    //         });
+    //     }
+    
+    // }
+    
