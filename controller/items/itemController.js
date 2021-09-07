@@ -57,7 +57,7 @@ exports.getItemsByLocation = async (req, res) => {
     try {
         await itemModel.find({
             "location": currentLocation
-        }).sort({"postTime":-1}).exec((err, results) => {
+        }).sort({ "postTime": -1 }).exec((err, results) => {
             if (err) {
                 return res.status(400).json({
                     error: err.message,
@@ -133,7 +133,7 @@ exports.updatePosition = async (req, res) => {
         await itemModel.findByIdAndUpdate(itemId, req.body, (err, results) => {
             if (err) {
                 return res.status(400).json({
-                    error: err.message,
+                    error: err,
                     errorCode: "1",
                     message: "BAD_REQUEST"
                 })
@@ -167,46 +167,61 @@ exports.incDecLikes = async (req, res) => {
     const {
         type,
         number,
-
+        userId
     } = req.body;
     console.log(req.body);
     let obj = {}
     obj[type] = Number(number);
 
     console.log(obj);
-    try {
+    Promise.all([
         await itemModel.findByIdAndUpdate(itemId, {
             $inc: obj
         }, {
-            new: true
-        }, ).exec((err, results) => {
-            if (err) {
-                return res.status(400).json({
-                    error: err.message,
-                    errorCode: "1",
-                    message: "BAD_REQUEST"
-                })
-            } else if (results === null) {
-                return res.status(403).json({
-                    error: "BAD_REQUEST",
-                    errorCode: "1",
-                    message: "Ushbu jihoz tarmoqda mavjud emas"
-                })
-            }
-            return res.status(200).json({
-                error: null,
-                errorCode: "0",
-                message: "SUCCESS",
-                data: results
-            });
-        })
-    } catch (error) {
+            new: false
+        }),
+        number === 1 ? await User.findByIdAndUpdate(userId, { $push: { likedItems: itemId } }) :
+            await User.findByIdAndUpdate(userId, { $pull: { likedItems: itemId } })
+    ]).then((results) => {
+
+        return res.status(200).json({
+            error: null,
+            errorCode: "0",
+            message: "SUCCESS",
+        });
+    }).catch((err) => {
         return res.status(400).json({
-            error: error,
+            error: err,
             errorCode: "1",
             message: "BAD_REQUEST"
-        })
-    }
+        });
+    })
+    // await itemModel.findByIdAndUpdate(itemId, {
+    //     $inc: obj
+    // }, {
+    //     new: true
+    // }, ).exec((err, results) => {
+    //     if (err) {
+    //         return res.status(400).json({
+    //             error: err.message,
+    //             errorCode: "1",
+    //             message: "BAD_REQUEST"
+    //         })
+    //     } else if (results === null) {
+    //         return res.status(403).json({
+    //             error: "BAD_REQUEST",
+    //             errorCode: "1",
+    //             message: "Ushbu jihoz tarmoqda mavjud emas"
+    //         })
+    //     }
+    //     return res.status(200).json({
+    //         error: null,
+    //         errorCode: "0",
+    //         message: "SUCCESS",
+    //         data: results
+    //     });
+    // })
+
 }
 
 exports.uploadItemImages = async (req, res) => {
@@ -259,6 +274,40 @@ exports.uploadItemImages = async (req, res) => {
     }
 }
 
+exports.favouriteItems = async (req, res) => {
+    console.log(req.body);
+    const { items } = req.body;
+    var results = [];
+    let count = 0;
+    items.forEach(async (element) => {
+        await itemModel.findById(element,)
+            .exec((err, result) => {
+                if (err) {
+                    return res.status(400).json({
+                        error: err,
+                        errorCode: "1",
+                        message: "BAD_REQUEST"
+                    })
+                }
+                results.push(result);
+                count++;
+                if (count === items.length) {
+                    console.log(results);
+                    return res.status(200).json({
+                        error: null,
+                        errorCode: "0",
+                        message: "SUCCESS",
+                        data: results
+                    });
+                }
+
+            })
+
+    });
+
+
+}
+
 // exports.postItem = async (req, res) => {
     //     console.log(req.params);
     //     const user = await User.findOne({
@@ -280,7 +329,7 @@ exports.uploadItemImages = async (req, res) => {
     //             errorCode: "0",
     //             message: "SUCCESS"
     //         });
-    
+
     //     } catch (error) {
     //         res.status(400).json({
     //             error: error,
@@ -288,6 +337,5 @@ exports.uploadItemImages = async (req, res) => {
     //             message: "BAD_REQUEST"
     //         });
     //     }
-    
+
     // }
-    

@@ -7,7 +7,8 @@ const {
     getItemsOfUser,
     updatePosition,
     incDecLikes,
-    uploadItemImages
+    uploadItemImages,
+    favouriteItems
 } = require("./itemController");
 const Multer = require("multer");
 const path = require("path")
@@ -49,7 +50,7 @@ router.post("/postItem/:currentLocation/:phoneNumber",Multer({
 // update item position
 router.put("/updatePosition/:itemId",updatePosition)
 
-
 router.put("/updateLikes/:itemId",incDecLikes)
 
+router.post("/favouriteItems",favouriteItems)
 module.exports = router;

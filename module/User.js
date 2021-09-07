@@ -31,7 +31,7 @@ const UserSchema = new mongoose.Schema({
     type: Array,
     default: 36.6
   },
-  likedItems: [{type: mongoose.Schema.Types.ObjectId, ref: "items"}],
+  likedItems: [{type: Array, }],
   items: [{type: mongoose.Schema.Types.ObjectId, ref: "items"}],
   
 });
