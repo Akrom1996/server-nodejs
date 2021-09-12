@@ -9,6 +9,7 @@ const userModel = require('../../module/User');
 const mongoose = require("mongoose")
 require('dotenv').config();
 const Multer = require("multer");
+const Item = require("../../module/Item");
 
 
 exports.registrate = async (req, res) => {
@@ -55,42 +56,50 @@ exports.registrate = async (req, res) => {
 
 exports.deleteUser = async (req, res) => {
     const {
-        phoneNumber
+        id
     } = req.params;
-    try {
-
-        await userModel.findOneAndRemove({
-            "phoneNumber": phoneNumber
-        }, (err, results) => {
-            if (err) {
-                return res.status(400).json({
-                    error: err.message,
-                    errorCode: "1",
-                    message: "BAD_REQUEST"
-                })
-            } else if (results === null) {
-                return res.status(403).json({
-                    error: "BAD_REQUEST",
-                    errorCode: "1",
-                    message: "Ushbu foydalanuvchi tarmoqda mavjud emas"
-                })
-            }
+    console.log(id);
+        Promise.all([
+            await Item.deleteMany({"user":id}),
+            await userModel.deleteOne({"_id":id},),
+        ]).then((results)=>{
             return res.status(200).json({
                 error: null,
                 errorCode: "0",
                 message: "SUCCESS",
                 data: results
             });
+        }).catch((err)=>{
+            return res.status(400).json({
+                error: err.message,
+                errorCode: "1",
+                message: "BAD_REQUEST"
+            });
         })
-
-    } catch (error) {
-        return res.status(400).json({
-            error: error,
-            errorCode: "1",
-            message: "BAD_REQUEST"
-        })
-
-    }
+    
+        // await userModel.findByIdAndRemove({
+        //     _id
+        // }, (err, results) => {
+        //     if (err) {
+        //         return res.status(400).json({
+        //             error: err.message,
+        //             errorCode: "1",
+        //             message: "BAD_REQUEST"
+        //         })
+        //     } else if (results === null) {
+        //         return res.status(403).json({
+        //             error: "BAD_REQUEST",
+        //             errorCode: "1",
+        //             message: "Ushbu foydalanuvchi tarmoqda mavjud emas"
+        //         })
+        //     }
+        //     return res.status(200).json({
+        //         error: null,
+        //         errorCode: "0",
+        //         message: "SUCCESS",
+        //         data: results
+        //     });
+        // })
 }
 
 exports.getUserInfo = async (req, res) => {

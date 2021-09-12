@@ -30,8 +30,8 @@ const ItemSchema = new mongoose.Schema({
     default: 0,
   },
   views: {
-    type: Number,
-    default: 0,
+    type: Array,
+    default: null,
   },
   chats: {
     type: Number,
