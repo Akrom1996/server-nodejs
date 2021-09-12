@@ -318,12 +318,15 @@ exports.uploadItemImages = async (req, res) => {
 exports.favouriteItems = async (req, res) => {
     console.log(req.body);
     const {
-        id
+        id,lists,favourites,boughts
     } = req.body;
     var results = [];
     let count = 0;
     const user = await User.findById(id, );
-    let items = user.likedItems;
+    let items;
+    if(lists) items= user.items;
+    else if (favourites)items =user.likedItems;
+    else items = user.boughts;
     if (items.length === 0) {
         return res.status(200).json({
             error: null,
