@@ -11,7 +11,7 @@ const UserSchema = new mongoose.Schema({
     unique: true,
   },
   position:{type:Object},
-  address: {
+  address1: {
     type: String,
     required: true,
   },
@@ -33,6 +33,7 @@ const UserSchema = new mongoose.Schema({
   },
   likedItems: [{type: Array, }],
   boughts:[{type:Array,}],
+  chats:[{type: Array,}],
   items: [{type: mongoose.Schema.Types.ObjectId, ref: "items"}],
   
 });

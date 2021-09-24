@@ -7,7 +7,7 @@ mongoose.set('useFindAndModify', false);
 // mongoose.set('useFindAndModify', false);
 // mongoose.set('useUnifiedTopology', false);
 // mongoose.set('useCreateIndex', true); //useCreateIndex
-mongoose.connect('mongodb://localhost:27017/myKarrot',
+mongoose.connect('mongodb://localhost:27017/myKarrot',{useNewUrlParser: true},
   (err) => {
     if (err) {
       console.error('error connecting mongoose: ' + err.stack);

@@ -16,7 +16,7 @@ exports.registrate = async (req, res) => {
     console.log(req.body);
     try {
         const user = new userModel(req.body);
-
+        
         const users = await userModel.find({
             "phoneNumber": req.body.phoneNumber
         }, (err) => {
@@ -27,16 +27,20 @@ exports.registrate = async (req, res) => {
                     message: "BAD_REQUEST"
                 })
             }
-        })
+        }).then((value)=>console.log(value)).catch((err)=>console.log(err))
         console.log(users);
-        if (users.length == 0) {
-            await user.save();
+        console.log(users);
+
+        if (users === undefined) {
+            await user.save().catch((err)=>console.log(err));
             return res.status(200).json({
                 error: null,
                 errorCode: "0",
                 message: "SUCCESS"
             });
         } else {
+            
+            console.log("here error");
             return res.status(403).json({
                 error: "BAD_REQUEST",
                 errorCode: "1",
@@ -47,7 +51,7 @@ exports.registrate = async (req, res) => {
     } catch (error) {
         res.status(400).json({
             error: error,
-            errorCode: "1",
+            errorCode: "2",
             message: "BAD_REQUEST"
         });
     }
@@ -283,6 +287,7 @@ exports.uploadProfileImage = async (req, res) => {
                             message: "BAD_REQUEST"
                         })
                     }
+                    console.log(file_name);
                     await userModel.findOneAndUpdate({
                         "phoneNumber": phoneNumber
                     }, {
