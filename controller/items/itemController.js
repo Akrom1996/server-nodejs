@@ -268,7 +268,7 @@ exports.incDecLikes = async (req, res) => {
 exports.uploadItemImages = async (req, res) => {
     console.log(req.files);
     let file_name = [];
-    try {
+    if (req.files !== undefined)
         req.files.map((file) => {
             file_name.push("/images/item-images/" + uuid() + path.extname(file.originalname));
             console.log(file_name);
@@ -283,49 +283,57 @@ exports.uploadItemImages = async (req, res) => {
 
             });
         });
-        // var uploadedFilePath = []
-        // req.files.map((file) => uploadedFilePath.push(file.originalname));
-        console.log(req.params);
-        const user = await User.findOne({
-            "phoneNumber": req.params.phoneNumber
-        })
-        console.log(user._id);
-        var input = req.body;
-        input.user = user._id;
-        input.images = file_name;
-        input.location = req.params.currentLocation;
-        console.log(input);
-        const item = new itemModel(input);
-        var result = await item.save();
-        console.log(result);
-        user.items.push(result._id);
-        await user.save();
+    else
+        file_name = "null"
+
+    var input = req.body;
+    input.images = file_name;
+    input.location = req.params.currentLocation;
+
+    // var uploadedFilePath = []
+    // req.files.map((file) => uploadedFilePath.push(file.originalname));
+    console.log(req.params);
+    const item = new itemModel(input);
+    item.save().then(() => User.findOne({
+        "phoneNumber": req.params.phoneNumber
+    }).then((user) => {
+        console.log("user", user);
+        user.items.push(item);
+        item.user=user;
+        item.save();
+        return user.save();
+    }).then((data) => {
+        console.log(data);
+        console.log(item);
         return res.status(200).json({
             error: null,
             errorCode: "0",
-            message: "SUCCESS"
+            message: "SUCCESS",
         });
-
-    } catch (error) {
-        console.log(error)
-        return res.status(500).json({
-            error
+    })).catch((err) => {
+        console.log(err);
+        return res.status(400).json({
+            error: err,
+            errorCode: "1",
+            message: "BAD_REQUEST"
         })
-
-    }
+    });
 }
 
 exports.favouriteItems = async (req, res) => {
     console.log(req.body);
     const {
-        id,lists,favourites,boughts
+        id,
+        lists,
+        favourites,
+        boughts
     } = req.body;
     var results = [];
     let count = 0;
     const user = await User.findById(id, );
     let items;
-    if(lists) items= user.items;
-    else if (favourites)items =user.likedItems;
+    if (lists) items = user.items;
+    else if (favourites) items = user.likedItems;
     else items = user.boughts;
     if (items.length === 0) {
         return res.status(200).json({

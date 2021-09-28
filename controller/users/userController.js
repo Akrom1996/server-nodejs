@@ -11,12 +11,26 @@ require('dotenv').config();
 const Multer = require("multer");
 const Item = require("../../module/Item");
 
+function deleteProfileOrItemImage(images) {
+    return new Promise((resolve, reject) => {
+        minioClient.removeObjects('p2p-market', images, function (err, data) {
+            if (err) {
+                console.log(err)
+                reject(err)
+            } else {
+                console.log("Successfully deleted p2p-market/myKey");
+                resolve(data)
+            }
+        });
+
+    });
+}
 
 exports.registrate = async (req, res) => {
     console.log(req.body);
     try {
         const user = new userModel(req.body);
-        
+
         const users = await userModel.find({
             "phoneNumber": req.body.phoneNumber
         }, (err) => {
@@ -27,19 +41,19 @@ exports.registrate = async (req, res) => {
                     message: "BAD_REQUEST"
                 })
             }
-        }).then((value)=>console.log(value)).catch((err)=>console.log(err))
+        }).then((value) => console.log(value)).catch((err) => console.log(err))
         console.log(users);
         console.log(users);
 
         if (users === undefined) {
-            await user.save().catch((err)=>console.log(err));
+            await user.save().catch((err) => console.log(err));
             return res.status(200).json({
                 error: null,
                 errorCode: "0",
                 message: "SUCCESS"
             });
         } else {
-            
+
             console.log("here error");
             return res.status(403).json({
                 error: "BAD_REQUEST",
@@ -63,47 +77,70 @@ exports.deleteUser = async (req, res) => {
         id
     } = req.params;
     console.log(id);
-        Promise.all([
-            await Item.deleteMany({"user":id}),
-            await userModel.deleteOne({"_id":id},),
-        ]).then((results)=>{
-            return res.status(200).json({
-                error: null,
-                errorCode: "0",
-                message: "SUCCESS",
-                data: results
-            });
-        }).catch((err)=>{
-            return res.status(400).json({
-                error: err.message,
-                errorCode: "1",
-                message: "BAD_REQUEST"
-            });
+    console.log(req.body);
+
+    var itemData = await Item.find({
+        "user": id
+    });
+    // console.log("items", itemData);
+    var itemImages = [];
+    if (itemData.length > 0) {
+        itemData.forEach((item) => {
+            console.log("item: ", item);
+            itemImages.push(...item.images);
         })
-    
-        // await userModel.findByIdAndRemove({
-        //     _id
-        // }, (err, results) => {
-        //     if (err) {
-        //         return res.status(400).json({
-        //             error: err.message,
-        //             errorCode: "1",
-        //             message: "BAD_REQUEST"
-        //         })
-        //     } else if (results === null) {
-        //         return res.status(403).json({
-        //             error: "BAD_REQUEST",
-        //             errorCode: "1",
-        //             message: "Ushbu foydalanuvchi tarmoqda mavjud emas"
-        //         })
-        //     }
-        //     return res.status(200).json({
-        //         error: null,
-        //         errorCode: "0",
-        //         message: "SUCCESS",
-        //         data: results
-        //     });
-        // })
+    }
+    console.log(itemImages);
+    Promise.all([
+        await userModel.findByIdAndDelete({
+            _id: id
+        }),
+        await Item.deleteMany({
+            "user": id
+        }),
+        itemData.length != 0 ? await deleteProfileOrItemImage(itemImages) : null,
+
+        await deleteProfileOrItemImage([req.body.image]),
+
+
+    ]).then((results) => {
+        return res.status(200).json({
+            error: null,
+            errorCode: "0",
+            message: "SUCCESS",
+            data: results
+        });
+    }).catch((err) => {
+        return res.status(400).json({
+            error: err.message,
+            errorCode: "1",
+            message: "BAD_REQUEST"
+        });
+    })
+
+    // await userModel.findByIdAndRemove({
+    //     _id
+    // }, (err, results) => {
+    //     if (err) {
+    //         return res.status(400).json({
+    //             error: err.message,
+    //             errorCode: "1",
+    //             message: "BAD_REQUEST"
+    //         })
+    //     } else if (results === null) {
+    //         return res.status(403).json({
+    //             error: "BAD_REQUEST",
+    //             errorCode: "1",
+    //             message: "Ushbu foydalanuvchi tarmoqda mavjud emas"
+    //         })
+    //     }
+    //     return res.status(200).json({
+    //         error: null,
+    //         errorCode: "0",
+    //         message: "SUCCESS",
+    //         data: results
+    //     });
+    // })
 }
 
 exports.getUserInfo = async (req, res) => {

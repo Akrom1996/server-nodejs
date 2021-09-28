@@ -52,7 +52,13 @@ const ItemSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "users"
-  }
+  },
+  comments: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "comments"
+  }],
+}, {
+  timestamps: true
 });
 
 const Item = mongoose.model("items", ItemSchema);

@@ -10,32 +10,45 @@ const UserSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
-  position:{type:Object},
+  position: {
+    type: Object
+  },
   address1: {
     type: String,
     required: true,
   },
-  image:{
+  image: {
     type: String,
     default: null,
   },
   isLogged: {
-      type: Boolean,
-      default:false
+    type: Boolean,
+    default: false
   },
   registeredTime: {
     type: Date,
     required: true,
   },
-  manner:{
+  manner: {
     type: Array,
     default: 36.6
   },
-  likedItems: [{type: Array, }],
-  boughts:[{type:Array,}],
-  chats:[{type: Array,}],
-  items: [{type: mongoose.Schema.Types.ObjectId, ref: "items"}],
-  
+  likedItems: [{
+    type: Array,
+  }],
+  boughts: [{
+    type: Array,
+  }],
+  chats: [{
+    type: Array,
+  }],
+  items: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "items"
+  }],
+
+}, {
+  timestamps: true
 });
 
 const User = mongoose.model("users", UserSchema);
