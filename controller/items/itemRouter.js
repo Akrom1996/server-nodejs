@@ -8,7 +8,8 @@ const {
     updatePosition,
     incDecLikes,
     uploadItemImages,
-    favouriteItems
+    favouriteItems,
+    deleteItemById,
 } = require("./itemController");
 const Multer = require("multer");
 const path = require("path")
@@ -39,18 +40,22 @@ router.get('/getItemInfo/:itemId', getItemInfo);
 router.get("/getItemsOfUser/:userId", getItemsOfUser);
 
 // post an item by location
-router.post("/postItem/:currentLocation/:phoneNumber",Multer({
-    storage: Multer.memoryStorage(),
-    limits: { fileSize: 10000000 },
-    fileFilter: function (req,file, cb){
-        checkFileType(file, cb);
-    }
-}).array("upload",8), uploadItemImages),
+router.post("/postItem/:currentLocation/:phoneNumber", Multer({
+        storage: Multer.memoryStorage(),
+        limits: {
+            fileSize: 10000000
+        },
+        fileFilter: function (req, file, cb) {
+            checkFileType(file, cb);
+        }
+    }).array("upload", 8), uploadItemImages),
 
-// update item position
-router.put("/updatePosition/:itemId",updatePosition)
+    // update item position
+router.put("/updatePosition/:itemId", updatePosition)
 
-router.put("/updateLikes/:itemId",incDecLikes)
+router.put("/updateLikes/:itemId", incDecLikes)
 
-router.post("/favouriteItems",favouriteItems)
+router.post("/favouriteItems", favouriteItems)
+
+router.delete("/deleteItem/:itemId", deleteItemById);
 module.exports = router;

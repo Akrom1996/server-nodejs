@@ -41,12 +41,11 @@ exports.registrate = async (req, res) => {
                     message: "BAD_REQUEST"
                 })
             }
-        }).then((value) => console.log(value)).catch((err) => console.log(err))
-        console.log(users);
+        })//.then((value) => console.log(value)).catch((err) => console.log(err))
         console.log(users);
 
-        if (users === undefined) {
-            await user.save().catch((err) => console.log(err));
+        if (users === undefined || users.length == 0) {
+            await user.save();
             return res.status(200).json({
                 error: null,
                 errorCode: "0",

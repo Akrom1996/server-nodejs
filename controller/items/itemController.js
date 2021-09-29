@@ -10,7 +10,25 @@ const mongoose = require("mongoose")
 require('dotenv').config();
 const Multer = require("multer");
 const User = require("../../module/User");
+const {
+    query
+} = require("express");
 
+
+function deleteProfileOrItemImage(images) {
+    return new Promise((resolve, reject) => {
+        minioClient.removeObjects('p2p-market', images, function (err, data) {
+            if (err) {
+                console.log(err)
+                reject(err)
+            } else {
+                console.log("Successfully deleted p2p-market/myKey");
+                resolve(data)
+            }
+        });
+
+    });
+}
 
 exports.getItemInfo = async (req, res) => {
     const {
@@ -131,6 +149,7 @@ exports.updatePosition = async (req, res) => {
     const {
         itemId
     } = req.params;
+    console.log(req.body);
     try {
         await itemModel.findByIdAndUpdate(itemId, req.body, (err, results) => {
             if (err) {
@@ -146,6 +165,7 @@ exports.updatePosition = async (req, res) => {
                     message: "Ushbu jihoz tarmoqda mavjud emas"
                 })
             }
+            console.log(results);
             return res.status(200).json({
                 error: null,
                 errorCode: "0",
@@ -299,7 +319,7 @@ exports.uploadItemImages = async (req, res) => {
     }).then((user) => {
         console.log("user", user);
         user.items.push(item);
-        item.user=user;
+        item.user = user;
         item.save();
         return user.save();
     }).then((data) => {
@@ -370,6 +390,62 @@ exports.favouriteItems = async (req, res) => {
     });
 
 
+}
+
+exports.deleteItemById = async (req, res) => {
+    console.log(req.params.itemId);
+    const {
+        itemId
+    } = req.params;
+    console.log(itemId);
+    
+    var results1 = await User.updateMany({},
+        {
+            $pull: {
+                likedItems: {
+                    $in: itemId
+                }
+            }
+        }, 
+        {
+            multi: true,
+        })
+    console.log(results1);
+    var results = await User.find({
+        likedItems: {
+            $not: {
+                $elemMatch: {
+                    $in: [...itemId]
+                }
+            }
+        }
+    })
+    console.log(results.map(item => item.likedItems));
+    // .then((data) => console.log("user likes", data))
+    // .catch((error) => console.log(error));
+    res.end();
+    // itemModel.findByIdAndDelete({
+    //     _id: req.params.itemId
+    // }).then((data) => {
+    //     if (data.images.length > 0) {
+    //         deleteProfileOrItemImage(data.images)
+    //     }
+    //     User.find({
+    //         likedItems: {
+    //             $in: {
+    //                 itemId
+    //             }
+    //         }
+    //     })
+    //     .then((data) => console.log("user likes", data))
+    //     .catch((error) => console.log(error));
+    // }).catch((err) => {
+    //     return res.status(400).json({
+    //         error: err.message,
+    //         errorCode: "1",
+    //         message: "BAD_REQUEST"
+    //     });
+    // })
 }
 
 // exports.postItem = async (req, res) => {
