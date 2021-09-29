@@ -393,24 +393,22 @@ exports.favouriteItems = async (req, res) => {
 }
 
 exports.deleteItemById = async (req, res) => {
-    console.log(req.params.itemId);
     const {
         itemId
     } = req.params;
     console.log(itemId);
     
-    var results1 = await User.updateMany({},
+    await User.updateMany({},
         {
             $pull: {
                 likedItems: {
-                    $in: itemId
+                    $in: [...itemId]
                 }
             }
         }, 
         {
             multi: true,
-        })
-    console.log(results1);
+        }).then((data)=>console.log(data))
     var results = await User.find({
         likedItems: {
             $not: {
