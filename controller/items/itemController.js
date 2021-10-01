@@ -214,7 +214,7 @@ exports.incDecLikes = async (req, res) => {
                 }
             })
         ]).then((results) => {
-
+            console.log(results);
             return res.status(200).json({
                 error: null,
                 errorCode: "0",
@@ -397,53 +397,54 @@ exports.deleteItemById = async (req, res) => {
         itemId
     } = req.params;
     console.log(itemId);
-    
-    await User.updateMany({},
-        {
-            $pull: {
-                likedItems: {
-                    $in: [...itemId]
-                }
-            }
-        }, 
-        {
-            multi: true,
-        }).then((data)=>console.log(data))
-    var results = await User.find({
-        likedItems: {
-            $not: {
-                $elemMatch: {
-                    $in: [...itemId]
-                }
-            }
-        }
-    })
-    console.log(results.map(item => item.likedItems));
-    // .then((data) => console.log("user likes", data))
-    // .catch((error) => console.log(error));
-    res.end();
-    // itemModel.findByIdAndDelete({
-    //     _id: req.params.itemId
-    // }).then((data) => {
-    //     if (data.images.length > 0) {
-    //         deleteProfileOrItemImage(data.images)
-    //     }
-    //     User.find({
-    //         likedItems: {
-    //             $in: {
-    //                 itemId
+
+
+
+    // var results = await User.find({
+    //     likedItems: {
+    //         $not: {
+    //             $elemMatch: {
+    //                 $in: [...itemId]
     //             }
     //         }
-    //     })
-    //     .then((data) => console.log("user likes", data))
-    //     .catch((error) => console.log(error));
-    // }).catch((err) => {
-    //     return res.status(400).json({
-    //         error: err.message,
-    //         errorCode: "1",
-    //         message: "BAD_REQUEST"
-    //     });
+    //     }
     // })
+    // console.log(results.map(item => item.likedItems));
+    // .then((data) => console.log("user likes", data))
+    // .catch((error) => console.log(error));
+    // res.end();
+    itemModel.findByIdAndDelete({
+        _id: req.params.itemId
+    }).then((data) => {
+        if (data.images.length > 0) {
+            deleteProfileOrItemImage(data.images)
+        }
+        User.updateMany({}, {
+                $pull: {
+                    likedItems: itemId,
+                    items: itemId,
+                    boughts: itemId
+                }
+            }, {
+                multi: true,
+            })
+            .then((data) => {
+                console.log("user likes", data);
+                return res.status(200).json({
+                    error: null,
+                    errorCode: "0",
+                    message: "SUCCESS",
+                    data: data,
+                }); 
+            })
+            .catch((error) => console.log(error));
+    }).catch((err) => {
+        return res.status(400).json({
+            error: err.message,
+            errorCode: "1",
+            message: "BAD_REQUEST"
+        });
+    })
 }
 
 // exports.postItem = async (req, res) => {

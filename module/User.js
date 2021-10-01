@@ -33,15 +33,15 @@ const UserSchema = new mongoose.Schema({
     type: Array,
     default: 36.6
   },
-  likedItems: [{
+  likedItems: {
     type: Array,
-  }],
-  boughts: [{
+  },
+  boughts: {
     type: Array,
-  }],
-  chats: [{
+  },
+  chats: {
     type: Array,
-  }],
+  },
   items: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "items"

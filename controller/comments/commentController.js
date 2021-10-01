@@ -38,9 +38,10 @@ exports.postComment = async (req, res) => {
 
     // SAVE INSTANCE OF Comment MODEL TO DB
 
-    comment.save().then(() => Item.findById(req.params.itemId))
+    comment.save()
+    .then(() => Item.findById(req.params.itemId))
         .then((item) => {
-            item.comments.unshift(comment);
+            item.comments.push(comment);
             return item.save();
         }).then((data) => {
             console.log(data)

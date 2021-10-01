@@ -14,10 +14,7 @@ const CommentSchema = mongoose.Schema({
         type: String,
         default: null,
     },
-    postedTime: {
-        type: Date,
-        required: true,
-    },
+   
 
     content: {
         type: String,
@@ -25,7 +22,7 @@ const CommentSchema = mongoose.Schema({
     },
 
     thumb: {
-        type: Number,
+        type: Array,
         default: 0
     }
 
