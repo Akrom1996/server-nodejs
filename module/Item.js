@@ -57,10 +57,13 @@ const ItemSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "users"
   },
-  comments: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "comments"
-  }],
+  comments: {
+    type:Array
+  },
+  // [{
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: "comments"
+  // }],
 }, {
   timestamps: true
 });

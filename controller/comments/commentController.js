@@ -13,7 +13,7 @@ exports.getComments = async (req, res) => {
     Item
         .findById(req.params.itemId).lean().populate('comments')
         .then((data) => {
-            console.log(data)
+            // console.log(data)
             return res.status(200).json({
                 error: null,
                 errorCode: "0",
