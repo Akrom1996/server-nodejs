@@ -76,8 +76,32 @@ io.on("connection", (socket) => {
         }
     });
 
+    socket.on("chat join", async (data) => {
+        console.log("chat join ", data.roomId);
+        try {
+            let result = await chatCollection.findOne({
+                "_id": data.roomId
+            });
+            if (!result) {
+                await chatCollection.insertOne({
+                    "_id": data.roomId,
+                    "itemId": data.itemId,
+                    "ownerId": data.ownerId,
+                    "userId": data.userId,
+                    "messages": [],
+                });
+            }
+            socket.join(data.roomId);
+            console.log("emitting join");
+            socket.emit("chat joined", data.roomId);
+            socket.activeRoom = data.roomId;
+        } catch (e) {
+            console.error(e);
+        }
+    });
+
     socket.on("message", async (message) => {
-        message.id = v4()
+        message.id = new ObjectId()
         console.log(message);
         itemCollection.updateOne({
             "_id": ObjectId(socket.activeRoom)
@@ -95,6 +119,26 @@ io.on("connection", (socket) => {
             }
         });
         io.to(socket.activeRoom).emit("message", message);
+    });
+    socket.on("chat message", async (message) => {
+        message.id = new ObjectId()
+        console.log(message);
+        // chatCollection.updateOne({
+        //     "_id": ObjectId(socket.activeRoom)
+        // }, {
+        //     "$push": {
+        //         "comments": message.id
+        //     }
+        // })
+        //.then((data)=>console.log(data));
+        chatCollection.updateOne({
+            "_id": socket.activeRoom
+        }, {
+            "$push": {
+                "messages": message
+            }
+        });
+        io.to(socket.activeRoom).emit("chat message", message);
     });
 
     socket.on("get comments", async (data) => {
@@ -115,6 +159,7 @@ server.listen(process.env.PORT || 5000, async () => {
         const db = client.db("myKarrot");
         collection = db.collection("comments1");
         itemCollection = db.collection("items");
+        chatCollection = db.collection("chats");
         console.log("Listening on port :%s...", server.address().port);
     } catch (e) {
         console.error(e);

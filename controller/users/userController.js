@@ -99,7 +99,7 @@ exports.deleteUser = async (req, res) => {
         }),
         itemData.length != 0 ? await deleteProfileOrItemImage(itemImages) : null,
 
-        await deleteProfileOrItemImage([req.body.image]),
+        // await deleteProfileOrItemImage([req.body.image]),
 
 
     ]).then((results) => {
