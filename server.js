@@ -33,6 +33,7 @@ const io = require("socket.io")(server)
 const userRouter = require("./controller/users/userRouter");
 const itemRouter = require("./controller/items/itemRouter.js");
 const commentsRouter = require("./controller/comments/commentRouter.js");
+const chatsRouter = require("./controller/chats/chatsRouter.js");
 const {
     WebSocketServer
 } = require("ws");
@@ -44,6 +45,8 @@ app.use("/item", itemRouter);
 
 // adding comments router
 app.use("/comments", commentsRouter);
+
+app.use("/chats", chatsRouter);
 
 
 // 404 Error message
@@ -88,6 +91,8 @@ io.on("connection", (socket) => {
                     "itemId": data.itemId,
                     "ownerId": data.ownerId,
                     "userId": data.userId,
+                    "image": data.image,
+                    "userName": data.userName.trim(),
                     "messages": [],
                 });
             }
@@ -122,16 +127,23 @@ io.on("connection", (socket) => {
     });
     socket.on("chat message", async (message) => {
         message.id = new ObjectId()
-        console.log(message);
-        // chatCollection.updateOne({
-        //     "_id": ObjectId(socket.activeRoom)
-        // }, {
-        //     "$push": {
-        //         "comments": message.id
-        //     }
-        // })
-        //.then((data)=>console.log(data));
-        chatCollection.updateOne({
+        console.log(message.from, " ", message.to);
+        await userCollection.updateOne({
+            "_id": ObjectId(message.from)
+        }, {
+            "$addToSet": {
+                "chats": socket.activeRoom
+            }
+        })
+        await userCollection.updateOne({
+            "_id": ObjectId(message.to)
+        }, {
+            "$addToSet": {
+                "chats": socket.activeRoom
+            }
+        })
+
+        await chatCollection.updateOne({
             "_id": socket.activeRoom
         }, {
             "$push": {
@@ -140,6 +152,17 @@ io.on("connection", (socket) => {
         });
         io.to(socket.activeRoom).emit("chat message", message);
     });
+
+    socket.on("get chats", async (data) => {
+        console.log(socket.id, " ", socket.activeRoom || data); //socket.activeRoom is replaced with data
+        chatCollection.findOne({
+            "_id": socket.activeRoom || data
+        }).then((chats) => {
+            // console.log("chats ",chats);
+            io.to(socket.id).emit("message chats", chats.messages);
+        })
+
+    })
 
     socket.on("get comments", async (data) => {
         console.log(socket.id, " ", socket.activeRoom || data); //socket.activeRoom is replaced with data
@@ -157,9 +180,10 @@ server.listen(process.env.PORT || 5000, async () => {
     try {
         await client.connect();
         const db = client.db("myKarrot");
-        collection = db.collection("comments1");
+        collection = db.collection("comments");
         itemCollection = db.collection("items");
         chatCollection = db.collection("chats");
+        userCollection = db.collection("users");
         console.log("Listening on port :%s...", server.address().port);
     } catch (e) {
         console.error(e);

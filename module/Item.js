@@ -34,8 +34,8 @@ const ItemSchema = new mongoose.Schema({
     default: null,
   },
   chats: {
-    type: Number,
-    default: 0,
+    type: Array,
+    default: null,
   },
   isDeleted: {
     type: Boolean,
