@@ -80,7 +80,8 @@ io.on("connection", (socket) => {
     });
 
     socket.on("chat join", async (data) => {
-        console.log("chat join ", data.roomId);
+        console.log("chat join ", data);
+        console.log("active room ", socket.activeRoom,data.roomId);
         try {
             let result = await chatCollection.findOne({
                 "_id": data.roomId
@@ -90,11 +91,42 @@ io.on("connection", (socket) => {
                     "_id": data.roomId,
                     "itemId": data.itemId,
                     "ownerId": data.ownerId,
-                    "userId": data.userId,
-                    "image": data.image,
-                    "userName": data.userName.trim(),
+                    "user1": {
+                        "id": data.ownerId,
+                        "username": data.userName1.trim(),
+                        "image": data.ownerImage,
+                    },
+                    "user2": {
+                        "id": data.userId,
+                        "username": data.userName2.trim(),
+                        "image": data.userImage,
+                    },                    
                     "messages": [],
                 });
+                await itemCollection.updateOne({
+                    "_id": ObjectId(data.itemId)
+                }, {
+                    "$addToSet": {
+                        "chats": data.roomId
+                    }
+                })
+                // for user 1
+                await userCollection.updateOne({
+                    "_id": ObjectId(data.ownerId)
+                }, {
+                    "$addToSet": {
+                        "chats": data.roomId
+                    }
+                })
+                //for user 2
+                await userCollection.updateOne({
+                    "_id": ObjectId(data.userId)
+                }, {
+                    "$addToSet": {
+                        "chats": data.roomId
+                    }
+                })
+                
             }
             socket.join(data.roomId);
             console.log("emitting join");
@@ -125,23 +157,9 @@ io.on("connection", (socket) => {
         });
         io.to(socket.activeRoom).emit("message", message);
     });
-    socket.on("chat message", async (message) => {
+    socket.on("chat message", async (message, itemId) => {
+        console.log(message, " ", itemId);
         message.id = new ObjectId()
-        console.log(message.from, " ", message.to);
-        await userCollection.updateOne({
-            "_id": ObjectId(message.from)
-        }, {
-            "$addToSet": {
-                "chats": socket.activeRoom
-            }
-        })
-        await userCollection.updateOne({
-            "_id": ObjectId(message.to)
-        }, {
-            "$addToSet": {
-                "chats": socket.activeRoom
-            }
-        })
 
         await chatCollection.updateOne({
             "_id": socket.activeRoom

@@ -38,7 +38,9 @@ exports.getChats = async (req, res) => {
 exports.getChatsOfUser = async (req, res) => {
     var results = [];
     let count = 0;
+    console.log(req.params.id);
     var user = await userModel.findById(req.params.id);
+    console.log("user ", user);
      await user.chats.forEach(async (i) => {
         var chat = await chatCollection.findOne({
             "_id": i
@@ -46,7 +48,6 @@ exports.getChatsOfUser = async (req, res) => {
          results.push(chat);
          count ++;
          if (count === user.chats.length) {
-            console.log(results);
             return res.status(200).json({
                 error: null,
                 errorCode: "0",
@@ -73,6 +74,4 @@ exports.getChatsOfUser = async (req, res) => {
     //         message: "BAD_REQUEST",
     //     });
     // });
-    console.log(result);
-    res.end();
 }
