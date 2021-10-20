@@ -22,7 +22,7 @@ function deleteProfileOrItemImage(images) {
                 console.log(err)
                 reject(err)
             } else {
-                console.log("Successfully deleted p2p-market/myKey");
+                console.log("Successfully deleted p2p-market/", images);
                 resolve(data)
             }
         });
@@ -288,6 +288,7 @@ exports.incDecLikes = async (req, res) => {
 exports.uploadItemImages = async (req, res) => {
     console.log(req.files);
     let file_name = [];
+    //first upload item images to minio
     if (req.files !== undefined)
         req.files.map((file) => {
             file_name.push("/images/item-images/" + uuid() + path.extname(file.originalname));
@@ -397,22 +398,6 @@ exports.deleteItemById = async (req, res) => {
         itemId
     } = req.params;
     console.log(itemId);
-
-
-
-    // var results = await User.find({
-    //     likedItems: {
-    //         $not: {
-    //             $elemMatch: {
-    //                 $in: [...itemId]
-    //             }
-    //         }
-    //     }
-    // })
-    // console.log(results.map(item => item.likedItems));
-    // .then((data) => console.log("user likes", data))
-    // .catch((error) => console.log(error));
-    // res.end();
     itemModel.findByIdAndDelete({
         _id: req.params.itemId
     }).then((data) => {

@@ -72,12 +72,16 @@ exports.registrate = async (req, res) => {
 }
 
 exports.deleteUser = async (req, res) => {
-    const {
-        id
+    let {
+        id,type
     } = req.params;
     console.log(id);
     console.log(req.body);
-
+    if(type === 1){
+        userModel.findOne({"phoneNumber": id})
+        .then((user)=>id = user._id)
+        .catch(err=>console.log(err));
+    }
     var itemData = await Item.find({
         "user": id
     });

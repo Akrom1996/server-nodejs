@@ -18,7 +18,7 @@ Multer({
     }
 }).single("upload"), registrate);
 // User delete
-router.delete('/deleteUser/:id',deleteUser);
+router.delete('/deleteUser/:id/:type',deleteUser);
 // Get user info
 router.get('/getUser/:phoneNumber',getUserInfo);
 //Get user by id

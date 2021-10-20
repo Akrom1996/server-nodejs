@@ -10,14 +10,14 @@ const client = new MongoClient("mongodb://localhost:27017/myKarrot");
 client.connect();
 const db = client.db("myKarrot");
 chatCollection = db.collection("chats");
-
+// ishlatilmaydi
 exports.getChats = async (req, res) => {
     console.log(req.params);
     chatCollection.findOne({
             "_id": req.params.id
         })
         .then((data) => {
-            // console.log(data)
+            console.log(data)
             return res.status(200).json({
                 error: null,
                 errorCode: "0",
@@ -41,21 +41,34 @@ exports.getChatsOfUser = async (req, res) => {
     console.log(req.params.id);
     var user = await userModel.findById(req.params.id);
     console.log("user ", user);
-     await user.chats.forEach(async (i) => {
-        var chat = await chatCollection.findOne({
-            "_id": i
+    if (user.chats.length > 0) {
+        await user.chats.forEach(async (i) => {
+            var chat = await chatCollection.findOne({
+                "_id": i
+            })
+            // delete chat.messages;
+            results.push(chat);
+            // console.log("chat: ", chat);
+            count++;
+            if (count === user.chats.length) {
+                return res.status(200).json({
+                    error: null,
+                    errorCode: "0",
+                    message: "SUCCESS",
+                    data: results
+                });
+            }
         })
-         results.push(chat);
-         count ++;
-         if (count === user.chats.length) {
-            return res.status(200).json({
-                error: null,
-                errorCode: "0",
-                message: "SUCCESS",
-                data: results
-            });
-        }
-    })
+    } else {
+        return res.status(200).json({
+            error: null,
+            errorCode: "0",
+            message: "SUCCESS",
+            data: []
+        });
+    }
+
+
     // .then((data) => {
     //     obj.push(data.chats.forEach((i) => chatCollection.findOne({
     //         "_id": i

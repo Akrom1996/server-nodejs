@@ -3,11 +3,11 @@ require('dotenv').config();
 const mongoose = require("mongoose")
 mongoose.set('useFindAndModify', false);
 
-// mongoose.set('useNewUrlParser', true);
-// mongoose.set('useFindAndModify', false);
-// mongoose.set('useUnifiedTopology', false);
-// mongoose.set('useCreateIndex', true); //useCreateIndex
-mongoose.connect('mongodb://localhost:27017/myKarrot',{useNewUrlParser: true},
+mongoose.connect('mongodb://localhost:27017/myKarrot', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true
+  },
   (err) => {
     if (err) {
       console.error('error connecting mongoose: ' + err.stack);
