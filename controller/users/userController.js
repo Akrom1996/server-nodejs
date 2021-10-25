@@ -41,7 +41,7 @@ exports.registrate = async (req, res) => {
                     message: "BAD_REQUEST"
                 })
             }
-        })//.then((value) => console.log(value)).catch((err) => console.log(err))
+        }) //.then((value) => console.log(value)).catch((err) => console.log(err))
         console.log(users);
 
         if (users === undefined || users.length == 0) {
@@ -54,7 +54,7 @@ exports.registrate = async (req, res) => {
         } else {
 
             console.log("here error");
-            return res.status(403).json({
+            return res.status(400).json({
                 error: "BAD_REQUEST",
                 errorCode: "1",
                 message: "Ushbu raqam ro'yxatdan o'tgan"
@@ -73,14 +73,17 @@ exports.registrate = async (req, res) => {
 
 exports.deleteUser = async (req, res) => {
     let {
-        id,type
+        id,
+        type
     } = req.params;
     console.log(id);
     console.log(req.body);
-    if(type === 1){
-        userModel.findOne({"phoneNumber": id})
-        .then((user)=>id = user._id)
-        .catch(err=>console.log(err));
+    if (type === 1) {
+        userModel.findOne({
+                "phoneNumber": id
+            })
+            .then((user) => id = user._id)
+            .catch(err => console.log(err));
     }
     var itemData = await Item.find({
         "user": id
@@ -235,7 +238,8 @@ exports.updateUserInfo = async (req, res) => {
         await userModel.findOneAndUpdate({
             "phoneNumber": phoneNumber
         }, req.body, {
-            upsert: true
+            upsert: true,
+            returnOriginal: false,
         }, (err, results) => {
             if (err) {
                 return res.status(400).json({
@@ -265,6 +269,30 @@ exports.updateUserInfo = async (req, res) => {
         })
 
     }
+}
+
+exports.updateToken = async (req, res) => {
+    const {
+        id,
+        fcmToken
+    } = req.params;
+    userModel.findByIdAndUpdate(id, {
+        fcmToken: fcmToken
+    }, {returnOriginal: false}).then((results) => {
+        console.log(results);
+        return res.status(200).json({
+            error: null,
+            errorCode: "0",
+            message: "SUCCESS",
+            data: results
+        });
+    }).catch((error) => {
+        return res.status(400).json({
+            error: error,
+            errorCode: "1",
+            message: "BAD_REQUEST"
+        })
+    })
 }
 var upload = Multer({
     storage: Multer.memoryStorage(),

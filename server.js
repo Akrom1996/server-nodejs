@@ -6,10 +6,16 @@ const {
     MongoClient,
     ObjectId
 } = require("mongodb");
-const client = new MongoClient("mongodb://localhost:27017/myKarrot", { useUnifiedTopology: true });
+const client = new MongoClient("mongodb://localhost:27017/myKarrot", {
+    useUnifiedTopology: true
+});
 const {
     v4
 } = require("uuid")
+
+const {
+    admin
+} = require('./controller/firebase/getToken')
 
 
 // if (cluster.isMaster) {
@@ -23,191 +29,212 @@ const {
 //         // cluster.fork()
 //     });
 // } else {
-    const app = express()
-    app.use(express.json());
+const app = express()
+app.use(express.json());
 
-    const server = require('http').createServer(app)
-    const io = require("socket.io")(server)
-
-
-    const userRouter = require("./controller/users/userRouter");
-    const itemRouter = require("./controller/items/itemRouter.js");
-    const commentsRouter = require("./controller/comments/commentRouter.js");
-    const chatsRouter = require("./controller/chats/chatsRouter.js");
-
-    // adding user router
-    app.use('/user', userRouter);
-
-    // adding item router
-    app.use("/item", itemRouter);
-
-    // adding comments router
-    app.use("/comments", commentsRouter);
-
-    app.use("/chats", chatsRouter);
+const server = require('http').createServer(app)
+const io = require("socket.io")(server)
 
 
-    // 404 Error message
-    app.all('*', (req, res) => {
-        res.status(401).json({
-            errorCode: "1",
-            errorMessage: "Xato URL"
-        });
-    })
+const userRouter = require("./controller/users/userRouter");
+const itemRouter = require("./controller/items/itemRouter.js");
+const commentsRouter = require("./controller/comments/commentRouter.js");
+const chatsRouter = require("./controller/chats/chatsRouter.js");
 
-    io.on("connection", (socket) => {
-        // join to comments
-        socket.on("join", async (roomId) => {
-            console.log("join ", roomId);
-            try {
-                let result = await collection.findOne({
-                    "_id": roomId
-                });
-                if (!result) {
-                    await collection.insertOne({
-                        "_id": roomId,
-                        messages: []
-                    });
-                }
-                socket.join(roomId);
-                socket.emit("joined", roomId);
-                socket.activeRoom = roomId;
-            } catch (e) {
-                console.error(e);
-            }
-        });
+// adding user router
+app.use('/user', userRouter);
 
-        // join to private chats
-        socket.on("chat join", async (data) => {
-            console.log("active room ", socket.activeRoom, data.roomId);
-            try {
-                let result = await chatCollection.findOne({
-                    "_id": data.roomId
-                });
-                if (!result) {
-                    await chatCollection.insertOne({
-                        "_id": data.roomId,
-                        "itemId": data.itemId,
-                        "ownerId": data.ownerId,
-                        "user1": {
-                            "id": data.ownerId,
-                            "username": data.userName1.trim(),
-                            "image": data.ownerImage,
-                        },
-                        "user2": {
-                            "id": data.userId,
-                            "username": data.userName2.trim(),
-                            "image": data.userImage,
-                        },
-                        "messages": [],
-                    });
-                    await itemCollection.updateOne({
-                        "_id": ObjectId(data.itemId)
-                    }, {
-                        "$addToSet": {
-                            "chats": data.roomId
-                        }
-                    })
-                    // for user 1
-                    await userCollection.updateOne({
-                        "_id": ObjectId(data.ownerId)
-                    }, {
-                        "$addToSet": {
-                            "chats": data.roomId
-                        }
-                    })
-                    //for user 2
-                    await userCollection.updateOne({
-                        "_id": ObjectId(data.userId)
-                    }, {
-                        "$addToSet": {
-                            "chats": data.roomId
-                        }
-                    })
+// adding item router
+app.use("/item", itemRouter);
 
-                }
-                socket.join(data.roomId);
-                console.log("emitting join");
-                socket.emit("chat joined", data.roomId);
-                socket.activeRoom = data.roomId;
-            } catch (e) {
-                console.error(e);
-            }
-        });
+// adding comments router
+app.use("/comments", commentsRouter);
 
-        // create and get messages from comments
-        socket.on("message", async (message) => {
-            message.id = new ObjectId()
-            console.log(message);
-            itemCollection.updateOne({
-                "_id": ObjectId(socket.activeRoom)
-            }, {
-                "$push": {
-                    "comments": message.id
-                }
-            })
-            //.then((data)=>console.log(data));
-            collection.updateOne({
-                "_id": socket.activeRoom
-            }, {
-                "$push": {
-                    "messages": message
-                }
-            });
-            io.to(socket.activeRoom).emit("message", message);
-        });
+app.use("/chats", chatsRouter);
 
-        // create and get private chat messages
-        socket.on("chat message", async (message, itemId) => {
-            console.log(message, " ", itemId);
-            message.id = new ObjectId()
 
-            await chatCollection.updateOne({
-                "_id": socket.activeRoom
-            }, {
-                "$push": {
-                    "messages": message
-                }
-            });
-            io.to(socket.activeRoom).emit("chat message", message);
-        });
-
-        // get messages from private chats
-        socket.on("get chats", async (data) => {
-            console.log(socket.id, " ", socket.activeRoom || data); //socket.activeRoom is replaced with data
-            chatCollection.findOne({
-                "_id": socket.activeRoom || data
-            }).then((chats) => {
-                // console.log("chats ",chats);
-                io.to(socket.id).emit("message chats", chats.messages);
-            })
-
-        })
-
-        // get messages from comments
-        socket.on("get comments", async (data) => {
-            console.log(socket.id, " ", socket.activeRoom || data); //socket.activeRoom is replaced with data
-            collection.findOne({
-                "_id": socket.activeRoom || data
-            }).then((comments) => {
-                io.to(socket.id).emit("message comments", comments.messages);
-            })
-
-        })
-
+// 404 Error message
+app.all('*', (req, res) => {
+    res.status(401).json({
+        errorCode: "1",
+        errorMessage: "Xato URL"
     });
-    server.listen(process.env.PORT || 5000, async () => {
-        console.log(`${process.pid} Server is listening on port ${process.env.PORT}`);
+})
+
+io.on("connection", (socket) => {
+    // join to comments
+    socket.on("join", async (roomId) => {
+        console.log("join ", roomId);
         try {
-            await client.connect();
-            const db = client.db("myKarrot");
-            collection = db.collection("comments");
-            itemCollection = db.collection("items");
-            chatCollection = db.collection("chats");
-            userCollection = db.collection("users");
-            console.log("Listening on port :%s...", server.address().port);
+            let result = await collection.findOne({
+                "_id": roomId
+            });
+            if (!result) {
+                await collection.insertOne({
+                    "_id": roomId,
+                    messages: []
+                });
+            }
+            socket.join(roomId);
+            socket.emit("joined", roomId);
+            socket.activeRoom = roomId;
         } catch (e) {
             console.error(e);
         }
     });
+
+    // join to private chats
+    socket.on("chat join", async (data) => {
+        console.log("active room ", socket.activeRoom, data.roomId);
+        try {
+            let result = await chatCollection.findOne({
+                "_id": data.roomId
+            });
+            if (!result) {
+                await chatCollection.insertOne({
+                    "_id": data.roomId,
+                    "itemId": data.itemId,
+                    "ownerId": data.ownerId,
+                    "user1": {
+                        "id": data.ownerId,
+                        "username": data.userName1.trim(),
+                        "image": data.ownerImage,
+                        "fcm":data.ownerFCM,
+                    },
+                    "user2": {
+                        "id": data.userId,
+                        "username": data.userName2.trim(),
+                        "image": data.userImage,
+                        "fcm":data.userFCM,
+                    },
+                    "messages": [],
+                });
+
+
+            }
+            socket.join(data.roomId);
+            console.log("emitting join");
+            socket.emit("chat joined", data.roomId);
+            socket.activeRoom = data.roomId;
+        } catch (e) {
+            console.error(e);
+        }
+    });
+
+    // create and get messages from comments
+    socket.on("message", async (message) => {
+        message.id = new ObjectId()
+        console.log(message);
+        itemCollection.updateOne({
+            "_id": ObjectId(socket.activeRoom)
+        }, {
+            "$push": {
+                "comments": message.id
+            }
+        })
+        //.then((data)=>console.log(data));
+        collection.updateOne({
+            "_id": socket.activeRoom
+        }, {
+            "$push": {
+                "messages": message
+            }
+        });
+        io.to(socket.activeRoom).emit("message", message);
+    });
+
+    // create and get private chat messages
+    socket.on("chat message", async (message, itemId,fcmToken) => {
+        console.log(message, " ", itemId);
+        message.id = new ObjectId()
+
+        await chatCollection.updateOne({
+            "_id": socket.activeRoom
+        }, {
+            "$push": {
+                "messages": message
+            }
+        });
+        await itemCollection.updateOne({
+            "_id": ObjectId(itemId)
+        }, {
+            "$addToSet": {
+                "chats": socket.activeRoom
+            }
+        })
+        // for user 1
+        await userCollection.updateOne({
+            "_id": ObjectId(message.from)
+        }, {
+            "$addToSet": {
+                "chats": socket.activeRoom
+            }
+        })
+        //for user 2
+        await userCollection.updateOne({
+            "_id": ObjectId(message.to)
+        }, {
+            "$addToSet": {
+                "chats": socket.activeRoom
+            }
+        })
+        // firebase cloud messaging here
+        const options = {
+            priority: "high",
+            timeToLive: 60 * 60 * 24
+        };
+        const  fcm = {
+            notification: {
+                title: message.to,
+                body: message.content,
+                imageUrl: `http://localhost:9000/p2p-market/images/item-images/9bf98691-8225-4e3c-93f0-75b61d9ebbc1.jpg`
+            },
+            data: {
+                type: "type",
+            }
+        };
+        console.log("sending to ", fcmToken);
+        admin.messaging().sendToDevice(fcmToken, fcm, options ).then(data => console.log(data)).catch(err => console.log(err));
+
+        io.to(socket.activeRoom).emit("chat message", message);
+    });
+
+    // get messages from private chats
+    socket.on("get chats", async (data) => {
+        console.log(socket.id, " ", socket.activeRoom || data); //socket.activeRoom is replaced with data
+        chatCollection.findOne({
+            "_id": socket.activeRoom || data
+        }).then((chats) => {
+            // console.log("chats ",chats);
+            io.to(socket.id).emit("message chats", chats.messages);
+        })
+
+    })
+
+    // get messages from comments
+    socket.on("get comments", async (data) => {
+        console.log(socket.id, " ", socket.activeRoom || data); //socket.activeRoom is replaced with data
+        collection.findOne({
+            "_id": socket.activeRoom || data
+        }).then((comments) => {
+            io.to(socket.id).emit("message comments", comments.messages);
+        })
+
+    })
+
+});
+server.listen(process.env.PORT || 5000, async () => {
+    console.log(`${process.pid} Server is listening on port ${process.env.PORT}`);
+    try {
+        await client.connect();
+        const db = client.db("myKarrot");
+        collection = db.collection("comments");
+        itemCollection = db.collection("items");
+        chatCollection = db.collection("chats");
+        userCollection = db.collection("users");
+        console.log("Listening on port :%s...", server.address().port);
+    } catch (e) {
+        console.error(e);
+    }
+});
 // }

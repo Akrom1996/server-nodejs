@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const path = require("path")
-const {saveEmail, registrate, getUserInfo, deleteUser, uploadProfileImage, uploadItemImages,updateUserInfo,getUserById} = require("./userController")
+const {saveEmail, registrate, getUserInfo, deleteUser, uploadProfileImage, uploadItemImages,updateUserInfo,updateToken,getUserById} = require("./userController")
 const Multer = require("multer");
 
 // Saving User Email  
@@ -25,6 +25,8 @@ router.get('/getUser/:phoneNumber',getUserInfo);
 router.get('/getUserById/:userId',getUserById);
 // Update user info
 router.put("/update-user-info/:phoneNumber",updateUserInfo);
+//update user fcm token
+router.put("/update-user-fcm/:id/:fcmToken",updateToken);
 // Upload user image
 router.post('/upload-profile-image/:phoneNumber', uploadProfileImage);
 // Upload item images

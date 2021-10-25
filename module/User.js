@@ -39,6 +39,9 @@ const UserSchema = new mongoose.Schema({
   boughts: {
     type: Array,
   },
+  fcmToken: {
+    type: String
+  },
   chats: {
     type: Array,
   },
