@@ -61,6 +61,8 @@ app.all('*', (req, res) => {
     });
 })
 
+let onlineUsers = new Set();
+
 io.on("connection", (socket) => {
     // join to comments
     socket.on("join", async (roomId) => {
@@ -85,7 +87,6 @@ io.on("connection", (socket) => {
 
     // join to private chats
     socket.on("chat join", async (data) => {
-        console.log("active room ", socket.activeRoom, data.roomId);
         try {
             let result = await chatCollection.findOne({
                 "_id": data.roomId
@@ -99,27 +100,34 @@ io.on("connection", (socket) => {
                         "id": data.ownerId,
                         "username": data.userName1.trim(),
                         "image": data.ownerImage,
-                        "fcm":data.ownerFCM,
+                        "fcm": data.ownerFCM,
                     },
                     "user2": {
                         "id": data.userId,
                         "username": data.userName2.trim(),
                         "image": data.userImage,
-                        "fcm":data.userFCM,
+                        "fcm": data.userFCM,
                     },
                     "messages": [],
                 });
 
 
             }
+            // set online
+            onlineUsers.add(data.userId);
             socket.join(data.roomId);
-            console.log("emitting join");
+            console.log("Online users", onlineUsers);
+            socket.to(data.roomId).emit("user online", onlineUsers.has(data.ownerId))
             socket.emit("chat joined", data.roomId);
             socket.activeRoom = data.roomId;
         } catch (e) {
             console.error(e);
         }
     });
+
+    socket.on("set online", (id) => {
+        onlineUsers.add(id)
+    })
 
     // create and get messages from comments
     socket.on("message", async (message) => {
@@ -144,7 +152,7 @@ io.on("connection", (socket) => {
     });
 
     // create and get private chat messages
-    socket.on("chat message", async (message, itemId,fcmToken) => {
+    socket.on("chat message", async (message, itemId, fcmToken) => {
         console.log(message, " ", itemId);
         message.id = new ObjectId()
 
@@ -183,20 +191,22 @@ io.on("connection", (socket) => {
             priority: "high",
             timeToLive: 60 * 60 * 24
         };
-        const  fcm = {
+        const fcm = {
             notification: {
-                title: message.to,
+                title: message.toUserName,
                 body: message.content,
                 imageUrl: `http://localhost:9000/p2p-market/images/item-images/9bf98691-8225-4e3c-93f0-75b61d9ebbc1.jpg`
             },
             data: {
-                type: "type",
-            }
-        };
-        console.log("sending to ", fcmToken);
-        admin.messaging().sendToDevice(fcmToken, fcm, options ).then(data => console.log(data)).catch(err => console.log(err));
+                type: "/message_screen",
+            },
 
-        io.to(socket.activeRoom).emit("chat message", message);
+        };
+        console.log("sending to ", fcmToken); 
+               io.to(socket.activeRoom).emit("chat message", message);
+       ! onlineUsers.has(message.to) ?
+        admin.messaging().sendToDevice(fcmToken, fcm, options).then(data => console.log(data)).catch(err => console.log(err)):null;
+
     });
 
     // get messages from private chats
@@ -220,6 +230,15 @@ io.on("connection", (socket) => {
             io.to(socket.id).emit("message comments", comments.messages);
         })
 
+    })
+
+    socket.on("dis join", (data) => {
+        const isExists = onlineUsers.has(data.id);
+        console.log("deleting socket", data.id);
+        onlineUsers.delete(data.id);
+        console.log(onlineUsers);
+        console.log("roomid ", data.roomId);
+        socket.to(data.roomId).emit("user online", isExists)
     })
 
 });

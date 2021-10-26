@@ -45,12 +45,17 @@ exports.registrate = async (req, res) => {
         console.log(users);
 
         if (users === undefined || users.length == 0) {
-            await user.save();
-            return res.status(200).json({
+             user.save().then((result)=> res.status(200).json({
                 error: null,
                 errorCode: "0",
-                message: "SUCCESS"
-            });
+                message: "SUCCESS",
+                data: result,
+            })).catch((error)=>res.status(400).json({
+                error: error,
+                errorCode: "2",
+                message: "BAD_REQUEST"
+            }))
+            
         } else {
 
             console.log("here error");
