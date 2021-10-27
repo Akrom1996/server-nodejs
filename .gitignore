@@ -1,4 +1,4 @@
 .env
 node_modules
-m_token.json
-access.log
+*.json
+*.log
