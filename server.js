@@ -17,6 +17,10 @@ const {
     admin
 } = require('./controller/firebase/getToken')
 
+const path = require("path")
+const morgan = require("morgan")
+const fs = require("fs")
+const accessLogStream = fs.createWriteStream(path.join(__dirname, "access.log"),{flags: 'a'})
 
 // if (cluster.isMaster) {
 
@@ -30,7 +34,8 @@ const {
 //     });
 // } else {
 const app = express()
-app.use(express.json());
+app.use(express.json())
+app.use(morgan('dev', /*{stream: accessLogStream}*/))
 
 const server = require('http').createServer(app)
 const io = require("socket.io")(server)
@@ -202,10 +207,11 @@ io.on("connection", (socket) => {
             },
 
         };
-        console.log("sending to ", fcmToken); 
-               io.to(socket.activeRoom).emit("chat message", message);
-       ! onlineUsers.has(message.to) ?
-        admin.messaging().sendToDevice(fcmToken, fcm, options).then(data => console.log(data)).catch(err => console.log(err)):null;
+        console.log("sending to ", fcmToken);
+        io.to(socket.activeRoom).emit("chat message", message);
+        //if fcm token user is not online send message notification
+        !onlineUsers.has(message.to) ?
+            admin.messaging().sendToDevice(fcmToken, fcm, options).then(data => console.log(data)).catch(err => console.log(err)) : null;
 
     });
 
