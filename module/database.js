@@ -2,6 +2,9 @@ const mysql = require('mysql');
 require('dotenv').config();
 const mongoose = require("mongoose")
 mongoose.set('useFindAndModify', false);
+const {
+  MongoClient,
+} = require("mongodb");
 
 mongoose.connect('mongodb://localhost:27017/myKarrot', {
     useNewUrlParser: true,
@@ -16,7 +19,15 @@ mongoose.connect('mongodb://localhost:27017/myKarrot', {
     console.log("Connected to mongoose")
   }
 );
-
+const client = new MongoClient("mongodb://localhost:27017/myKarrot", {
+    useUnifiedTopology: true
+});
+client.connect();
+db = client.db("myKarrot");
+const collection = db.collection("comments");
+const itemCollection = db.collection("items");
+const chatCollection = db.collection("chats");
+const userCollection = db.collection("users");
 // const connection = mysql.createConnection({
 //   host: process.env.DB_HOSTNAME,
 //   user: process.env.DB_USER,
@@ -35,5 +46,6 @@ mongoose.connect('mongodb://localhost:27017/myKarrot', {
 
 module.exports = {
   // connection,
-  mongoose
+  mongoose,
+  collection,itemCollection,userCollection,chatCollection,db
 };

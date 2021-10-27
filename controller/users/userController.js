@@ -11,6 +11,7 @@ require('dotenv').config();
 const Multer = require("multer");
 const Item = require("../../module/Item");
 
+
 function deleteProfileOrItemImage(images) {
     return new Promise((resolve, reject) => {
         minioClient.removeObjects('p2p-market', images, function (err, data) {
@@ -45,17 +46,17 @@ exports.registrate = async (req, res) => {
         console.log(users);
 
         if (users === undefined || users.length == 0) {
-             user.save().then((result)=> res.status(200).json({
+            user.save().then((result) => res.status(200).json({
                 error: null,
                 errorCode: "0",
                 message: "SUCCESS",
                 data: result,
-            })).catch((error)=>res.status(400).json({
+            })).catch((error) => res.status(400).json({
                 error: error,
                 errorCode: "2",
                 message: "BAD_REQUEST"
             }))
-            
+
         } else {
 
             console.log("here error");
@@ -283,7 +284,9 @@ exports.updateToken = async (req, res) => {
     } = req.params;
     userModel.findByIdAndUpdate(id, {
         fcmToken: fcmToken
-    }, {returnOriginal: false}).then((results) => {
+    }, {
+        returnOriginal: false
+    }).then((results) => {
         console.log(results);
         return res.status(200).json({
             error: null,
@@ -400,81 +403,41 @@ exports.uploadProfileImage = async (req, res) => {
 
 }
 
+exports.getStats = async (req, res) => {
+    userModel.aggregate([{
+            $match: {}
+        },
+        {
+            $group: {
+                _id: {
+                    $dateToString: {
+                        format: "%Y-%m-%d",
+                        date: "$createdAt"
+                    }
+                },
+                count: {
+                    $sum: 1
+                }
+            }
+        },
+        {
+            $sort: {
+                _id: 1
+            }
+        }
 
-
-// let SQL = "INSERT INTO users VALUES(NULL, ?,NOW())";
-// try {
-//     connection.query("SELECT * FROM users WHERE phone_number = ?",[phoneNumber], (err,results)=>{
-//         if(err){
-//             return res.status(400).json({error:err.message,errorCode:"1",message:"BAD_REQUEST"})
-//         }
-//         else if(results.length>0){
-//             return res.status(409).json({error:null,errorCode:"1",message:"Ushbu raqam ro'yxatdan o'tgan"})
-
-//         }else{
-//             connection.query(SQL,[[userName,phoneNumber,address,image]],(err, results)=>{
-//             if(err){
-//                 return res.status(400).json({error:err.message,errorCode:"1",message:"BAD_REQUEST"})
-//             }
-//             return res.status(200).json({error:null,errorCode:"0",message:"SUCCESS"})
-//         })
-//         }
-//     })
-
-// } catch (error) {
-//     return res.status(400).json({error:error,errorCode:"1",message:"BAD_REQUEST"})
-// }
-
-
-// let SQL = "DELETE FROM users WHERE phone_number=? LIMIT 1"
-
-// connection.query(SQL,[phoneNumber],(err,results)=>{
-//     if(err){
-//         return res.status(400).json({error:err.message,errorCode:"1",message:"BAD_REQUEST"})
-//     }
-//     return res.status(200).json({error:null,errorCode:"0",message:"SUCCESS"})
-
-// })
-
-// connection.query(SQL, [phoneNumber], (err, results) => {
-//     if (err) {
-//         return res.status(400).json({
-//             error: err.message,
-//             errorCode: "1",
-//             message: "BAD_REQUEST"
-//         })
-//     }
-//     console.log(results);
-//     return res.status(200).json({
-//         error: null,
-//         errorCode: "0",
-//         message: "SUCCESS",
-//         data: results[0]
-//     })
-// })
-
-// connection.query(SQL, [userName, address, image, phoneNumber], (err, results) => {
-//     if (err) {
-//         return res.status(400).json({
-//             error: err.message,
-//             errorCode: "1",
-//             message: "BAD_REQUEST"
-//         })
-//     }
-//     console.log(results);
-//     return res.status(200).json({
-//         error: null,
-//         errorCode: "0",
-//         message: "SUCCESS"
-//     })
-
-// })
-
-// let sql = "UPDATE user SET profile_image = ?, full_name = ? WHERE email = ?;";
-// connection.query(sql,[file_name,userName, email], (error, results)=>{
-//     if(error){
-//         console.log(err);
-//         return res.status(500).json({error})
-//     }
-//     // console.log(results);
-// })
+    ]).then(result => {
+        res.status(200).json({
+            error: null,
+            errorCode: "0",
+            message: "SUCCESS",
+            data: result
+        })
+    }).catch((err) => {
+        return res.status(400).json({
+            error: err,
+            errorCode: "1",
+            message: "BAD_REQUEST"
+        })
+    })
+}

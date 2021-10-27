@@ -6,9 +6,13 @@ const {
     MongoClient,
     ObjectId
 } = require("mongodb");
-const client = new MongoClient("mongodb://localhost:27017/myKarrot", {
-    useUnifiedTopology: true
-});
+const {
+    collection,
+    chatCollection,
+    userCollection,
+    itemCollection
+} = require("./module/database")
+
 const {
     v4
 } = require("uuid")
@@ -20,7 +24,9 @@ const {
 const path = require("path")
 const morgan = require("morgan")
 const fs = require("fs")
-const accessLogStream = fs.createWriteStream(path.join(__dirname, "access.log"),{flags: 'a'})
+const accessLogStream = fs.createWriteStream(path.join(__dirname, "access.log"), {
+    flags: 'a'
+})
 
 // if (cluster.isMaster) {
 
@@ -35,7 +41,7 @@ const accessLogStream = fs.createWriteStream(path.join(__dirname, "access.log"),
 // } else {
 const app = express()
 app.use(express.json())
-app.use(morgan('dev', /*{stream: accessLogStream}*/))
+app.use(morgan('dev', /*{stream: accessLogStream}*/ ))
 
 const server = require('http').createServer(app)
 const io = require("socket.io")(server)
@@ -121,8 +127,8 @@ io.on("connection", (socket) => {
             // set online
             onlineUsers.add(data.userId);
             socket.join(data.roomId);
-            console.log("Online users", onlineUsers);
-            socket.to(data.roomId).emit("user online", onlineUsers.has(data.ownerId))
+            console.log("Online users", onlineUsers, " ", data.ownerId);
+            socket.to(data.roomId).emit("user online", onlineUsers)
             socket.emit("chat joined", data.roomId);
             socket.activeRoom = data.roomId;
         } catch (e) {
@@ -239,24 +245,18 @@ io.on("connection", (socket) => {
     })
 
     socket.on("dis join", (data) => {
-        const isExists = onlineUsers.has(data.id);
-        console.log("deleting socket", data.id);
+        console.log("deleting socket ", data.id, " ", data.roomId);
         onlineUsers.delete(data.id);
         console.log(onlineUsers);
         console.log("roomid ", data.roomId);
-        socket.to(data.roomId).emit("user online", isExists)
+        socket.to(data.roomId).emit("user online", onlineUsers)
     })
 
 });
 server.listen(process.env.PORT || 5000, async () => {
     console.log(`${process.pid} Server is listening on port ${process.env.PORT}`);
     try {
-        await client.connect();
-        const db = client.db("myKarrot");
-        collection = db.collection("comments");
-        itemCollection = db.collection("items");
-        chatCollection = db.collection("chats");
-        userCollection = db.collection("users");
+
         console.log("Listening on port :%s...", server.address().port);
     } catch (e) {
         console.error(e);
