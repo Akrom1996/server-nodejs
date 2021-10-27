@@ -1,3 +1,0 @@
-[0mGET /user/getUser/+998(90)%20206-42-41 [32m200[0m 24.158 ms - 628[0m
-[0mGET /item/getItemInfo/615198a7bf84cd10a91021a2 [33m403[0m 12.305 ms - 84[0m
-[0mGET /item/getItemInfo/615198a7bf84cd10a91021a2 [33m403[0m 13.125 ms - 84[0m
