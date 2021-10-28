@@ -10,7 +10,7 @@ const mongoose = require("mongoose")
 require('dotenv').config();
 const Multer = require("multer");
 const Item = require("../../module/Item");
-
+const jwt = require("jsonwebtoken")
 
 function deleteProfileOrItemImage(images) {
     return new Promise((resolve, reject) => {
@@ -28,10 +28,11 @@ function deleteProfileOrItemImage(images) {
 }
 
 exports.registrate = async (req, res) => {
-    console.log(req.body);
-    try {
-        const user = new userModel(req.body);
+    console.log(req.body)
+    let token = jwt.sign(req.body.phoneNumber, 'my_key')
 
+    try {
+        var user = new userModel(req.body);
         const users = await userModel.find({
             "phoneNumber": req.body.phoneNumber
         }, (err) => {
@@ -42,23 +43,22 @@ exports.registrate = async (req, res) => {
                     message: "BAD_REQUEST"
                 })
             }
-        }) //.then((value) => console.log(value)).catch((err) => console.log(err))
-        console.log(users);
-
+        })
         if (users === undefined || users.length == 0) {
-            user.save().then((result) => res.status(200).json({
+            
+            var userResult = await user.save();
+            console.log(userResult._id);
+            var tokenId = jwt.sign(String(userResult._id), 'my_key_id')
+            // console.log(tokenId);
+            return res.status(200).json({
                 error: null,
                 errorCode: "0",
                 message: "SUCCESS",
-                data: result,
-            })).catch((error) => res.status(400).json({
-                error: error,
-                errorCode: "2",
-                message: "BAD_REQUEST"
-            }))
-
+                data: userResult,
+                token: token,
+                tokenId: tokenId,
+            })
         } else {
-
             console.log("here error");
             return res.status(400).json({
                 error: "BAD_REQUEST",
@@ -129,30 +129,6 @@ exports.deleteUser = async (req, res) => {
             message: "BAD_REQUEST"
         });
     })
-
-    // await userModel.findByIdAndRemove({
-    //     _id
-    // }, (err, results) => {
-    //     if (err) {
-    //         return res.status(400).json({
-    //             error: err.message,
-    //             errorCode: "1",
-    //             message: "BAD_REQUEST"
-    //         })
-    //     } else if (results === null) {
-    //         return res.status(403).json({
-    //             error: "BAD_REQUEST",
-    //             errorCode: "1",
-    //             message: "Ushbu foydalanuvchi tarmoqda mavjud emas"
-    //         })
-    //     }
-    //     return res.status(200).json({
-    //         error: null,
-    //         errorCode: "0",
-    //         message: "SUCCESS",
-    //         data: results
-    //     });
-    // })
 }
 
 exports.getUserInfo = async (req, res) => {
@@ -160,9 +136,15 @@ exports.getUserInfo = async (req, res) => {
     const {
         phoneNumber
     } = req.params;
-    let SQL = "SELECT * FROM users WHERE phone_number=?";
-    try {
-
+    jwt.verify(req.token,'my_key',async function(err,data) {
+        console.log(data);
+        if(err){
+            return res.status(403).json({
+                error: err.message,
+                errorCode: "1",
+                message: "Authorization forbidden"
+            })
+        }
         await userModel.findOne({
             "phoneNumber": phoneNumber
         }, (err, results) => {
@@ -173,7 +155,7 @@ exports.getUserInfo = async (req, res) => {
                     message: "BAD_REQUEST"
                 })
             } else if (results === null) {
-                return res.status(403).json({
+                return res.status(400).json({
                     error: "BAD_REQUEST",
                     errorCode: "1",
                     message: "Ushbu foydalanuvchi tarmoqda mavjud emas"
@@ -186,19 +168,21 @@ exports.getUserInfo = async (req, res) => {
                 data: results
             });
         })
-    } catch (error) {
-        return res.status(400).json({
-            error: error,
-            errorCode: "1",
-            message: "BAD_REQUEST"
-        })
-    }
+    })
 }
 
 exports.getUserById = async (req, res) => {
     console.log(req.params);
-    try {
 
+    jwt.verify(req.token,'my_key_id',async function(err,data) {
+        console.log(data);
+        if(err){
+            return res.status(403).json({
+                error: err.message,
+                errorCode: "1",
+                message: "Authorization forbidden"
+            })
+        }
         await userModel.findOne({
             "_id": req.params.userId
         }, (err, results) => {
@@ -222,6 +206,11 @@ exports.getUserById = async (req, res) => {
                 data: results
             });
         })
+
+    })
+    try {
+
+        
     } catch (error) {
         return res.status(400).json({
             error: error,
