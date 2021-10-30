@@ -223,13 +223,47 @@ io.on("connection", (socket) => {
 
     // get messages from private chats
     socket.on("get chats", async (data) => {
-        console.log(socket.id, " ", socket.activeRoom || data); //socket.activeRoom is replaced with data
-        chatCollection.findOne({
-            "_id": socket.activeRoom || data
-        }).then((chats) => {
-            // console.log("chats ",chats);
-            io.to(socket.id).emit("message chats", chats.messages);
-        })
+        console.log(socket.id, " ", socket.activeRoom || data.itemId); //socket.activeRoom is replaced with data
+        // chatCollection.findOne({
+        //     "_id": socket.activeRoom || data.itemId
+        // }).then((chats) => {
+        //     // console.log("chats ",chats);
+        //     // var messages =[];
+        //     //  chats.messages.forEach((element)=>{
+        //     //     if(element.from != data.userId){
+        //     //         console.log("elem: ", element);
+        //     //         element.isSeen = true;
+        //     //         messages.push(element); 
+        //     //     }
+        //     //     else{
+        //     //         messages.push(element)
+        //     //     }
+        //     // })
+        //     // console.log("messages ", messages);
+
+        //     io.to(socket.id).emit("message chats", chats.messages);
+        // })
+        console.log(data);
+        chatCollection.updateMany({
+                "_id": socket.activeRoom || data.itemId,
+
+            }, {
+                $set: {
+                    "messages.$[elem].isSeen": true
+                }
+            }, {
+                "arrayFilters": [{
+                    "elem.to": data.userId
+                }],
+                "multi": true
+            }, {
+                returnOriginal: false
+            }, )
+            .then(() => {
+                chatCollection.findOne({
+                    "_id": socket.activeRoom || data.itemId
+                }).then(chats => io.to(socket.id).emit("message chats", chats.messages));
+            })
 
     })
 

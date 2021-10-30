@@ -30,19 +30,19 @@ router.post('/registrate',
         }
     }).single("upload"), registrate);
 // User delete
-router.delete('/deleteUser/:id/:type', ensureToken, deleteUser);
+router.delete('/deleteUser/:id/:type', /*ensureToken, */deleteUser);
 // Get user info
-router.get('/getUser/:phoneNumber', ensureToken, getUserInfo);
+router.get('/getUser/:phoneNumber', /*ensureToken, */ getUserInfo);
 //Get user by id
-router.get('/getUserById/:userId', ensureToken, getUserById);
+router.get('/getUserById/:userId', /*ensureToken, */ getUserById);
 //Get stats
-router.get('/getStats', ensureToken, getStats)
+router.get('/getStats', /*ensureToken, */ getStats)
 // Update user info
-router.put("/update-user-info/:phoneNumber", ensureToken, updateUserInfo);
+router.put("/update-user-info/:phoneNumber", /*ensureToken, */ updateUserInfo);
 //update user fcm token
-router.put("/update-user-fcm/:id/:fcmToken", ensureToken, updateToken);
+router.put("/update-user-fcm/:id/:fcmToken", /*ensureToken, */ updateToken);
 // Upload user image
-router.post('/upload-profile-image/:phoneNumber', ensureToken, uploadProfileImage);
+router.post('/upload-profile-image/:phoneNumber', /*ensureToken, */ uploadProfileImage);
 // Upload item images
 // router.post('upload-item-images/:email', Multer({
 //     storage: Multer.memoryStorage(),

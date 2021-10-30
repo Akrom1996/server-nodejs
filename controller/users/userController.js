@@ -29,7 +29,7 @@ function deleteProfileOrItemImage(images) {
 
 exports.registrate = async (req, res) => {
     console.log(req.body)
-    let token = jwt.sign(req.body.phoneNumber, 'my_key')
+    // let token = jwt.sign(req.body.phoneNumber, 'my_key')
 
     try {
         var user = new userModel(req.body);
@@ -47,16 +47,15 @@ exports.registrate = async (req, res) => {
         if (users === undefined || users.length == 0) {
             
             var userResult = await user.save();
-            console.log(userResult._id);
-            var tokenId = jwt.sign(String(userResult._id), 'my_key_id')
+            // var tokenId = jwt.sign(String(userResult._id), 'my_key_id')
             // console.log(tokenId);
             return res.status(200).json({
                 error: null,
                 errorCode: "0",
                 message: "SUCCESS",
                 data: userResult,
-                token: token,
-                tokenId: tokenId,
+                // token: token,
+                // tokenId: tokenId,
             })
         } else {
             console.log("here error");
@@ -136,15 +135,15 @@ exports.getUserInfo = async (req, res) => {
     const {
         phoneNumber
     } = req.params;
-    jwt.verify(req.token,'my_key',async function(err,data) {
-        console.log(data);
-        if(err){
-            return res.status(403).json({
-                error: err.message,
-                errorCode: "1",
-                message: "Authorization forbidden"
-            })
-        }
+    // jwt.verify(req.token,'my_key',async function(err,data) {
+    //     console.log(data);
+    //     if(err){
+    //         return res.status(403).json({
+    //             error: err.message,
+    //             errorCode: "1",
+    //             message: "Authorization forbidden"
+    //         })
+    //     }
         await userModel.findOne({
             "phoneNumber": phoneNumber
         }, (err, results) => {
@@ -168,21 +167,21 @@ exports.getUserInfo = async (req, res) => {
                 data: results
             });
         })
-    })
+    // })
 }
 
 exports.getUserById = async (req, res) => {
     console.log(req.params);
 
-    jwt.verify(req.token,'my_key_id',async function(err,data) {
-        console.log(data);
-        if(err){
-            return res.status(403).json({
-                error: err.message,
-                errorCode: "1",
-                message: "Authorization forbidden"
-            })
-        }
+    // jwt.verify(req.token,'my_key_id',async function(err,data) {
+    //     console.log(data);
+    //     if(err){
+    //         return res.status(403).json({
+    //             error: err.message,
+    //             errorCode: "1",
+    //             message: "Authorization forbidden"
+    //         })
+    //     }
         await userModel.findOne({
             "_id": req.params.userId
         }, (err, results) => {
@@ -207,17 +206,8 @@ exports.getUserById = async (req, res) => {
             });
         })
 
-    })
-    try {
-
-        
-    } catch (error) {
-        return res.status(400).json({
-            error: error,
-            errorCode: "1",
-            message: "BAD_REQUEST"
-        })
-    }
+    // })
+    
 }
 
 exports.updateUserInfo = async (req, res) => {
