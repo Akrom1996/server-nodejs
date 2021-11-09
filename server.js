@@ -49,6 +49,7 @@ const io = require("socket.io")(server)
 
 const userRouter = require("./controller/users/userRouter");
 const itemRouter = require("./controller/items/itemRouter.js");
+const fcmRouter = require("./controller/firebase/notificationRouter");
 const commentsRouter = require("./controller/comments/commentRouter.js");
 const chatsRouter = require("./controller/chats/chatsRouter.js");
 
@@ -57,6 +58,8 @@ app.use('/user', userRouter);
 
 // adding item router
 app.use("/item", itemRouter);
+
+app.use("/fcm",fcmRouter);
 
 // adding comments router
 app.use("/comments", commentsRouter);
@@ -127,8 +130,8 @@ io.on("connection", (socket) => {
             // set online
             onlineUsers.add(data.userId);
             socket.join(data.roomId);
-            console.log("Online users", onlineUsers, " ", data.ownerId);
-            socket.to(data.roomId).emit("user online", onlineUsers)
+            console.log("Online users", onlineUsers);
+            io.to(data.roomId).emit("user online", Array.from(onlineUsers))
             socket.emit("chat joined", data.roomId);
             socket.activeRoom = data.roomId;
         } catch (e) {
@@ -283,7 +286,7 @@ io.on("connection", (socket) => {
         onlineUsers.delete(data.id);
         console.log(onlineUsers);
         console.log("roomid ", data.roomId);
-        socket.to(data.roomId).emit("user online", onlineUsers)
+        socket.to(data.roomId).emit("user online",Array.from(onlineUsers))
     })
 
 });

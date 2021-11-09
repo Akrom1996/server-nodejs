@@ -284,6 +284,24 @@ exports.incDecLikes = async (req, res) => {
 
 }
 
+exports.getGlobalItems = async (req, res)=>{
+    const {position} = req.params;
+    itemModel.find({"position": position}).then((data)=>{
+        return res.status(200).json({
+            error: null,
+            errorCode: "0",
+            message: "SUCCESS",
+            data: data
+        });
+    }).catch((error)=>{
+        return res.status(400).json({
+            error: error,
+            errorCode: "1",
+            message: "BAD_REQUEST"
+        })
+    })
+}
+
 //post item
 exports.uploadItemImages = async (req, res) => {
     console.log(req.files);

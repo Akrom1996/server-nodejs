@@ -2,11 +2,9 @@ const connection = require("../../module/database")
 const {
     minioClient
 } = require('../../module/minio');
-const mailer = require("nodemailer");
 const path = require("path")
 const uuid = require("uuid").v4;
 const userModel = require('../../module/User');
-const mongoose = require("mongoose")
 require('dotenv').config();
 const Multer = require("multer");
 const Item = require("../../module/Item");
@@ -28,6 +26,7 @@ function deleteProfileOrItemImage(images) {
 }
 
 exports.registrate = async (req, res) => {
+    console.log("register");
     console.log(req.body)
     // let token = jwt.sign(req.body.phoneNumber, 'my_key')
 
@@ -35,7 +34,7 @@ exports.registrate = async (req, res) => {
         var user = new userModel(req.body);
         const users = await userModel.find({
             "phoneNumber": req.body.phoneNumber
-        }, (err) => {
+        }, (err, users) => {
             if (err) {
                 return res.status(400).json({
                     error: err.message,
@@ -43,31 +42,41 @@ exports.registrate = async (req, res) => {
                     message: "BAD_REQUEST"
                 })
             }
+            console.log("users ", users);
+            if (users === undefined || users.length == 0) {
+                // var userResult = await 
+                 user.save().then((userResult)=>{
+                    return res.status(200).json({
+                        error: null,
+                        errorCode: "0",
+                        message: "SUCCESS",
+                        data: userResult,
+                        // token: token,
+                        // tokenId: tokenId,
+                    });
+                }).catch((error)=>{
+                    return res.status(400).json({
+                        error: error,
+                        errorCode: "2",
+                        message: "BAD_REQUEST"
+                    });
+                })
+                // var tokenId = jwt.sign(String(userResult._id), 'my_key_id')
+                // console.log(tokenId);
+                
+
+            } else {
+                console.log("here error");
+                return res.status(400).json({
+                    error: "BAD_REQUEST",
+                    errorCode: "1",
+                    message: "Ushbu raqam ro'yxatdan o'tgan"
+                })
+            }
         })
-        if (users === undefined || users.length == 0) {
-            
-            var userResult = await user.save();
-            // var tokenId = jwt.sign(String(userResult._id), 'my_key_id')
-            // console.log(tokenId);
-            return res.status(200).json({
-                error: null,
-                errorCode: "0",
-                message: "SUCCESS",
-                data: userResult,
-                // token: token,
-                // tokenId: tokenId,
-            })
-        } else {
-            console.log("here error");
-            return res.status(400).json({
-                error: "BAD_REQUEST",
-                errorCode: "1",
-                message: "Ushbu raqam ro'yxatdan o'tgan"
-            })
-        }
 
     } catch (error) {
-        res.status(400).json({
+        return res.status(400).json({
             error: error,
             errorCode: "2",
             message: "BAD_REQUEST"
@@ -144,29 +153,29 @@ exports.getUserInfo = async (req, res) => {
     //             message: "Authorization forbidden"
     //         })
     //     }
-        await userModel.findOne({
-            "phoneNumber": phoneNumber
-        }, (err, results) => {
-            if (err) {
-                return res.status(400).json({
-                    error: err.message,
-                    errorCode: "1",
-                    message: "BAD_REQUEST"
-                })
-            } else if (results === null) {
-                return res.status(400).json({
-                    error: "BAD_REQUEST",
-                    errorCode: "1",
-                    message: "Ushbu foydalanuvchi tarmoqda mavjud emas"
-                })
-            }
-            return res.status(200).json({
-                error: null,
-                errorCode: "0",
-                message: "SUCCESS",
-                data: results
-            });
-        })
+    await userModel.findOne({
+        "phoneNumber": phoneNumber
+    }, (err, results) => {
+        if (err) {
+            return res.status(400).json({
+                error: err.message,
+                errorCode: "1",
+                message: "BAD_REQUEST"
+            })
+        } else if (results === null) {
+            return res.status(400).json({
+                error: "BAD_REQUEST",
+                errorCode: "1",
+                message: "Ushbu foydalanuvchi tarmoqda mavjud emas"
+            })
+        }
+        return res.status(200).json({
+            error: null,
+            errorCode: "0",
+            message: "SUCCESS",
+            data: results
+        });
+    })
     // })
 }
 
@@ -182,32 +191,32 @@ exports.getUserById = async (req, res) => {
     //             message: "Authorization forbidden"
     //         })
     //     }
-        await userModel.findOne({
-            "_id": req.params.userId
-        }, (err, results) => {
-            if (err) {
-                return res.status(400).json({
-                    error: err.message,
-                    errorCode: "1",
-                    message: "BAD_REQUEST"
-                })
-            } else if (results === null) {
-                return res.status(403).json({
-                    error: "BAD_REQUEST",
-                    errorCode: "1",
-                    message: "Ushbu foydalanuvchi tarmoqda mavjud emas"
-                })
-            }
-            return res.status(200).json({
-                error: null,
-                errorCode: "0",
-                message: "SUCCESS",
-                data: results
-            });
-        })
+    await userModel.findOne({
+        "_id": req.params.userId
+    }, (err, results) => {
+        if (err) {
+            return res.status(400).json({
+                error: err.message,
+                errorCode: "1",
+                message: "BAD_REQUEST"
+            })
+        } else if (results === null) {
+            return res.status(403).json({
+                error: "BAD_REQUEST",
+                errorCode: "1",
+                message: "Ushbu foydalanuvchi tarmoqda mavjud emas"
+            })
+        }
+        return res.status(200).json({
+            error: null,
+            errorCode: "0",
+            message: "SUCCESS",
+            data: results
+        });
+    })
 
     // })
-    
+
 }
 
 exports.updateUserInfo = async (req, res) => {

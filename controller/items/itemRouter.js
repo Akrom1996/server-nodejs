@@ -2,6 +2,7 @@ const express = require("express");
 const {
     getItems,
     getItemInfo,
+    getGlobalItems,
     // postItem,
     getItemsByLocation,
     getItemsOfUser,
@@ -38,6 +39,9 @@ router.get('/getItemInfo/:itemId', getItemInfo);
 // get All Items of an user
 
 router.get("/getItemsOfUser/:userId", getItemsOfUser);
+
+// get Items by position
+router.get("/getGlobalItems/:position", getGlobalItems);
 
 // post an item by location
 router.post("/postItem/:currentLocation/:phoneNumber", Multer({
