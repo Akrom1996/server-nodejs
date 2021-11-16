@@ -2,7 +2,6 @@ const connection = require("../../module/database");
 const {
     minioClient
 } = require('../../module/minio');
-const mailer = require("nodemailer");
 const path = require("path")
 const uuid = require("uuid").v4;
 const itemModel = require('../../module/Item');

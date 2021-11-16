@@ -28,6 +28,7 @@ const collection = db.collection("comments");
 const itemCollection = db.collection("items");
 const chatCollection = db.collection("chats");
 const userCollection = db.collection("users");
+const onlineCollection = db.collection("onlines");
 // const connection = mysql.createConnection({
 //   host: process.env.DB_HOSTNAME,
 //   user: process.env.DB_USER,

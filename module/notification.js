@@ -7,6 +7,7 @@ const FCMnotification = new mongoose.Schema({
   },
   fcmId: {
     type: String,
+    default: null
   }
 });
 

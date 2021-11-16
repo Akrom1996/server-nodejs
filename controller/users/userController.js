@@ -9,6 +9,9 @@ require('dotenv').config();
 const Multer = require("multer");
 const Item = require("../../module/Item");
 const jwt = require("jsonwebtoken")
+const {
+    fcmFunc
+} = require("../firebase/notificationController")
 
 function deleteProfileOrItemImage(images) {
     return new Promise((resolve, reject) => {
@@ -29,58 +32,89 @@ exports.registrate = async (req, res) => {
     console.log("register");
     console.log(req.body)
     // let token = jwt.sign(req.body.phoneNumber, 'my_key')
+    var user = new userModel(req.body);
+    const users = await userModel.find({
+        "phoneNumber": req.body.phoneNumber
+    }, (err) => {
+        if (err) {
+            return res.status(400).json({
+                error: err.message,
+                errorCode: "1",
+                message: "BAD_REQUEST"
+            })
+        }
 
-    try {
-        var user = new userModel(req.body);
-        const users = await userModel.find({
-            "phoneNumber": req.body.phoneNumber
-        }, (err, users) => {
-            if (err) {
-                return res.status(400).json({
-                    error: err.message,
-                    errorCode: "1",
-                    message: "BAD_REQUEST"
-                })
-            }
-            console.log("users ", users);
-            if (users === undefined || users.length == 0) {
-                // var userResult = await 
-                 user.save().then((userResult)=>{
-                    return res.status(200).json({
-                        error: null,
-                        errorCode: "0",
-                        message: "SUCCESS",
-                        data: userResult,
-                        // token: token,
-                        // tokenId: tokenId,
-                    });
-                }).catch((error)=>{
-                    return res.status(400).json({
-                        error: error,
-                        errorCode: "2",
-                        message: "BAD_REQUEST"
-                    });
-                })
-                // var tokenId = jwt.sign(String(userResult._id), 'my_key_id')
-                // console.log(tokenId);
-                
-
-            } else {
-                console.log("here error");
-                return res.status(400).json({
-                    error: "BAD_REQUEST",
-                    errorCode: "1",
-                    message: "Ushbu raqam ro'yxatdan o'tgan"
-                })
-            }
+    })
+    console.log("users ", users);
+    if (users === undefined || users.length == 0) {
+        // var userResult = await 
+        let userResult;
+        let notification;
+        Promise.all([
+            userResult = await user.save(),
+            notification = {
+                fcmId: req.body.fcmToken,
+                userId: userResult._id
+            },
+            await fcmFunc(notification),
+        ]).then((result)=>{
+            return res.status(200).json({
+                error: null,
+                errorCode: "0",
+                message: "SUCCESS",
+                data: result[0],
+                // token: token,
+                // tokenId: tokenId,
+            })
+        }).catch((error)=>{
+            return res.status(400).json({
+                error: error,
+                errorCode: "2",
+                message: "BAD_REQUEST"
+            });
         })
+        // user.save()
+        //     .then((userResult) => {
+        //         let notification = {
+        //             id: req.body.fcmToken,
+        //             userId: userResult._id
+        //         }
+        //         fcmFunc(notification).then(() =>
+        //             res.status(200).json({
+        //                 error: null,
+        //                 errorCode: "0",
+        //                 message: "SUCCESS",
+        //                 data: userResult,
+        //                 // token: token,
+        //                 // tokenId: tokenId,
+        //             })).catch(() => res.status(200).json({
+        //             error: null,
+        //             errorCode: "0",
+        //             message: "SUCCESS",
+        //             data: userResult,
+        //             // token: token,
+        //             // tokenId: tokenId,
+        //         }));
 
-    } catch (error) {
+
+        //     }).catch((error) => {
+        //         return res.status(400).json({
+        //             error: error,
+        //             errorCode: "2",
+        //             message: "BAD_REQUEST"
+        //         });
+        //     })
+        // var tokenId = jwt.sign(String(userResult._id), 'my_key_id')
+        // console.log(tokenId);
+
+
+    } else {
+        console.log("here error");
         return res.status(400).json({
-            error: error,
-            errorCode: "2",
-            message: "BAD_REQUEST"
-        });
+            error: "BAD_REQUEST",
+            errorCode: "1",
+            message: "Ushbu raqam ro'yxatdan o'tgan"
+        })
     }
 
 }

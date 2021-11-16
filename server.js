@@ -3,16 +3,16 @@ const cpus = require("os").cpus
 const express = require("express")
 require('dotenv').config();
 const {
-    MongoClient,
     ObjectId
 } = require("mongodb");
 const {
     collection,
     chatCollection,
     userCollection,
-    itemCollection
-} = require("./module/database")
+    itemCollection,
 
+} = require("./module/database")
+const OnlineSchema = require("./module/online.js")
 const {
     v4
 } = require("uuid")
@@ -20,6 +20,7 @@ const {
 const {
     admin
 } = require('./controller/firebase/getToken')
+
 
 const path = require("path")
 const morgan = require("morgan")
@@ -59,7 +60,7 @@ app.use('/user', userRouter);
 // adding item router
 app.use("/item", itemRouter);
 
-app.use("/fcm",fcmRouter);
+app.use("/fcm", fcmRouter);
 
 // adding comments router
 app.use("/comments", commentsRouter);
@@ -127,11 +128,8 @@ io.on("connection", (socket) => {
 
 
             }
-            // set online
-            onlineUsers.add(data.userId);
+
             socket.join(data.roomId);
-            console.log("Online users", onlineUsers);
-            io.to(data.roomId).emit("user online", Array.from(onlineUsers))
             socket.emit("chat joined", data.roomId);
             socket.activeRoom = data.roomId;
         } catch (e) {
@@ -139,8 +137,17 @@ io.on("connection", (socket) => {
         }
     });
 
-    socket.on("set online", (id) => {
-        onlineUsers.add(id)
+    socket.on("set online", async (data) => {
+        // set online
+        let resultOnline = await OnlineSchema.findOneAndUpdate({}, {
+            "$addToSet": {
+                "onlineUsers": data.id
+            }
+        }, {
+            returnOriginal: false
+        })
+        io.to(data.roomId).emit("user online", resultOnline.onlineUsers)
+
     })
 
     // create and get messages from comments
@@ -205,11 +212,11 @@ io.on("connection", (socket) => {
             priority: "high",
             timeToLive: 60 * 60 * 24
         };
-        const fcm = {
+        const fcmMessage = {
             notification: {
                 title: message.toUserName,
                 body: message.content,
-                imageUrl: `http://localhost:9000/p2p-market/images/item-images/9bf98691-8225-4e3c-93f0-75b61d9ebbc1.jpg`
+                image: `http://localhost:9000/p2p-market/images/item-images/9bf98691-8225-4e3c-93f0-75b61d9ebbc1.jpg`
             },
             data: {
                 type: "/message_screen",
@@ -219,9 +226,10 @@ io.on("connection", (socket) => {
         console.log("sending to ", fcmToken);
         io.to(socket.activeRoom).emit("chat message", message);
         //if fcm token user is not online send message notification
-        !onlineUsers.has(message.to) ?
-            admin.messaging().sendToDevice(fcmToken, fcm, options).then(data => console.log(data)).catch(err => console.log(err)) : null;
-
+        let usersOnline = await OnlineSchema.findOne({});
+        console.log(usersOnline);
+        !usersOnline.onlineUsers.includes(message.to) ?
+            admin.messaging().sendToDevice(fcmToken, fcmMessage, options).then(data => console.log(data)).catch(err => console.log(err)) : null;
     });
 
     // get messages from private chats
@@ -281,12 +289,20 @@ io.on("connection", (socket) => {
 
     })
 
-    socket.on("dis join", (data) => {
+    socket.on("dis join", async (data) => {
         console.log("deleting socket ", data.id, " ", data.roomId);
-        onlineUsers.delete(data.id);
-        console.log(onlineUsers);
-        console.log("roomid ", data.roomId);
-        socket.to(data.roomId).emit("user online",Array.from(onlineUsers))
+        // onlineUsers.delete(data.id);
+        // console.log(onlineUsers);
+        // console.log("roomid ", data.roomId);
+        let resultOnline = await OnlineSchema.findOneAndUpdate({}, {
+            "$pullAll": {
+                "onlineUsers": [data.id]
+            }
+        }, {
+            returnOriginal: false
+        }) //Array.from(
+        console.log(resultOnline);
+        socket.to(data.roomId).emit("user online", resultOnline.onlineUsers)
     })
 
 });

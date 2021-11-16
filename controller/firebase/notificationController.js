@@ -1,4 +1,29 @@
 const fcmModel = require("../../module/notification.js")
+const {
+    admin
+} = require('../../controller/firebase/getToken')
+
+exports.fcmFunc = async (data) => {
+    console.log(data);
+    const fcm = fcmModel(data);
+    fcmModel.findOne({
+        "userId": data.userId
+    }).then((userFCM) => {
+        //update if user exists
+        if (userFCM) {
+            userFCM.fcmId = id;
+            userFCM.save().then((result) => console.log("fcm updated ", result));
+        }
+        // save
+        else {
+            fcm.save().then((result) => console.log("fcm saved ", result));
+        }
+        return;
+    }).catch((error) => {
+        console.log("error ", error);
+        return;
+    })
+}
 
 exports.saveFCM = async (req, res) => {
     console.log(req.body);
@@ -13,7 +38,7 @@ exports.saveFCM = async (req, res) => {
     fcmModel.findOne({
         "userId": userId
     }).then((userFCM) => {
-
+        //update if user exists
         if (userFCM) {
             userFCM.fcmId = id;
             userFCM.save().then((result) => res.status(200).json({
@@ -23,7 +48,9 @@ exports.saveFCM = async (req, res) => {
                 data: result,
 
             }));
-        } else {
+        }
+        // save
+        else {
             fcm.save().then((result) => res.status(200).json({
                 error: null,
                 errorCode: "0",
@@ -39,4 +66,82 @@ exports.saveFCM = async (req, res) => {
             message: "BAD_REQUEST"
         })
     })
+}
+
+exports.subscribe = async (req, res) => {
+    const {
+        fcmToken,
+        topic
+    } = req.body;
+    admin.messaging().subscribeToTopic(fcmToken, topic)
+        .then((result) => {
+            console.log(`${fcmToken.substring(0,20)}... successfully subscribed to ${topic}`);
+            return res.status(200).json({
+                error: null,
+                errorCode: "0",
+                message: "SUCCESS",
+                data: result,
+            })
+        }).catch((error) => {
+            console.log(error);
+            return res.status(400).json({
+                error: error.message,
+                errorCode: "1",
+                message: "BAD_REQUEST"
+            })
+        })
+}
+
+exports.unsubscribe = async (req, res) => {
+    const {
+        fcmToken,
+        topic
+    } = req.body;
+    fcmToken.substring(0, 10)
+    admin.messaging().unsubscribeFromTopic(fcmToken, topic)
+        .then((result) => {
+            console.log(`${fcmToken.substring(0,10)}... successfully unsubscribed from ${topic}`);
+            return res.status(200).json({
+                error: null,
+                errorCode: "0",
+                message: "SUCCESS",
+                data: result,
+            })
+        }).catch((error) => {
+            console.log(error);
+            return res.status(400).json({
+                error: error.message,
+                errorCode: "1",
+                message: "BAD_REQUEST"
+            })
+        })
+}
+
+exports.sendToTopic = async (req, res) => {
+    const {
+        data,
+        topic
+    } = req.body;
+    console.log(req.body);
+    const message = {
+        data: data,
+        topic: topic
+    };
+    admin.messaging().send(message)
+        .then((result) => {
+            console.log(`successfully send to ${result}`);
+            return res.status(200).json({
+                error: null,
+                errorCode: "0",
+                message: "SUCCESS",
+                data: result,
+            })
+        }).catch((error) => {
+            console.log(error);
+            return res.status(400).json({
+                error: error.message,
+                errorCode: "1",
+                message: "BAD_REQUEST"
+            })
+        })
 }
