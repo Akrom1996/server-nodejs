@@ -76,7 +76,6 @@ app.all('*', (req, res) => {
     });
 })
 
-let onlineUsers = new Set();
 
 io.on("connection", (socket) => {
     // join to comments

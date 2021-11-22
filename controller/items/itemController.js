@@ -5,10 +5,11 @@ const {
 const path = require("path")
 const uuid = require("uuid").v4;
 const itemModel = require('../../module/Item');
-const mongoose = require("mongoose")
 require('dotenv').config();
-const Multer = require("multer");
 const User = require("../../module/User");
+const {
+    sendToTopicFunction
+} = require("../firebase/notificationController");
 const {
     query
 } = require("express");
@@ -283,16 +284,20 @@ exports.incDecLikes = async (req, res) => {
 
 }
 
-exports.getGlobalItems = async (req, res)=>{
-    const {position} = req.params;
-    itemModel.find({"position": position}).then((data)=>{
+exports.getGlobalItems = async (req, res) => {
+    const {
+        position
+    } = req.params;
+    itemModel.find({
+        "position": position
+    }).then((data) => {
         return res.status(200).json({
             error: null,
             errorCode: "0",
             message: "SUCCESS",
             data: data
         });
-    }).catch((error)=>{
+    }).catch((error) => {
         return res.status(400).json({
             error: error,
             errorCode: "1",
@@ -333,22 +338,31 @@ exports.uploadItemImages = async (req, res) => {
     console.log(req.params);
     const item = new itemModel(input);
     item.save().then(() => User.findOne({
-        "phoneNumber": req.params.phoneNumber
-    }).then((user) => {
-        console.log("user", user);
-        user.items.push(item);
-        item.user = user;
-        item.save();
-        return user.save();
-    }).then((data) => {
-        console.log(data);
-        console.log(item);
-        return res.status(200).json({
-            error: null,
-            errorCode: "0",
-            message: "SUCCESS",
-        });
-    })).catch((err) => {
+            "phoneNumber": req.params.phoneNumber
+        }).then((user) => {
+            console.log("user", user);
+            user.items.push(item);
+            item.user = user;
+            item.save();
+            return user.save();
+        })
+        .then((data) => {
+            var title = item.title.split(' ')[0]
+            console.log("title ", title);
+            return sendToTopicFunction({
+                "message": `Yangi ${title}`,
+                "time": Date.now().toString()
+            }, title)
+        })
+        .then((data) => {
+            // console.log(data);
+            // console.log(item);
+            return res.status(200).json({
+                error: null,
+                errorCode: "0",
+                message: "SUCCESS",
+            });
+        })).catch((err) => {
         console.log(err);
         return res.status(400).json({
             error: err,
@@ -437,7 +451,7 @@ exports.deleteItemById = async (req, res) => {
                     errorCode: "0",
                     message: "SUCCESS",
                     data: data,
-                }); 
+                });
             })
             .catch((error) => console.log(error));
     }).catch((err) => {

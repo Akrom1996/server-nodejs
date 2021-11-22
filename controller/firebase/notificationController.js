@@ -117,17 +117,36 @@ exports.unsubscribe = async (req, res) => {
         })
 }
 
+exports.sendToTopicFunction = async (data, topic)=>{
+    var payload = {
+        notification: {
+          title: topic,
+          body: "Yangi e'lon berildi"
+        }
+      };
+    admin.messaging().sendToTopic(topic, payload)
+        .then((result) => {
+            console.log(`successfully send to ${result}`);
+            return result;
+        }).catch((error) => {
+            console.log(error);
+            return error;
+        })
+}
+
 exports.sendToTopic = async (req, res) => {
     const {
         data,
         topic
     } = req.body;
     console.log(req.body);
-    const message = {
-        data: data,
-        topic: topic
-    };
-    admin.messaging().send(message)
+    var payload = {
+        notification: {
+          title: topic,
+          body: "Yangi e'lon berildi"
+        }
+      };
+    admin.messaging().sendToTopic(topic, payload)
         .then((result) => {
             console.log(`successfully send to ${result}`);
             return res.status(200).json({
