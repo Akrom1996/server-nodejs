@@ -340,7 +340,7 @@ exports.uploadItemImages = async (req, res) => {
     item.save().then(() => User.findOne({
             "phoneNumber": req.params.phoneNumber
         }).then((user) => {
-            console.log("user", user);
+            // console.log("user", user);
             user.items.push(item);
             item.user = user;
             item.save();
@@ -349,10 +349,10 @@ exports.uploadItemImages = async (req, res) => {
         .then((data) => {
             var title = item.title.split(' ')[0]
             console.log("title ", title);
-            return sendToTopicFunction({
-                "message": `Yangi ${title}`,
-                "time": Date.now().toString()
-            }, title)
+            delete item.user;
+            console.log("item ", item);
+            
+            return sendToTopicFunction(item, title)
         })
         .then((data) => {
             // console.log(data);

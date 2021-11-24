@@ -117,13 +117,20 @@ exports.unsubscribe = async (req, res) => {
         })
 }
 
-exports.sendToTopicFunction = async (data, topic)=>{
+exports.sendToTopicFunction = async (data, topic) => {
     var payload = {
-        notification: {
-          title: topic,
-          body: "Yangi e'lon berildi"
+        "notification": {
+            title: topic,
+            body: "Yangi e'lon berildi"
+        },
+        "data": {
+            // data: JSON.stringify(data),
+            click_action: "FLUTTER_NOTIFICATION_CLICK",
         }
-      };
+
+    };
+    console.log("data ", data);
+    console.log("payload ", payload);
     admin.messaging().sendToTopic(topic, payload)
         .then((result) => {
             console.log(`successfully send to ${result}`);
@@ -141,12 +148,18 @@ exports.sendToTopic = async (req, res) => {
     } = req.body;
     console.log(req.body);
     var payload = {
-        notification: {
-          title: topic,
-          body: "Yangi e'lon berildi"
+        "notification": {
+            title: topic,
+            body: "Yangi e'lon berildi"
+        },
+        "data": {
+            data: JSON.stringify(data),
+            type: "topic",
+            click_action: "FLUTTER_NOTIFICATION_CLICK",
         }
-      };
-    admin.messaging().sendToTopic(topic, payload)
+
+    };
+    admin.messaging().sendToTopic(String(topic).split(' ')[0].toLowerCase(), payload)
         .then((result) => {
             console.log(`successfully send to ${result}`);
             return res.status(200).json({
