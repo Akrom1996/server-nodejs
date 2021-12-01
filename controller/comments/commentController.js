@@ -3,7 +3,9 @@ const userModel = require('../../module/User');
 const mongoose = require("mongoose");
 require('dotenv').config();
 const Item = require("../../module/Item");
-const {collection} = require("./module/database")
+const {
+    ObjectId
+} = require('mongodb')
 
 exports.getComments = async (req, res) => {
     console.log(req.params);
@@ -11,7 +13,7 @@ exports.getComments = async (req, res) => {
     Item
         .findById(req.params.itemId).lean().populate('comments')
         .then((data) => {
-            console.log(data)
+
             return res.status(200).json({
                 error: null,
                 errorCode: "0",
@@ -37,12 +39,12 @@ exports.postComment = async (req, res) => {
     // SAVE INSTANCE OF Comment MODEL TO DB
 
     comment.save()
-    .then(() => Item.findById(req.params.itemId))
+        .then(() => Item.findById(req.params.itemId))
         .then((item) => {
             item.comments.push(comment);
             return item.save();
         }).then((data) => {
-            console.log(data)
+
             return res.status(200).json({
                 error: null,
                 errorCode: "0",
@@ -60,9 +62,60 @@ exports.postComment = async (req, res) => {
         });
 }
 
-exports.putThumb = async (req, res)=>{
-    const {itemId,commentId, userId}=req.params;
+exports.putThumb = async (req, res) => {
+    const {
+        itemId,
+        commentId,
+        userId
+    } = req.params;
+    const {
+        value
+    } = req.body;
     console.log(req.params);
-    collection.findOne(commentId).then((data)=>console.log(data)).catch(error=>console.log(error));
-    res.end();
+    value ?
+        connection.collection.updateOne({
+            "_id": itemId,
+            "messages.id": ObjectId(commentId)
+        }, {
+            $addToSet: {
+                "messages.$.thumb": userId
+            }
+        }).then((data) => {
+
+            res.status(200).json({
+                error: null,
+                errorCode: "0",
+                message: "SUCCESS",
+            });
+        })
+        .catch(error => {
+
+            res.status(400).json({
+                error: err,
+                errorCode: "1",
+                message: "BAD_REQUEST"
+            });
+        }) : connection.collection.updateOne({
+            "_id": itemId,
+            "messages.id": ObjectId(commentId)
+        }, {
+            $pull: {
+                "messages.$.thumb": userId
+            }
+        }).then((data) => {
+
+            res.status(200).json({
+                error: null,
+                errorCode: "0",
+                message: "SUCCESS",
+            });
+        })
+        .catch(error => {
+
+            res.status(400).json({
+                error: err,
+                errorCode: "1",
+                message: "BAD_REQUEST"
+            });
+        });
 }
