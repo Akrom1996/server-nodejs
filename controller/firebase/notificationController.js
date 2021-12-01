@@ -118,13 +118,14 @@ exports.unsubscribe = async (req, res) => {
 }
 
 exports.sendToTopicFunction = async (data, topic) => {
-    var payload = {
+     var payload = {
         "notification": {
             title: topic,
             body: "Yangi e'lon berildi"
         },
         "data": {
-            // data: JSON.stringify(data),
+            data: JSON.stringify(data),
+            type: "topic",
             click_action: "FLUTTER_NOTIFICATION_CLICK",
         }
 
@@ -146,7 +147,9 @@ exports.sendToTopic = async (req, res) => {
         data,
         topic
     } = req.body;
-    console.log(req.body);
+    
+    delete data.user
+    console.log(data);
     var payload = {
         "notification": {
             title: topic,

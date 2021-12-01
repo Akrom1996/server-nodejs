@@ -3,9 +3,7 @@ const userModel = require('../../module/User');
 const mongoose = require("mongoose");
 require('dotenv').config();
 const Item = require("../../module/Item");
-const {
-    CommentModel
-} = require("../../module/comment");
+const {collection} = require("./module/database")
 
 exports.getComments = async (req, res) => {
     console.log(req.params);
@@ -13,7 +11,7 @@ exports.getComments = async (req, res) => {
     Item
         .findById(req.params.itemId).lean().populate('comments')
         .then((data) => {
-            // console.log(data)
+            console.log(data)
             return res.status(200).json({
                 error: null,
                 errorCode: "0",
@@ -60,4 +58,11 @@ exports.postComment = async (req, res) => {
                 message: "BAD_REQUEST"
             })
         });
+}
+
+exports.putThumb = async (req, res)=>{
+    const {itemId,commentId, userId}=req.params;
+    console.log(req.params);
+    collection.findOne(commentId).then((data)=>console.log(data)).catch(error=>console.log(error));
+    res.end();
 }
