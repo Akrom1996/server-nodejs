@@ -6,6 +6,7 @@ const {
     // postItem,
     getItemsByLocation,
     getItemsOfUser,
+    getItemsByCategory,
     updatePosition,
     incDecLikes,
     uploadItemImages,
@@ -42,6 +43,10 @@ router.get("/getItemsOfUser/:userId", getItemsOfUser);
 
 // get Items by position
 router.get("/getGlobalItems/:position", getGlobalItems);
+
+
+// get Items by category
+router.get("/getItemsByCategory/:position/:category", getItemsByCategory);
 
 // post an item by location
 router.post("/postItem/:currentLocation/:phoneNumber", Multer({

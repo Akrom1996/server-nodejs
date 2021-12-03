@@ -107,6 +107,51 @@ exports.getItemsByLocation = async (req, res) => {
     }
 }
 
+exports.getItemsByCategory = async (req, res) => {
+    const {
+        position,
+        category,
+    } = req.params;
+    console.log(req.params);
+    itemModel.find({
+            "location": position,
+            "category": category
+        })
+        // itemModel.aggregate([{
+        //         $match: {
+        //             "location": position,
+        //             "category": category
+        //         },
+
+        //     }, 
+
+        //     {
+        //         $sort: {
+        //             "likes": -1
+        //         }
+        //     }, 
+        // ])
+        .sort({
+            "likes": -1
+        })
+        .limit(20)
+        .then((results) => {
+            return res.status(200).json({
+                error: null,
+                errorCode: "0",
+                message: "SUCCESS",
+                data: results
+            });
+        })
+        .catch((error) => {
+            return res.status(400).json({
+                error: error,
+                errorCode: "1",
+                message: "BAD_REQUEST"
+            });
+        })
+}
+
 exports.getItemsOfUser = async (req, res) => {
     const {
         userId
@@ -208,11 +253,11 @@ exports.incDecLikes = async (req, res) => {
                     likedItems: itemId
                 }
             }) :
-                await User.findByIdAndUpdate(userId, {
-                    $pull: {
-                        likedItems: itemId
-                    }
-                })
+            await User.findByIdAndUpdate(userId, {
+                $pull: {
+                    likedItems: itemId
+                }
+            })
         ]).then((results) => {
             console.log(results);
             return res.status(200).json({
@@ -229,10 +274,10 @@ exports.incDecLikes = async (req, res) => {
         })
     } else if (type === "views") {
         await itemModel.findByIdAndUpdate(itemId, {
-            $addToSet: {
-                views: userId
-            }
-        },
+                $addToSet: {
+                    views: userId
+                }
+            },
             (err, results) => {
                 if (err) {
                     return res.status(400).json({
@@ -338,14 +383,14 @@ exports.uploadItemImages = async (req, res) => {
     console.log(req.params);
     const item = new itemModel(input);
     item.save().then(() => User.findOne({
-        "phoneNumber": req.params.phoneNumber
-    }).then((user) => {
-        // console.log("user", user);
-        user.items.push(item);
-        item.user = user;
-        item.save();
-        return user.save();
-    })
+            "phoneNumber": req.params.phoneNumber
+        }).then((user) => {
+            // console.log("user", user);
+            user.items.push(item);
+            item.user = user;
+            item.save();
+            return user.save();
+        })
         .then((data) => {
             var title = item.title.split(' ')[0]
             console.log("title ", title);
@@ -363,13 +408,13 @@ exports.uploadItemImages = async (req, res) => {
                 message: "SUCCESS",
             });
         })).catch((err) => {
-            console.log(err);
-            return res.status(400).json({
-                error: err,
-                errorCode: "1",
-                message: "BAD_REQUEST"
-            })
-        });
+        console.log(err);
+        return res.status(400).json({
+            error: err,
+            errorCode: "1",
+            message: "BAD_REQUEST"
+        })
+    });
 }
 
 exports.favouriteItems = async (req, res) => {
@@ -382,7 +427,7 @@ exports.favouriteItems = async (req, res) => {
     } = req.body;
     var results = [];
     let count = 0;
-    const user = await User.findById(id,);
+    const user = await User.findById(id, );
     let items;
     if (lists) items = user.items;
     else if (favourites) items = user.likedItems;
@@ -396,7 +441,7 @@ exports.favouriteItems = async (req, res) => {
         });
     }
     items.forEach(async (element) => {
-        await itemModel.findById(element,)
+        await itemModel.findById(element, )
             .exec((err, result) => {
                 if (err) {
                     return res.status(400).json({
@@ -436,14 +481,14 @@ exports.deleteItemById = async (req, res) => {
             deleteProfileOrItemImage(data.images)
         }
         User.updateMany({}, {
-            $pull: {
-                likedItems: itemId,
-                items: itemId,
-                boughts: itemId
-            }
-        }, {
-            multi: true,
-        })
+                $pull: {
+                    likedItems: itemId,
+                    items: itemId,
+                    boughts: itemId
+                }
+            }, {
+                multi: true,
+            })
             .then((data) => {
                 console.log("user likes", data);
                 return res.status(200).json({
