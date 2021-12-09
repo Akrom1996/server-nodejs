@@ -12,12 +12,12 @@ const db = client.db("myKarrot");
 chatCollection = db.collection("chats");
 // ishlatilmaydi
 exports.getChats = async (req, res) => {
-    console.log(req.params);
+    //console.log(req.params);
     chatCollection.findOne({
             "_id": req.params.id
         })
         .then((data) => {
-            console.log(data)
+            //console.log(data)
             return res.status(200).json({
                 error: null,
                 errorCode: "0",
@@ -26,7 +26,7 @@ exports.getChats = async (req, res) => {
             });
         })
         .catch((err) => {
-            console.log(err.message);
+            //console.log(err.message);
             return res.status(400).json({
                 error: err,
                 errorCode: "1",
@@ -38,9 +38,9 @@ exports.getChats = async (req, res) => {
 exports.getChatsOfUser = async (req, res) => {
     var results = [];
     let count = 0;
-    console.log(req.params.id);
+    //console.log(req.params.id);
     var user = await userModel.findById(req.params.id);
-    console.log("user ", user);
+    //console.log("user ", user);
     if (user.chats.length > 0) {
         await user.chats.forEach(async (i) => {
             var chat = await chatCollection.findOne({
@@ -48,7 +48,7 @@ exports.getChatsOfUser = async (req, res) => {
             })
             // delete chat.messages;
             results.push(chat);
-            // console.log("chat: ", chat);
+            // //console.log("chat: ", chat);
             count++;
             if (count === user.chats.length) {
                 return res.status(200).json({
@@ -79,7 +79,7 @@ exports.getChatsOfUser = async (req, res) => {
     //             message: "BAD_REQUEST",
     //         });
     //     })))
-    //     console.log(obj);
+    //     //console.log(obj);
     // }).catch((err) => {
     //     return res.status(400).json({
     //         error: err,

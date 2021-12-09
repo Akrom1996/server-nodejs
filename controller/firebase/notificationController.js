@@ -4,7 +4,7 @@ const {
 } = require('../../controller/firebase/getToken')
 
 exports.fcmFunc = async (data) => {
-    console.log(data);
+    //console.log(data);
     const fcm = fcmModel(data);
     fcmModel.findOne({
         "userId": data.userId
@@ -20,13 +20,13 @@ exports.fcmFunc = async (data) => {
         }
         return;
     }).catch((error) => {
-        console.log("error ", error);
+        //console.log("error ", error);
         return;
     })
 }
 
 exports.saveFCM = async (req, res) => {
-    console.log(req.body);
+    //console.log(req.body);
     const {
         id,
         userId
@@ -75,7 +75,7 @@ exports.subscribe = async (req, res) => {
     } = req.body;
     admin.messaging().subscribeToTopic(fcmToken, topic)
         .then((result) => {
-            console.log(`${fcmToken.substring(0,20)}... successfully subscribed to ${topic}`);
+            //console.log(`${fcmToken.substring(0,20)}... successfully subscribed to ${topic}`);
             return res.status(200).json({
                 error: null,
                 errorCode: "0",
@@ -83,7 +83,7 @@ exports.subscribe = async (req, res) => {
                 data: result,
             })
         }).catch((error) => {
-            console.log(error);
+            //console.log(error);
             return res.status(400).json({
                 error: error.message,
                 errorCode: "1",
@@ -100,7 +100,7 @@ exports.unsubscribe = async (req, res) => {
     fcmToken.substring(0, 10)
     admin.messaging().unsubscribeFromTopic(fcmToken, topic)
         .then((result) => {
-            console.log(`${fcmToken.substring(0,10)}... successfully unsubscribed from ${topic}`);
+            //console.log(`${fcmToken.substring(0,10)}... successfully unsubscribed from ${topic}`);
             return res.status(200).json({
                 error: null,
                 errorCode: "0",
@@ -108,7 +108,7 @@ exports.unsubscribe = async (req, res) => {
                 data: result,
             })
         }).catch((error) => {
-            console.log(error);
+            //console.log(error);
             return res.status(400).json({
                 error: error.message,
                 errorCode: "1",
@@ -130,14 +130,14 @@ exports.sendToTopicFunction = async (data, topic) => {
         }
 
     };
-    console.log("data ", data);
-    console.log("payload ", payload);
+    //console.log("data ", data);
+    //console.log("payload ", payload);
     admin.messaging().sendToTopic(topic, payload)
         .then((result) => {
-            console.log(`successfully send to ${result}`);
+            //console.log(`successfully send to ${result}`);
             return result;
         }).catch((error) => {
-            console.log(error);
+            //console.log(error);
             return error;
         })
 }
@@ -149,7 +149,7 @@ exports.sendToTopic = async (req, res) => {
     } = req.body;
     
     delete data.user
-    console.log(data);
+    //console.log(data);
     var payload = {
         "notification": {
             title: topic,
@@ -164,7 +164,7 @@ exports.sendToTopic = async (req, res) => {
     };
     admin.messaging().sendToTopic(String(topic).split(' ')[0].toLowerCase(), payload)
         .then((result) => {
-            console.log(`successfully send to ${result}`);
+            //console.log(`successfully send to ${result}`);
             return res.status(200).json({
                 error: null,
                 errorCode: "0",
@@ -172,7 +172,7 @@ exports.sendToTopic = async (req, res) => {
                 data: result,
             })
         }).catch((error) => {
-            console.log(error);
+            //console.log(error);
             return res.status(400).json({
                 error: error.message,
                 errorCode: "1",

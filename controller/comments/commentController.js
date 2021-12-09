@@ -8,7 +8,7 @@ const {
 } = require('mongodb')
 
 exports.getComments = async (req, res) => {
-    console.log(req.params);
+    //console.log(req.params);
     // LOOK UP THE POST
     Item
         .findById(req.params.itemId).lean().populate('comments')
@@ -22,7 +22,7 @@ exports.getComments = async (req, res) => {
             });
         })
         .catch((err) => {
-            console.log(err.message);
+            //console.log(err.message);
             return res.status(400).json({
                 error: err,
                 errorCode: "1",
@@ -32,7 +32,7 @@ exports.getComments = async (req, res) => {
 }
 
 exports.postComment = async (req, res) => {
-    console.log(req.body);
+    //console.log(req.body);
     // INSTANTIATE INSTANCE OF MODEL
     const comment = new CommentModel(req.body);
 
@@ -53,7 +53,7 @@ exports.postComment = async (req, res) => {
             });
         })
         .catch((err) => {
-            console.log(err);
+            //console.log(err);
             return res.status(400).json({
                 error: err,
                 errorCode: "1",
@@ -71,7 +71,7 @@ exports.putThumb = async (req, res) => {
     const {
         value
     } = req.body;
-    console.log(req.params);
+    //console.log(req.params);
     value ?
         connection.collection.updateOne({
             "_id": itemId,

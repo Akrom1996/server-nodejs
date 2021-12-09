@@ -19,10 +19,10 @@ function deleteProfileOrItemImage(images) {
     return new Promise((resolve, reject) => {
         minioClient.removeObjects('p2p-market', images, function (err, data) {
             if (err) {
-                console.log(err)
+                //console.log(err)
                 reject(err)
             } else {
-                console.log("Successfully deleted p2p-market/", images);
+                //console.log("Successfully deleted p2p-market/", images);
                 resolve(data)
             }
         });
@@ -71,7 +71,7 @@ exports.getItemsByLocation = async (req, res) => {
     const {
         currentLocation
     } = req.params;
-    console.log(currentLocation);
+    //console.log(currentLocation);
     try {
         await itemModel.find({
             "location": currentLocation
@@ -113,6 +113,7 @@ exports.getItemsByCategory = async (req, res) => {
         category,
         title
     } = req.params;
+    //console.log(req.params.title.split(' ')[0]);
     itemModel.find({
             "location": position,
             $or: [{
@@ -160,7 +161,7 @@ exports.getItemsOfUser = async (req, res) => {
     const {
         userId
     } = req.params;
-    console.log(userId);
+    //console.log(userId);
     try {
         await itemModel.find({
             "user": userId
@@ -198,7 +199,7 @@ exports.updatePosition = async (req, res) => {
     const {
         itemId
     } = req.params;
-    console.log(req.body);
+    //console.log(req.body);
     try {
         await itemModel.findByIdAndUpdate(itemId, req.body, (err, results) => {
             if (err) {
@@ -214,7 +215,7 @@ exports.updatePosition = async (req, res) => {
                     message: "Ushbu jihoz tarmoqda mavjud emas"
                 })
             }
-            console.log(results);
+            //console.log(results);
             return res.status(200).json({
                 error: null,
                 errorCode: "0",
@@ -240,12 +241,12 @@ exports.incDecLikes = async (req, res) => {
         number,
         userId
     } = req.body;
-    console.log(req.body);
+    //console.log(req.body);
     let obj = {}
 
     if (type === "likes") {
         obj[type] = Number(number);
-        console.log(obj);
+        //console.log(obj);
         Promise.all([
             await itemModel.findByIdAndUpdate(itemId, {
                 $inc: obj
@@ -263,7 +264,7 @@ exports.incDecLikes = async (req, res) => {
                 }
             })
         ]).then((results) => {
-            console.log(results);
+            //console.log(results);
             return res.status(200).json({
                 error: null,
                 errorCode: "0",
@@ -357,21 +358,21 @@ exports.getGlobalItems = async (req, res) => {
 
 //post item
 exports.uploadItemImages = async (req, res) => {
-    console.log(req.files);
+    //console.log(req.files);
     let file_name = [];
     //first upload item images to minio
     if (req.files !== undefined)
         req.files.map((file) => {
             file_name.push("/images/item-images/" + uuid() + path.extname(file.originalname));
-            console.log(file_name);
+            //console.log(file_name);
             minioClient.putObject("p2p-market", file_name[file_name.length - 1], file.buffer, function (error, etag) {
                 if (error) {
-                    console.log(error);
+                    //console.log(error);
                     return res.status(500).json({
                         error
                     })
                 }
-                // console.log(etag);
+                // //console.log(etag);
 
             });
         });
@@ -384,12 +385,12 @@ exports.uploadItemImages = async (req, res) => {
 
     // var uploadedFilePath = []
     // req.files.map((file) => uploadedFilePath.push(file.originalname));
-    console.log(req.params);
+    //console.log(req.params);
     const item = new itemModel(input);
     item.save().then(() => User.findOne({
             "phoneNumber": req.params.phoneNumber
         }).then((user) => {
-            // console.log("user", user);
+            // //console.log("user", user);
             user.items.push(item);
             item.user = user;
             item.save();
@@ -397,22 +398,22 @@ exports.uploadItemImages = async (req, res) => {
         })
         .then((data) => {
             var title = item.title.split(' ')[0]
-            console.log("title ", title);
+            //console.log("title ", title);
             item["user"] = item.user._id;
-            console.log("item ", item);
+            //console.log("item ", item);
 
             return sendToTopicFunction(item, title)
         })
         .then((data) => {
-            // console.log(data);
-            // console.log(item);
+            // //console.log(data);
+            // //console.log(item);
             return res.status(200).json({
                 error: null,
                 errorCode: "0",
                 message: "SUCCESS",
             });
         })).catch((err) => {
-        console.log(err);
+        //console.log(err);
         return res.status(400).json({
             error: err,
             errorCode: "1",
@@ -422,7 +423,7 @@ exports.uploadItemImages = async (req, res) => {
 }
 
 exports.favouriteItems = async (req, res) => {
-    console.log(req.body);
+    //console.log(req.body);
     const {
         id,
         lists,
@@ -457,7 +458,7 @@ exports.favouriteItems = async (req, res) => {
                 results.push(result);
                 count++;
                 if (count === items.length) {
-                    console.log(results);
+                    //console.log(results);
                     return res.status(200).json({
                         error: null,
                         errorCode: "0",
@@ -477,7 +478,7 @@ exports.deleteItemById = async (req, res) => {
     const {
         itemId
     } = req.params;
-    console.log(itemId);
+    //console.log(itemId);
     itemModel.findByIdAndDelete({
         _id: req.params.itemId
     }).then((data) => {
@@ -494,7 +495,7 @@ exports.deleteItemById = async (req, res) => {
                 multi: true,
             })
             .then((data) => {
-                console.log("user likes", data);
+                //console.log("user likes", data);
                 return res.status(200).json({
                     error: null,
                     errorCode: "0",
@@ -513,19 +514,19 @@ exports.deleteItemById = async (req, res) => {
 }
 
 // exports.postItem = async (req, res) => {
-//     console.log(req.params);
+//     //console.log(req.params);
 //     const user = await User.findOne({
 //         "phoneNumber": req.params.phoneNumber
 //     })
-//     console.log(user._id);
+//     //console.log(user._id);
 //     var input = req.body;
 //     input.user = user._id;
 //     input.location = req.params.currentLocation;
-//     console.log(input);
+//     //console.log(input);
 //     const item = new itemModel(input);
 //     try {
 //         var result = await item.save();
-//         console.log(result);
+//         //console.log(result);
 //         user.items.push(result._id);
 //         await user.save();
 //         return res.status(200).json({

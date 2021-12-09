@@ -16,7 +16,7 @@ mongoose.connect('mongodb://localhost:27017/myKarrot', {
       console.error('error connecting mongoose: ' + err.stack);
       return;
     }
-    console.log("Connected to mongoose")
+    //console.log("Connected to mongoose")
   }
 );
 const client = new MongoClient("mongodb://localhost:27017/myKarrot", {
@@ -42,7 +42,7 @@ const onlineCollection = db.collection("onlines");
 //     return;
 //   }
 
-//   console.log('connected as id ' + connection.threadId);
+//   //console.log('connected as id ' + connection.threadId);
 // });
 
 module.exports = {

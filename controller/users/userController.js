@@ -17,10 +17,10 @@ function deleteProfileOrItemImage(images) {
     return new Promise((resolve, reject) => {
         minioClient.removeObjects('p2p-market', images, function (err, data) {
             if (err) {
-                console.log(err)
+                //console.log(err)
                 reject(err)
             } else {
-                console.log("Successfully deleted p2p-market/myKey");
+                //console.log("Successfully deleted p2p-market/myKey");
                 resolve(data)
             }
         });
@@ -29,8 +29,8 @@ function deleteProfileOrItemImage(images) {
 }
 
 exports.registrate = async (req, res) => {
-    console.log("register");
-    console.log(req.body)
+    //console.log("register");
+    //console.log(req.body)
     // let token = jwt.sign(req.body.phoneNumber, 'my_key')
     var user = new userModel(req.body);
     const users = await userModel.find({
@@ -45,7 +45,7 @@ exports.registrate = async (req, res) => {
         }
 
     })
-    console.log("users ", users);
+    //console.log("users ", users);
     if (users === undefined || users.length == 0) {
         // var userResult = await 
         let userResult;
@@ -105,11 +105,11 @@ exports.registrate = async (req, res) => {
         //         });
         //     })
         // var tokenId = jwt.sign(String(userResult._id), 'my_key_id')
-        // console.log(tokenId);
+        // //console.log(tokenId);
 
 
     } else {
-        console.log("here error");
+        //console.log("here error");
         return res.status(400).json({
             error: "BAD_REQUEST",
             errorCode: "1",
@@ -124,8 +124,8 @@ exports.deleteUser = async (req, res) => {
         id,
         type
     } = req.params;
-    console.log(id);
-    console.log(req.body);
+    //console.log(id);
+    //console.log(req.body);
     if (type === 1) {
         userModel.findOne({
                 "phoneNumber": id
@@ -136,15 +136,15 @@ exports.deleteUser = async (req, res) => {
     var itemData = await Item.find({
         "user": id
     });
-    // console.log("items", itemData);
+    // //console.log("items", itemData);
     var itemImages = [];
     if (itemData.length > 0) {
         itemData.forEach((item) => {
-            console.log("item: ", item);
+            //console.log("item: ", item);
             itemImages.push(...item.images);
         })
     }
-    console.log(itemImages);
+    //console.log(itemImages);
     Promise.all([
         await userModel.findByIdAndDelete({
             _id: id
@@ -174,12 +174,12 @@ exports.deleteUser = async (req, res) => {
 }
 
 exports.getUserInfo = async (req, res) => {
-    console.log(req.params);
+    //console.log(req.params);
     const {
         phoneNumber
     } = req.params;
     // jwt.verify(req.token,'my_key',async function(err,data) {
-    //     console.log(data);
+    //     //console.log(data);
     //     if(err){
     //         return res.status(403).json({
     //             error: err.message,
@@ -214,10 +214,10 @@ exports.getUserInfo = async (req, res) => {
 }
 
 exports.getUserById = async (req, res) => {
-    console.log(req.params);
+    //console.log(req.params);
 
     // jwt.verify(req.token,'my_key_id',async function(err,data) {
-    //     console.log(data);
+    //     //console.log(data);
     //     if(err){
     //         return res.status(403).json({
     //             error: err.message,
@@ -257,8 +257,8 @@ exports.updateUserInfo = async (req, res) => {
     const {
         phoneNumber
     } = req.params;
-    console.log(req.body);
-    console.log(req.params);
+    //console.log(req.body);
+    //console.log(req.params);
 
     // let SQL = "UPDATE users SET user_name = ?, address=?, image=? WHERE phone_number=?"
     try {
@@ -309,7 +309,7 @@ exports.updateToken = async (req, res) => {
     }, {
         returnOriginal: false
     }).then((results) => {
-        console.log(results);
+        //console.log(results);
         return res.status(200).json({
             error: null,
             errorCode: "0",
@@ -360,7 +360,7 @@ exports.uploadProfileImage = async (req, res) => {
                 })
             } else if (error) {
                 // An unknown error occurred when uploading.
-                console.log(error)
+                //console.log(error)
                 return res.status(500).json({
                     error
                 })
@@ -368,7 +368,7 @@ exports.uploadProfileImage = async (req, res) => {
 
 
             // Everything went fine.
-            console.log(req.file);
+            //console.log(req.file);
             let file_name;
             const {
                 phoneNumber
@@ -385,7 +385,7 @@ exports.uploadProfileImage = async (req, res) => {
                             message: "BAD_REQUEST"
                         })
                     }
-                    console.log(file_name);
+                    //console.log(file_name);
                     await userModel.findOneAndUpdate({
                         "phoneNumber": phoneNumber
                     }, {
@@ -400,7 +400,7 @@ exports.uploadProfileImage = async (req, res) => {
                                 message: "BAD_REQUEST"
                             })
                         }
-                        console.log(results);
+                        //console.log(results);
 
                         return res.status(200).json({
                             error: null,
