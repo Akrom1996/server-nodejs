@@ -111,11 +111,15 @@ exports.getItemsByCategory = async (req, res) => {
     const {
         position,
         category,
+        title
     } = req.params;
-    console.log(req.params);
     itemModel.find({
             "location": position,
-            "category": category
+            $or: [{
+                "category": category,
+            }, {
+                "title": /title/
+            }]
         })
         // itemModel.aggregate([{
         //         $match: {

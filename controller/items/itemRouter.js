@@ -46,7 +46,7 @@ router.get("/getGlobalItems/:position", getGlobalItems);
 
 
 // get Items by category
-router.get("/getItemsByCategory/:position/:category", getItemsByCategory);
+router.get("/getItemsByCategory/:position/:category/:title", getItemsByCategory);
 
 // post an item by location
 router.post("/postItem/:currentLocation/:phoneNumber", Multer({
