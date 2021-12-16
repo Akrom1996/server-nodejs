@@ -113,6 +113,7 @@ exports.getItemsByCategory = async (req, res) => {
         category,
         title
     } = req.params;
+    const {itemId} = req.query
     //console.log(req.params.title.split(' ')[0]);
     itemModel.find({
             "location": position,
@@ -120,7 +121,10 @@ exports.getItemsByCategory = async (req, res) => {
                 "category": category,
             }, {
                 "title": /title/
-            }]
+            }],
+            "_id": {
+                $nin: itemId
+            }
         })
         // itemModel.aggregate([{
         //         $match: {
