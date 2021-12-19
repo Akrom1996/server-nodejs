@@ -54,7 +54,7 @@ if (cluster.isMaster) {
     const commentsRouter = require("./controller/comments/commentRouter.js");
     const chatsRouter = require("./controller/chats/chatsRouter.js");
     const messagesRouter = require("./controller/adminNotifications/adminNotificationRouter.js");
-
+    const priceRouter = require("./controller/pricelist/priceRouter.js");
     // adding user router
     app.use('/user', userRouter);
 
@@ -69,6 +69,9 @@ if (cluster.isMaster) {
     app.use("/chats", chatsRouter);
 
     app.use("/messages", messagesRouter);
+
+    //adding price data 
+    app.use("/price", priceRouter);
 
     // 404 Error message
     app.all('*', (req, res) => {

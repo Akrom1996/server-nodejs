@@ -74,7 +74,10 @@ exports.getItemsByLocation = async (req, res) => {
     //console.log(currentLocation);
     try {
         await itemModel.find({
-            "location": currentLocation
+            "location": currentLocation,
+            "status": {
+                $nin: ["unpaid", "paid"]
+            }
         }).sort({
             "postTime": -1
         }).exec((err, results) => {
@@ -113,7 +116,9 @@ exports.getItemsByCategory = async (req, res) => {
         category,
         title
     } = req.params;
-    const {itemId} = req.query
+    const {
+        itemId
+    } = req.query
     //console.log(req.params.title.split(' ')[0]);
     itemModel.find({
             "location": position,
@@ -340,24 +345,26 @@ exports.incDecLikes = async (req, res) => {
 
 exports.getGlobalItems = async (req, res) => {
     const {
-        position
+        status
     } = req.params;
     itemModel.find({
-        "position": position
-    }).then((data) => {
-        return res.status(200).json({
-            error: null,
-            errorCode: "0",
-            message: "SUCCESS",
-            data: data
-        });
-    }).catch((error) => {
-        return res.status(400).json({
-            error: error,
-            errorCode: "1",
-            message: "BAD_REQUEST"
+            "status": status
+        }, )
+        .limit(30)
+        .then((data) => {
+            return res.status(200).json({
+                error: null,
+                errorCode: "0",
+                message: "SUCCESS",
+                data: data
+            });
+        }).catch((error) => {
+            return res.status(400).json({
+                error: error,
+                errorCode: "1",
+                message: "BAD_REQUEST"
+            })
         })
-    })
 }
 
 //post item

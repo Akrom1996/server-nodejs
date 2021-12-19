@@ -121,7 +121,7 @@ exports.sendToTopicFunction = async (data, topic) => {
      var payload = {
         "notification": {
             title: topic,
-            body: "Yangi e'lon berildi"
+            body: "Yangi e'lon berildi. Bilidirishnomalarni tekshiring"
         },
         "data": {
             data: JSON.stringify(data),
@@ -130,9 +130,9 @@ exports.sendToTopicFunction = async (data, topic) => {
         }
 
     };
-    //console.log("data ", data);
+    console.log("data ", topic);
     //console.log("payload ", payload);
-    admin.messaging().sendToTopic(topic, payload)
+    admin.messaging().sendToTopic(topic.toLowerCase(), payload)
         .then((result) => {
             //console.log(`successfully send to ${result}`);
             return result;

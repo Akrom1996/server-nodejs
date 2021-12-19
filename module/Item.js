@@ -45,6 +45,10 @@ const ItemSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
+  status: {
+    type: String,
+    default: null,
+  },
   price: {
     type: String,
     required: true

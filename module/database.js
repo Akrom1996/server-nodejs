@@ -29,6 +29,7 @@ const itemCollection = db.collection("items");
 const chatCollection = db.collection("chats");
 const userCollection = db.collection("users");
 const onlineCollection = db.collection("onlines");
+const priceList = db.collection("price");
 // const connection = mysql.createConnection({
 //   host: process.env.DB_HOSTNAME,
 //   user: process.env.DB_USER,
@@ -48,5 +49,5 @@ const onlineCollection = db.collection("onlines");
 module.exports = {
   // connection,
   mongoose,
-  collection,itemCollection,userCollection,chatCollection,db
+  collection,itemCollection,userCollection,chatCollection,db,priceList
 };

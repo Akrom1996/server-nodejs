@@ -42,7 +42,7 @@ router.get('/getItemInfo/:itemId', getItemInfo);
 router.get("/getItemsOfUser/:userId", getItemsOfUser);
 
 // get Items by position
-router.get("/getGlobalItems/:position", getGlobalItems);
+router.get("/getGlobalItems/:status", getGlobalItems);
 
 
 // get Items by category
