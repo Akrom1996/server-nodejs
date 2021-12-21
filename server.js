@@ -29,17 +29,17 @@ const accessLogStream = fs.createWriteStream(path.join(__dirname, "access.log"),
     flags: 'a'
 })
 
-if (cluster.isMaster) {
+// if (cluster.isMaster) {
 
-    for (let i = 0; i < cpus().length; i++) {
-        cluster.fork()
+//     for (let i = 0; i < cpus().length; i++) {
+//         cluster.fork()
 
-    }
-    cluster.on('exit', (worker, code, signal) => {
-        //console.log(`worker ${worker.process.pid} died`);
-        // cluster.fork()
-    });
-} else {
+//     }
+//     cluster.on('exit', (worker, code, signal) => {
+//         //console.log(`worker ${worker.process.pid} died`);
+//         // cluster.fork()
+//     });
+// } else {
     const app = express()
     app.use(express.json())
     app.use(morgan('dev', /*{stream: accessLogStream}*/ ))
@@ -319,4 +319,4 @@ if (cluster.isMaster) {
             console.error(e);
         }
     });
-}
+// }

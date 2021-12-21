@@ -10,7 +10,7 @@ const {
     updateUserInfo,
     updateToken,
     getUserById,
-    getStats
+    getStats,checkUserForExistance
 } = require("./userController")
 const Multer = require("multer");
 const {
@@ -18,6 +18,8 @@ const {
 } = require('../../security/jwt')
 // Saving User Email  
 // router.post('/saveEmail', saveEmail)
+//check user
+router.get("/checkUser/:phoneNumber", checkUserForExistance);
 // User Registration
 router.post('/registrate',
     Multer({

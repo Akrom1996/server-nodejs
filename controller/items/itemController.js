@@ -129,6 +129,9 @@ exports.getItemsByCategory = async (req, res) => {
             }],
             "_id": {
                 $nin: itemId
+            }, 
+            "status": {
+                $ne: "unpaid"
             }
         })
         // itemModel.aggregate([{
