@@ -38,14 +38,25 @@ exports.getChats = async (req, res) => {
 exports.getChatsOfUser = async (req, res) => {
     var results = [];
     let count = 0;
-    //console.log(req.params.id);
-    var user = await userModel.findById(req.params.id);
-    //console.log("user ", user);
+    const {
+        id,
+        itemId
+    } = req.query;
+    console.log(req.query);
+    var user = await userModel.findById(id);
     if (user.chats.length > 0) {
         await user.chats.forEach(async (i) => {
-            var chat = await chatCollection.findOne({
-                "_id": i
-            })
+            var chat;
+            if (itemId) {
+                chat = await chatCollection.findOne({
+                    "_id": i
+                })
+            } else {
+                chat = await chatCollection.findOne({
+                    "_id": i,
+                    "itemId": itemId
+                })
+            }
             // delete chat.messages;
             results.push(chat);
             // //console.log("chat: ", chat);

@@ -129,7 +129,7 @@ exports.getItemsByCategory = async (req, res) => {
             }],
             "_id": {
                 $nin: itemId
-            }, 
+            },
             "status": {
                 $ne: "unpaid"
             }
@@ -209,11 +209,26 @@ exports.getItemsOfUser = async (req, res) => {
 
 exports.updatePosition = async (req, res) => {
     const {
-        itemId
+        itemId,
     } = req.params;
-    //console.log(req.body);
+    const {
+        toUser,
+        position
+    } = req.body;
+    console.log(req.body);
+    console.log(req.params);
     try {
-        await itemModel.findByIdAndUpdate(itemId, req.body, (err, results) => {
+        if (toUser) {
+            await User.findByIdAndUpdate(toUser, {
+                $addToSet: {
+                    "boughts": itemId
+                }
+            }, )
+        }
+
+        await itemModel.findByIdAndUpdate(itemId, {
+            "position": position
+        }, (err, results) => {
             if (err) {
                 return res.status(400).json({
                     error: err,
@@ -227,7 +242,8 @@ exports.updatePosition = async (req, res) => {
                     message: "Ushbu jihoz tarmoqda mavjud emas"
                 })
             }
-            //console.log(results);
+            console.log(results);
+
             return res.status(200).json({
                 error: null,
                 errorCode: "0",

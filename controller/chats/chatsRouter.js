@@ -8,6 +8,6 @@ const {
 
 router.get("/getChats/:id", getChats);
 
-router.get("/getChatsOfUser/:id", getChatsOfUser);
+router.get("/getChatsOfUser", getChatsOfUser);
 
 module.exports = router;
