@@ -110,49 +110,41 @@ exports.getItemsByLocation = async (req, res) => {
     }
 }
 
-exports.getItemsByCategory = async (req, res) => {
+//For searching items
+exports.getItemsByLocationStartsWith = async (req, res) => {
     const {
-        position,
-        category,
-        title
+        currentLocation
     } = req.params;
     const {
-        itemId
+        value
     } = req.query
-    //console.log(req.params.title.split(' ')[0]);
-    itemModel.find({
-            "location": position,
-            $or: [{
-                "category": category,
-            }, {
-                "title": /title/
-            }],
-            "_id": {
-                $nin: itemId
+    //console.log(currentLocation);
+    try {
+        await itemModel.find({
+            "location": currentLocation,
+            "title": {
+                $regex: value + ".*",
+                $options: 'i'
             },
             "status": {
-                $ne: "unpaid"
+                $nin: ["unpaid", "paid"]
             }
-        })
-        // itemModel.aggregate([{
-        //         $match: {
-        //             "location": position,
-        //             "category": category
-        //         },
-
-        //     }, 
-
-        //     {
-        //         $sort: {
-        //             "likes": -1
-        //         }
-        //     }, 
-        // ])
-        .sort({
-            "likes": -1
-        })
-        .limit(20)
-        .then((results) => {
+        }).sort({
+            "postTime": -1
+        }).exec((err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    error: err.message,
+                    errorCode: "1",
+                    message: "BAD_REQUEST"
+                })
+            } else if (results === null) {
+                return res.status(403).json({
+                    error: "BAD_REQUEST",
+                    errorCode: "1",
+                    message: "Ushbu jihoz tarmoqda mavjud emas"
+                })
+            }
             return res.status(200).json({
                 error: null,
                 errorCode: "0",
@@ -160,13 +152,84 @@ exports.getItemsByCategory = async (req, res) => {
                 data: results
             });
         })
-        .catch((error) => {
-            return res.status(400).json({
-                error: error,
-                errorCode: "1",
-                message: "BAD_REQUEST"
-            });
+    } catch (error) {
+        return res.status(400).json({
+            error: error,
+            errorCode: "1",
+            message: "BAD_REQUEST"
         })
+    }
+}
+
+exports.getItemsByCategory = async (req, res) => {
+    const {
+        position,
+        category,
+
+    } = req.params;
+    const {
+        itemId,
+        title
+    } = req.query
+    //console.log(req.params.title.split(' ')[0]);
+    if (itemId) {
+        itemModel.find({
+                "location": position,
+                $or: [{
+                    "category": category,
+                }, {
+                    "title": /title/
+                }],
+                "_id": {
+                    $nin: itemId
+                },
+                "status": {
+                    $ne: "unpaid"
+                }
+            })
+
+            .sort({
+                "likes": -1
+            })
+            .limit(20)
+            .then((results) => {
+                return res.status(200).json({
+                    error: null,
+                    errorCode: "0",
+                    message: "SUCCESS",
+                    data: results
+                });
+            })
+            .catch((error) => {
+                return res.status(400).json({
+                    error: error,
+                    errorCode: "1",
+                    message: "BAD_REQUEST"
+                });
+            })
+    } else {
+        itemModel.find({
+                "location": position,
+                "category": category
+            },
+        ).
+        then((results) => {
+                return res.status(200).json({
+                    error: null,
+                    errorCode: "0",
+                    message: "SUCCESS",
+                    data: results
+                });
+            })
+            .catch((error) => {
+                return res.status(400).json({
+                    error: error,
+                    errorCode: "1",
+                    message: "BAD_REQUEST"
+                });
+            })
+
+    }
 }
 
 exports.getItemsOfUser = async (req, res) => {

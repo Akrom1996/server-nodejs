@@ -55,6 +55,7 @@ const accessLogStream = fs.createWriteStream(path.join(__dirname, "access.log"),
     const chatsRouter = require("./controller/chats/chatsRouter.js");
     const messagesRouter = require("./controller/adminNotifications/adminNotificationRouter.js");
     const priceRouter = require("./controller/pricelist/priceRouter.js");
+    const download = require("./controller/document/documentation.js");
     // adding user router
     app.use('/user', userRouter);
 
@@ -72,7 +73,7 @@ const accessLogStream = fs.createWriteStream(path.join(__dirname, "access.log"),
 
     //adding price data 
     app.use("/price", priceRouter);
-
+    app.use("/file", download);
     // 404 Error message
     app.all('*', (req, res) => {
         res.status(401).json({

@@ -12,6 +12,7 @@ const {
     uploadItemImages,
     favouriteItems,
     deleteItemById,
+    getItemsByLocationStartsWith,
 } = require("./itemController");
 const Multer = require("multer");
 const path = require("path")
@@ -34,6 +35,9 @@ function checkFileType(file, cb) {
 // get all items by location
 router.get("/getItemsByLocation/:currentLocation", getItemsByLocation);
 
+// get items by location starts with value
+router.get("/getItemsByLocationStartsWith/:currentLocation", getItemsByLocationStartsWith);
+
 // get Item info
 router.get('/getItemInfo/:itemId', getItemInfo);
 
@@ -46,7 +50,7 @@ router.get("/getGlobalItems/:status", getGlobalItems);
 
 
 // get Items by category
-router.get("/getItemsByCategory/:position/:category/:title", getItemsByCategory);
+router.get("/getItemsByCategory/:position/:category", getItemsByCategory);
 
 // post an item by location
 router.post("/postItem/:currentLocation/:phoneNumber", Multer({
