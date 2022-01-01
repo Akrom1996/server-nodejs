@@ -56,6 +56,7 @@ const accessLogStream = fs.createWriteStream(path.join(__dirname, "access.log"),
     const messagesRouter = require("./controller/adminNotifications/adminNotificationRouter.js");
     const priceRouter = require("./controller/pricelist/priceRouter.js");
     const download = require("./controller/document/documentation.js");
+    const otp = require("./controller/otp/otpRouter.js");
     // adding user router
     app.use('/user', userRouter);
 
@@ -69,7 +70,11 @@ const accessLogStream = fs.createWriteStream(path.join(__dirname, "access.log"),
 
     app.use("/chats", chatsRouter);
 
+    // document
     app.use("/messages", messagesRouter);
+
+    //otp
+    app.use("/otp", otp)
 
     //adding price data 
     app.use("/price", priceRouter);
@@ -219,7 +224,7 @@ const accessLogStream = fs.createWriteStream(path.join(__dirname, "access.log"),
             };
             const fcmMessage = {
                 notification: {
-                    title: message.toUserName,
+                    title: message.fromUserName,
                     body: message.content,
                     image: `http://localhost:9000/p2p-market/images/item-images/9bf98691-8225-4e3c-93f0-75b61d9ebbc1.jpg`
                 },
