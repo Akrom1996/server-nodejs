@@ -209,10 +209,9 @@ exports.getItemsByCategory = async (req, res) => {
             })
     } else {
         itemModel.find({
-                "location": position,
-                "category": category
-            },
-        ).
+            "location": position,
+            "category": category
+        }, ).
         then((results) => {
                 return res.status(200).json({
                     error: null,
@@ -230,6 +229,33 @@ exports.getItemsByCategory = async (req, res) => {
             })
 
     }
+}
+
+exports.getItemsById = async (req, res) => {
+    const
+        itemIds = req.query.itemIds;
+    console.log("item ids ", itemIds, );
+    var queryParam = []
+
+    Array.isArray(itemIds) ? queryParam = itemIds : queryParam.push(itemIds)
+    itemModel.find({
+        "_id": {
+            $in: [...queryParam]
+        }
+    }).then((results) => {
+        return res.status(200).json({
+            error: null,
+            errorCode: "0",
+            message: "SUCCESS",
+            data: results
+        });
+    }).catch((error) => {
+        return res.status(400).json({
+            error: error,
+            errorCode: "1",
+            message: "BAD_REQUEST"
+        });
+    })
 }
 
 exports.getItemsOfUser = async (req, res) => {
@@ -492,10 +518,11 @@ exports.uploadItemImages = async (req, res) => {
         .then((data) => {
             var title = item.title.split(' ')[0]
             //console.log("title ", title);
-            item["user"] = item.user._id;
+            // item["user"] = item.user._id;
             //console.log("item ", item);
+            if (item["status"] == "unpaid") return;
 
-            return sendToTopicFunction(item, title)
+            return sendToTopicFunction(item._id, title)
         })
         .then((data) => {
             // //console.log(data);

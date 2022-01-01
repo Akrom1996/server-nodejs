@@ -13,6 +13,7 @@ const {
     favouriteItems,
     deleteItemById,
     getItemsByLocationStartsWith,
+    getItemsById
 } = require("./itemController");
 const Multer = require("multer");
 const path = require("path")
@@ -48,6 +49,8 @@ router.get("/getItemsOfUser/:userId", getItemsOfUser);
 // get Items by position
 router.get("/getGlobalItems/:status", getGlobalItems);
 
+// get Items by ID
+router.get("/getItemsById", getItemsById);
 
 // get Items by category
 router.get("/getItemsByCategory/:position/:category", getItemsByCategory);
@@ -61,10 +64,10 @@ router.post("/postItem/:currentLocation/:phoneNumber", Multer({
         fileFilter: function (req, file, cb) {
             checkFileType(file, cb);
         }
-    }).array("upload", 8), uploadItemImages),
+    }).array("upload", 6), uploadItemImages),
 
     // update item position
-router.put("/updatePosition/:itemId", updatePosition)
+    router.put("/updatePosition/:itemId", updatePosition)
 
 router.put("/updateLikes/:itemId", incDecLikes)
 
