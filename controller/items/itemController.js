@@ -191,7 +191,7 @@ exports.getItemsByCategory = async (req, res) => {
             .sort({
                 "likes": -1
             })
-            .limit(20)
+            .limit(14)
             .then((results) => {
                 return res.status(200).json({
                     error: null,
