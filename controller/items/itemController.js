@@ -71,6 +71,9 @@ exports.getItemsByLocation = async (req, res) => {
     const {
         currentLocation
     } = req.params;
+    const {
+        skip
+    } = req.query
     //console.log(currentLocation);
     try {
         await itemModel.find({
@@ -78,7 +81,10 @@ exports.getItemsByLocation = async (req, res) => {
             "status": {
                 $nin: ["unpaid", "paid"]
             }
-        }).sort({
+        })
+        .skip(Number(skip))
+        .limit(15)
+        .sort({
             "postTime": -1
         }).exec((err, results) => {
             if (err) {
@@ -169,9 +175,10 @@ exports.getItemsByCategory = async (req, res) => {
     } = req.params;
     const {
         itemId,
-        title
+        title,
+        skip
     } = req.query
-    //console.log(req.params.title.split(' ')[0]);
+    console.log(req.query.skip);
     if (itemId) {
         itemModel.find({
                 "location": position,
@@ -209,10 +216,15 @@ exports.getItemsByCategory = async (req, res) => {
             })
     } else {
         itemModel.find({
-            "location": position,
-            "category": category
-        }, ).
-        then((results) => {
+                "location": position,
+                "category": category
+            }, )
+            .sort({
+                "postTime": -1
+            })
+            .skip(Number(skip))
+            .limit(15)
+            .then((results) => {
                 return res.status(200).json({
                     error: null,
                     errorCode: "0",
@@ -548,8 +560,10 @@ exports.favouriteItems = async (req, res) => {
         id,
         lists,
         favourites,
-        boughts
+        boughts,
+        skip
     } = req.body;
+    console.log("skip ", skip);
     var results = [];
     let count = 0;
     const user = await User.findById(id, );
@@ -557,7 +571,7 @@ exports.favouriteItems = async (req, res) => {
     if (lists) items = user.items;
     else if (favourites) items = user.likedItems;
     else items = user.boughts;
-    if (items.length === 0) {
+    if (items.length === 0 || items.length < skip) {
         return res.status(200).json({
             error: null,
             errorCode: "0",
@@ -565,31 +579,41 @@ exports.favouriteItems = async (req, res) => {
             data: [],
         });
     }
-    items.forEach(async (element) => {
-        await itemModel.findById(element, )
-            .exec((err, result) => {
-                if (err) {
-                    return res.status(400).json({
-                        error: err,
-                        errorCode: "1",
-                        message: "BAD_REQUEST"
-                    })
-                }
-                results.push(result);
-                count++;
-                if (count === items.length) {
-                    //console.log(results);
-                    return res.status(200).json({
-                        error: null,
-                        errorCode: "0",
-                        message: "SUCCESS",
-                        data: results
-                    });
-                }
+    var element = [];
+    for (let i = skip; i < skip + 15; i++) {
+        if(items[i] == null) break;
+        element.push(items[i])
+    }
 
-            })
+    console.log("elements: ", element);
+    // items.forEach(async (element) => {
+    await itemModel.find({
+            "_id": {
+                $in: [...element]
+            }
+        })
+        .exec((err, result) => {
+            if (err) {
+                return res.status(400).json({
+                    error: err,
+                    errorCode: "1",
+                    message: "BAD_REQUEST"
+                })
+            }
+            // results.push(result);
+            // count++;
+            // if (count === items.length) {
+            // console.log(result);
+            return res.status(200).json({
+                error: null,
+                errorCode: "0",
+                message: "SUCCESS",
+                data: result
+            });
+            // }
 
-    });
+        })
+
 
 
 }
