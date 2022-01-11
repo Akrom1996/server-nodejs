@@ -129,8 +129,8 @@ exports.getItemsByLocationStartsWith = async (req, res) => {
         await itemModel.find({
             "location": currentLocation,
             "title": {
-                $regex: value + ".*",
-                $options: 'i'
+                $regex: value,//value + ".*",/^value/
+                // $options: 'i'
             },
             "status": {
                 $nin: ["unpaid", "paid"]

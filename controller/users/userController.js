@@ -12,6 +12,8 @@ const jwt = require("jsonwebtoken")
 const {
     fcmFunc
 } = require("../firebase/notificationController")
+const {complainModel} = require("../../module/complain")
+
 
 function deleteProfileOrItemImage(images) {
     return new Promise((resolve, reject) => {
@@ -146,7 +148,7 @@ exports.deleteUser = async (req, res) => {
         }),
         itemData.length != 0 ? await deleteProfileOrItemImage(itemImages) : null,
 
-        // await deleteProfileOrItemImage([req.body.image]),
+        await deleteProfileOrItemImage([req.body.image]),
 
 
     ]).then((results) => {
@@ -249,46 +251,35 @@ exports.updateUserInfo = async (req, res) => {
     const {
         phoneNumber
     } = req.params;
-    //console.log(req.body);
-    //console.log(req.params);
-
-    // let SQL = "UPDATE users SET user_name = ?, address=?, image=? WHERE phone_number=?"
-    try {
-
-        await userModel.findOneAndUpdate({
-            "phoneNumber": phoneNumber
-        }, req.body, {
-            upsert: true,
-            returnOriginal: false,
-        }, (err, results) => {
-            if (err) {
-                return res.status(400).json({
-                    error: err.message,
-                    errorCode: "1",
-                    message: "BAD_REQUEST"
-                })
-            } else if (results === null) {
-                return res.status(403).json({
-                    error: "BAD_REQUEST",
-                    errorCode: "1",
-                    message: "Ushbu foydalanuvchi tarmoqda mavjud emas"
-                })
-            }
-            return res.status(200).json({
-                error: null,
-                errorCode: "0",
-                message: "SUCCESS",
-                data: results
-            });
-        })
-    } catch (error) {
+    console.log("body: ", req.body);
+    console.log(req.params);
+    await userModel.findOneAndUpdate({
+        "phoneNumber": phoneNumber
+    }, req.body, {
+        upsert: true,
+        returnOriginal: false,
+    }).then((results) => {
+        console.log(results);
+        if (results === null) {
+            return res.status(403).json({
+                error: "BAD_REQUEST",
+                errorCode: "1",
+                message: "Ushbu foydalanuvchi tarmoqda mavjud emas"
+            })
+        }
+        return res.status(200).json({
+            error: null,
+            errorCode: "0",
+            message: "SUCCESS",
+            data: results
+        });
+    }).catch((error) => {
         return res.status(400).json({
             error: error,
             errorCode: "1",
             message: "BAD_REQUEST"
-        })
-
-    }
+        });
+    })
 }
 
 exports.updateToken = async (req, res) => {
@@ -301,6 +292,42 @@ exports.updateToken = async (req, res) => {
     }, {
         returnOriginal: false
     }).then((results) => {
+        //console.log(results);
+        return res.status(200).json({
+            error: null,
+            errorCode: "0",
+            message: "SUCCESS",
+            data: results
+        });
+    }).catch((error) => {
+        return res.status(400).json({
+            error: error,
+            errorCode: "1",
+            message: "BAD_REQUEST"
+        })
+    })
+}
+
+exports.updateManner = async (req, res) => {
+    const {
+        id
+    } = req.params;
+    const {
+        manner,
+        complainerId
+    } = req.body;
+    var complain = new complainModel({"complainerId":complainerId,"userId":id});
+    Promise.all([
+        await userModel.findByIdAndUpdate(id, {
+            $push: {
+                manner: Number(manner)
+            }
+        }, {
+            returnOriginal: false
+        }),
+        await complain.save()
+    ])
+    .then((results) => {
         //console.log(results);
         return res.status(200).json({
             error: null,

@@ -10,7 +10,9 @@ const {
     updateUserInfo,
     updateToken,
     getUserById,
-    getStats,checkUserForExistance
+    getStats,
+    checkUserForExistance,
+    updateManner
 } = require("./userController")
 const Multer = require("multer");
 const {
@@ -32,7 +34,7 @@ router.post('/registrate',
         }
     }).single("upload"), registrate);
 // User delete
-router.delete('/deleteUser/:id/:type', /*ensureToken, */deleteUser);
+router.delete('/deleteUser/:id/:type', /*ensureToken, */ deleteUser);
 // Get user info
 router.get('/getUser/:phoneNumber', /*ensureToken, */ getUserInfo);
 //Get user by id
@@ -43,6 +45,8 @@ router.get('/getStats', /*ensureToken, */ getStats)
 router.put("/update-user-info/:phoneNumber", /*ensureToken, */ updateUserInfo);
 //update user fcm token
 router.put("/update-user-fcm/:id/:fcmToken", /*ensureToken, */ updateToken);
+//update user manner
+router.put("/update-user-manner/:id", /*ensureToken, */ updateManner);
 // Upload user image
 router.post('/upload-profile-image/:phoneNumber', /*ensureToken, */ uploadProfileImage);
 // Upload item images
