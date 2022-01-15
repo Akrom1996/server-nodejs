@@ -39,31 +39,33 @@ exports.getChats = async (req, res) => {
 }
 
 exports.getChatsOfUser = async (req, res) => {
-    // var results = [];
-    // let count = 0;
     const {
-        id,
-        itemId
+        id
     } = req.query;
     console.log(req.query);
-    if (!itemId) {
-        var user = await userModel.findById(id) //.lean().populate('chats').then(data=>res.json(data));
-        console.log("user chats: ", user.chats);
-        if (user.chats.length > 0) {
-            var chats = [];
-            for (let i = 0; i < user.chats.length; i++) {
-                chats.push(ObjectId(user.chats[i]))
+    var user = await userModel.findById(id) //.lean().populate('chats').then(data=>res.json(data));
+    console.log("user chats: ", user.chats);
+    if (user.chats.length > 0) {
+        var chats = [];
+        for (let i = 0; i < user.chats.length; i++) {
+            chats.push(ObjectId(user.chats[i]))
+        }
+        console.log(chats);
+        Chat.find({
+            "_id": {
+                $in: chats
             }
-            console.log(chats);
-            Chat.find({
-                "_id": {
-                    $in: chats
-                }
-            }).then(async (results) => {
-                console.log("results: ", results);
-                var result = []
-                for (let i = 0; i < results.length; i++) {
-                    var ownerData = await userModel.findById(results[i].ownerId);
+        }).then(async (results) => {
+            console.log("results: ", results);
+            var result = []
+            let nullCounter = 0;
+            for (let i = 0; i < results.length; i++) {
+                // console.log(results[i]);
+                var ownerData = await userModel.findById(results[i].ownerId);
+                console.log(ownerData);
+                if (!ownerData) {
+                    nullCounter++;
+                } else {
                     result.push({
                         "id": results[i].id,
                         "itemId": results[i].itemId,
@@ -81,51 +83,47 @@ exports.getChatsOfUser = async (req, res) => {
                         // },
                         "messages": results[i].messages
                     })
-                    if (result.length == results.length) {
-                        return res.status(200).json({
-                            error: null,
-                            errorCode: "0",
-                            message: "SUCCESS",
-                            data: result
-
-                        });
-                    }
                 }
+                if (result.length == results.length - nullCounter) {
+                    return res.status(200).json({
+                        error: null,
+                        errorCode: "0",
+                        message: "SUCCESS",
+                        data: result
 
+                    });
+                }
+            }
+        }).catch(err => {
+            return res.status(400).json({
+                error: err,
+                errorCode: "1",
+                message: "BAD_REQUEST",
+            });
+        })
 
-            }).catch(err => {
-                return res.status(400).json({
-                    error: err,
-                    errorCode: "1",
-                    message: "BAD_REQUEST",
-                });
-            })
-            // await user.chats.forEach(async (i) => {
-            //     var chat;
-            //     if (itemId) {
-            //         chat = await chatCollection.findOne({
-            //             "_id": i
-            //         })
-            //     } else {
-            //         chat = await chatCollection.findOne({
-            //             "_id": i,
-            //             "itemId": itemId
-            //         })
-            //     }
-            //     // delete chat.messages;
-            //     results.push(chat);
-            //     // //console.log("chat: ", chat);
-            //     count++;
-            //     if (count === user.chats.length) {
-            //         return res.status(200).json({
-            //             error: null,
-            //             errorCode: "0",
-            //             message: "SUCCESS",
-            //             data: results
-            //         });
-            //     }
-            // })
-        } else {
+    } else {
+        return res.status(200).json({
+            error: null,
+            errorCode: "0",
+            message: "SUCCESS",
+            data: []
+        });
+    }
+}
+
+exports.getChatsOfUserToSell = async (req, res) => {
+    console.log("with itemId");
+    const {
+        id,
+        itemId
+    } = req.query;
+    Chat.find({
+        "itemId": itemId,
+        "ownerId": id
+    }).then(async (results) => {
+        var result = [];
+        if (results.length == 0) {
             return res.status(200).json({
                 error: null,
                 errorCode: "0",
@@ -133,7 +131,38 @@ exports.getChatsOfUser = async (req, res) => {
                 data: []
             });
         }
-    }else{
-        
-    }
+        let nullCounter = 0;
+        for (let i = 0; i < results.length; i++) {
+            console.log("data ", results);
+            // var parsed = JSON.parse(results);
+            console.log(Object.keys(results[0].toJSON()));
+            userModel.findById(results[i].toJSON().user2).then(data => {
+                console.log("data ", data);
+                if (!data) {
+                    nullCounter++;
+                } else {
+                    result.push({
+                        "id": data._id,
+                        "userName": data.userName,
+                        "image": data.image
+                    })
+                }
+                console.log("result ", result);
+                if (result.length == results.length - nullCounter)
+                    return res.status(200).json({
+                        error: null,
+                        errorCode: "0",
+                        message: "SUCCESS",
+                        data: result
+                    });
+            })
+        }
+    }).catch(err => {
+        return res.status(400).json({
+            error: err,
+            errorCode: "1",
+            message: "BAD_REQUEST",
+        });
+    })
+
 }
