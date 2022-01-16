@@ -47,7 +47,7 @@ exports.getItemInfo = async (req, res) => {
                     return res.status(403).json({
                         error: "BAD_REQUEST",
                         errorCode: "1",
-                        message: "Ushbu jihoz tarmoqda mavjud emas"
+                        message: "Ushbu jihoz tarmoqda mavjud emas yoki o'chirilgan"
                     })
                 }
                 return res.status(200).json({

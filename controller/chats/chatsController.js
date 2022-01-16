@@ -59,11 +59,20 @@ exports.getChatsOfUser = async (req, res) => {
             console.log("results: ", results);
             var result = []
             let nullCounter = 0;
+            if(results.length == 0){
+                return res.status(200).json({
+                    error: null,
+                    errorCode: "0",
+                    message: "SUCCESS",
+                    data: []
+                });
+            }
             for (let i = 0; i < results.length; i++) {
                 // console.log(results[i]);
-                var ownerData = await userModel.findById(results[i].ownerId);
+                var ownerData = await userModel.findById(results[i].toJSON().ownerId);
+                var userData = await userModel.findById(results[i].toJSON().user2);
                 console.log(ownerData);
-                if (!ownerData) {
+                if (!ownerData || !userData) {
                     nullCounter++;
                 } else {
                     result.push({
@@ -75,12 +84,12 @@ exports.getChatsOfUser = async (req, res) => {
                             "image": ownerData.image,
                             "fcm": ownerData.fcmToken
                         },
-                        "userId": user.id,
-                        // {
-                        //     "id": user.id,
-                        //     "userName": user.userName,
-                        //     "image": user.image
-                        // },
+                        "user": {
+                            "id": userData.id,
+                            "userName": userData.userName,
+                            "image": userData.image,
+                            "fcm": userData.fcmToken
+                        },
                         "messages": results[i].messages
                     })
                 }
