@@ -95,10 +95,10 @@ app.all('*', (req, res) => {
 
 
 const getMessages = async (comments) => {
-    console.log("comments: ", comments);
+    // console.log("comments: ", comments);
     return new Promise((resolve, reject) => {
         var messages = []
-        if(comments.length == 0) resolve([])
+        if (comments.length == 0) resolve([])
         comments.forEach(async (comment) => {
             userCollection.findOne({
                 "_id": ObjectId(comment.userId)
@@ -154,7 +154,7 @@ io.on("connection", (socket) => {
         }
     });
 
-    
+
     socket.on("set online", async (data) => {
         // set online
         let resultOnline = await OnlineSchema.findOneAndUpdate({}, {
@@ -164,7 +164,7 @@ io.on("connection", (socket) => {
         }, {
             returnOriginal: false
         })
-        console.log(resultOnline);
+        // console.log(resultOnline);
         io.to(data.roomId).emit("user online", resultOnline.onlineUsers)
 
     })
@@ -173,7 +173,7 @@ io.on("connection", (socket) => {
     socket.on("chat join", async (data) => {
         try {
             let result = await chatCollection.findOne({
-                "_id": ObjectId( data.roomId)
+                "_id": ObjectId(data.roomId)
             });
             // if chat does not exist create new
             if (!result) {
@@ -249,7 +249,7 @@ io.on("connection", (socket) => {
         };
         const fcmMessage = {
             notification: {
-                title: "message.fromUserName",
+                title: "message",
                 body: message.content,
                 image: `http://localhost:9000/p2p-market/app-images/carrot.png` //9bf98691-8225-4e3c-93f0-75b61d9ebbc1.jpg`
             },
@@ -258,14 +258,15 @@ io.on("connection", (socket) => {
             },
 
         };
-        //console.log("sending to ", fcmToken);
-        io.to(socket.activeRoom).emit("chat message", message);
         //if fcm token user is not online send message notification
         let usersOnline = await OnlineSchema.findOne({});
         //console.log(usersOnline);
-        if(fcmToken)
-        !usersOnline.onlineUsers.includes(message.to) ?
-            admin.messaging().sendToDevice(fcmToken, fcmMessage, options).then(data => console.log(data)).catch(err => console.log(err)) : null;
+        if (fcmToken) {
+            !usersOnline.onlineUsers.includes(message.to) ?
+                admin.messaging().sendToDevice(fcmToken, fcmMessage, options).then(data => console.log(data)).catch(err => console.log(err)) : null;
+            console.log("sending to ",!usersOnline.onlineUsers.includes(message.to) ? fcmToken:null);
+        }
+        io.to(socket.activeRoom).emit("chat message",  message);
     });
 
     // get messages from private chats
@@ -297,7 +298,7 @@ io.on("connection", (socket) => {
     // create and get messages from comments
     socket.on("message", async (message) => {
         message.id = new ObjectId()
-        console.log(message);
+        // console.log(message);
         await itemCollection.updateOne({
             "_id": socket.activeRoom
         }, {
@@ -316,7 +317,7 @@ io.on("connection", (socket) => {
         var user = await userCollection.findOne({
             "_id": ObjectId(message.userId)
         })
-        console.log("user: ", user, " ", message.userId);
+        // console.log("user: ", user, " ", message.userId);
         if (user)
             io.to(socket.activeRoom).emit("message", {
                 "id": message.id,
@@ -342,15 +343,12 @@ io.on("connection", (socket) => {
 
     // get messages from comments
     socket.on("get comments", async (data) => {
-        console.log(socket.id, " ", socket.activeRoom || data); //socket.activeRoom is replaced with data
+        // console.log(socket.id, " ", socket.activeRoom || data); //socket.activeRoom is replaced with data
         var comments = await collection.findOne({
             "_id": socket.activeRoom || data
         })
         var messages = [];
-        console.log("messages");
-        console.log(comments);
         messages = await getMessages(comments.messages);
-        console.log("finished");
         // .then((messages) => {
         io.to(socket.id).emit("message comments", messages);
         // })

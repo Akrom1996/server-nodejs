@@ -254,7 +254,11 @@ exports.getItemsById = async (req, res) => {
         "_id": {
             $in: [...queryParam]
         }
-    }).then((results) => {
+    })
+    .sort({
+        "postTime": -1
+    })
+    .then((results) => {
         return res.status(200).json({
             error: null,
             errorCode: "0",
@@ -527,14 +531,14 @@ exports.uploadItemImages = async (req, res) => {
             item.save();
             return user.save();
         })
-        .then((data) => {
+        .then(async (data) => {
             var title = item.title.split(' ')[0]
             //console.log("title ", title);
             // item["user"] = item.user._id;
             //console.log("item ", item);
             if (item["status"] == "unpaid") return;
 
-            return sendToTopicFunction(item._id, title)
+            return await sendToTopicFunction(item._id, title)
         })
         .then((data) => {
             // //console.log(data);

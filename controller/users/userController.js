@@ -251,15 +251,15 @@ exports.updateUserInfo = async (req, res) => {
     const {
         phoneNumber
     } = req.params;
-    console.log("body: ", req.body);
-    console.log(req.params);
+    // console.log("body: ", req.body);
+    // console.log(req.params);
     await userModel.findOneAndUpdate({
         "phoneNumber": phoneNumber
     }, req.body, {
         upsert: true,
         returnOriginal: false,
     }).then((results) => {
-        console.log(results);
+        // console.log(results);
         if (results === null) {
             return res.status(403).json({
                 error: "BAD_REQUEST",
@@ -370,7 +370,7 @@ function checkFileType(file, cb) {
 
 exports.uploadProfileImage = async (req, res) => {
     try {
-
+        await deleteProfileOrItemImage([req.query.oldImagePath]) // delete old image on updating user image
         upload(req, res, function (error) {
             if (error instanceof Multer.MulterError) {
                 // A Multer error occurred when uploading.
@@ -410,7 +410,8 @@ exports.uploadProfileImage = async (req, res) => {
                     }, {
                         "image": file_name
                     }, {
-                        upsert: true
+                        upsert: true,
+                        returnOriginal: false,
                     }, (err, results) => {
                         if (err) {
                             return res.status(400).json({

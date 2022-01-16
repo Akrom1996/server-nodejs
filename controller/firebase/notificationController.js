@@ -132,14 +132,17 @@ exports.sendToTopicFunction = async (data, topic) => {
     };
     console.log("data ", topic);
     //console.log("payload ", payload);
-    admin.messaging().sendToTopic(topic.toLowerCase(), payload)
+    return new Promise((resolve, reject)=>{
+        admin.messaging().sendToTopic(topic.toLowerCase(), payload)
         .then((result) => {
             //console.log(`successfully send to ${result}`);
-            return result;
+            resolve( result);
         }).catch((error) => {
             //console.log(error);
-            return error;
+            reject(error);
         })
+    })
+    
 }
 
 exports.sendToTopic = async (req, res) => {

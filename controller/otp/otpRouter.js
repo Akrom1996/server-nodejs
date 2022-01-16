@@ -84,7 +84,7 @@ const sendOTP = async (token, phoneNumber, otp) => {
                 console.log(err);
                 reject(err);
             } else {
-                console.log("send body: ", body);
+                // console.log("send body: ", body);
 
                 responseData = JSON.parse(body);
                 resolve(responseData);
@@ -124,12 +124,11 @@ router.post("/send-otp", async (req, res) => {
         results.forEach((element) => {
             var createdDate = new Date(element.createdAt);
             var today = new Date();
-            console.log(createdDate.getDate() == today.getDate(), createdDate.getMonth() == today.getMonth);
             if (createdDate.getDate() == today.getDate() && createdDate.getMonth() == today.getMonth() && createdDate.getFullYear() == today.getFullYear()) {
                 counter++
             }
         })
-        console.log("counter: ", counter);
+        // console.log("counter: ", counter);
         if (counter < 3) {
             await OTPModel({
                 phoneNumber: phoneNumber,
@@ -137,7 +136,7 @@ router.post("/send-otp", async (req, res) => {
             }).save()
 
         } else {
-            console.log("more than 3");
+            // console.log("more than 3");
             return res.status(400).json({
                 error: "error",
                 errorCode: "1",
@@ -162,8 +161,8 @@ router.post("/send-otp", async (req, res) => {
     } else {
         var token = await getToken();
         // var response = await
-        sendOTP(token, phoneNumber, otp)
-        console.log("result: ", response);
+        // sendOTP(token, phoneNumber, otp)
+        // console.log("result: ", response);
         return res.status(200).json({
             error: null,
             errorCode: "0",

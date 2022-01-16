@@ -42,21 +42,18 @@ exports.getChatsOfUser = async (req, res) => {
     const {
         id
     } = req.query;
-    console.log(req.query);
     var user = await userModel.findById(id) //.lean().populate('chats').then(data=>res.json(data));
-    console.log("user chats: ", user.chats);
+    // console.log("user chats: ", user.chats);
     if (user.chats.length > 0) {
         var chats = [];
         for (let i = 0; i < user.chats.length; i++) {
             chats.push(ObjectId(user.chats[i]))
         }
-        console.log(chats);
         Chat.find({
             "_id": {
                 $in: chats
             }
         }).then(async (results) => {
-            console.log("results: ", results);
             var result = []
             let nullCounter = 0;
             if(results.length == 0){
@@ -71,7 +68,6 @@ exports.getChatsOfUser = async (req, res) => {
                 // console.log(results[i]);
                 var ownerData = await userModel.findById(results[i].toJSON().ownerId);
                 var userData = await userModel.findById(results[i].toJSON().user2);
-                console.log(ownerData);
                 if (!ownerData || !userData) {
                     nullCounter++;
                 } else {
@@ -122,7 +118,6 @@ exports.getChatsOfUser = async (req, res) => {
 }
 
 exports.getChatsOfUserToSell = async (req, res) => {
-    console.log("with itemId");
     const {
         id,
         itemId
@@ -142,11 +137,11 @@ exports.getChatsOfUserToSell = async (req, res) => {
         }
         let nullCounter = 0;
         for (let i = 0; i < results.length; i++) {
-            console.log("data ", results);
+            // console.log("data ", results);
             // var parsed = JSON.parse(results);
-            console.log(Object.keys(results[0].toJSON()));
+            // console.log(Object.keys(results[0].toJSON()));
             userModel.findById(results[i].toJSON().user2).then(data => {
-                console.log("data ", data);
+                // console.log("data ", data);
                 if (!data) {
                     nullCounter++;
                 } else {
@@ -156,7 +151,7 @@ exports.getChatsOfUserToSell = async (req, res) => {
                         "image": data.image
                     })
                 }
-                console.log("result ", result);
+                // console.log("result ", result);
                 if (result.length == results.length - nullCounter)
                     return res.status(200).json({
                         error: null,
