@@ -251,7 +251,7 @@ io.on("connection", (socket) => {
             notification: {
                 title: "message",
                 body: message.content,
-                image: `http://localhost:9000/p2p-market/app-images/carrot.png` //9bf98691-8225-4e3c-93f0-75b61d9ebbc1.jpg`
+                image: `http://localhost:9000/p2p-market/images/app-images/carrot.png` //9bf98691-8225-4e3c-93f0-75b61d9ebbc1.jpg`
             },
             data: {
                 type: "/message_screen",

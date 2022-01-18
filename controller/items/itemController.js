@@ -130,7 +130,7 @@ exports.getItemsByLocationStartsWith = async (req, res) => {
             "location": currentLocation,
             "title": {
                 $regex: value,//value + ".*",/^value/
-                // $options: 'i'
+                $options: 'i'
             },
             "status": {
                 $nin: ["unpaid", "paid"]
@@ -178,7 +178,7 @@ exports.getItemsByCategory = async (req, res) => {
         title,
         skip
     } = req.query
-    console.log(req.query.skip);
+    // console.log(req.query.skip);
     if (itemId) {
         itemModel.find({
                 "location": position,
@@ -246,7 +246,6 @@ exports.getItemsByCategory = async (req, res) => {
 exports.getItemsById = async (req, res) => {
     const
         itemIds = req.query.itemIds;
-    console.log("item ids ", itemIds, );
     var queryParam = []
 
     Array.isArray(itemIds) ? queryParam = itemIds : queryParam.push(itemIds)
@@ -320,8 +319,6 @@ exports.updatePosition = async (req, res) => {
         toUser,
         position
     } = req.body;
-    console.log(req.body);
-    console.log(req.params);
     try {
         if (toUser) {
             await User.findByIdAndUpdate(toUser, {
@@ -347,7 +344,6 @@ exports.updatePosition = async (req, res) => {
                     message: "Ushbu jihoz tarmoqda mavjud emas"
                 })
             }
-            console.log(results);
 
             return res.status(200).json({
                 error: null,
@@ -567,7 +563,6 @@ exports.favouriteItems = async (req, res) => {
         boughts,
         skip
     } = req.body;
-    console.log("skip ", skip);
     var results = [];
     let count = 0;
     const user = await User.findById(id, );
@@ -589,7 +584,6 @@ exports.favouriteItems = async (req, res) => {
         element.push(items[i])
     }
 
-    console.log("elements: ", element);
     // items.forEach(async (element) => {
     await itemModel.find({
             "_id": {

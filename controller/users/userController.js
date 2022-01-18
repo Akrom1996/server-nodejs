@@ -408,7 +408,8 @@ exports.uploadProfileImage = async (req, res) => {
                     await userModel.findOneAndUpdate({
                         "phoneNumber": phoneNumber
                     }, {
-                        "image": file_name
+                        "image": file_name,
+                        "userName": req.query.userName,
                     }, {
                         upsert: true,
                         returnOriginal: false,

@@ -149,7 +149,7 @@ router.post("/send-otp", async (req, res) => {
     if (fs.existsSync(__dirname + "/sms_token.txt")) {
         fs.readFile(__dirname + "/sms_token.txt", 'utf8', async (err, data) => {
             if (err) console.log(err)
-            var response = await sendOTP(data, phoneNumber, otp);
+            // var response = await sendOTP(data, phoneNumber, otp);
             // console.log("res data: ", response.status);
             return res.status(200).json({
                 error: null,
