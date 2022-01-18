@@ -18,7 +18,9 @@ const {
 const Multer = require("multer");
 const path = require("path")
 const router = express.Router();
-
+const {
+    ensureToken
+} = require('../../security/jwt')
 
 function checkFileType(file, cb) {
     // Allowed ext
@@ -34,29 +36,29 @@ function checkFileType(file, cb) {
     }
 }
 // get all items by location
-router.get("/getItemsByLocation/:currentLocation", getItemsByLocation);
+router.get("/getItemsByLocation/:currentLocation", ensureToken, getItemsByLocation);
 
 // get items by location starts with value
-router.get("/getItemsByLocationStartsWith/:currentLocation", getItemsByLocationStartsWith);
+router.get("/getItemsByLocationStartsWith/:currentLocation", ensureToken, getItemsByLocationStartsWith);
 
 // get Item info
-router.get('/getItemInfo/:itemId', getItemInfo);
+router.get('/getItemInfo/:itemId', ensureToken, getItemInfo);
 
 // get All Items of an user
 
-router.get("/getItemsOfUser/:userId", getItemsOfUser);
+router.get("/getItemsOfUser/:userId", ensureToken, getItemsOfUser);
 
 // get Items by position
-router.get("/getGlobalItems/:status", getGlobalItems);
+router.get("/getGlobalItems/:status", ensureToken, getGlobalItems);
 
 // get Items by ID
-router.get("/getItemsById", getItemsById);
+router.get("/getItemsById", ensureToken, getItemsById);
 
 // get Items by category
-router.get("/getItemsByCategory/:position/:category", getItemsByCategory);
+router.get("/getItemsByCategory/:position/:category", ensureToken, getItemsByCategory);
 
 // post an item by location
-router.post("/postItem/:currentLocation/:phoneNumber", Multer({
+router.post("/postItem/:currentLocation/:phoneNumber", ensureToken, Multer({
         storage: Multer.memoryStorage(),
         limits: {
             fileSize: 10000000
@@ -67,11 +69,11 @@ router.post("/postItem/:currentLocation/:phoneNumber", Multer({
     }).array("upload", 6), uploadItemImages),
 
     // update item position
-    router.put("/updatePosition/:itemId", updatePosition)
+    router.put("/updatePosition/:itemId", ensureToken, updatePosition)
 
 router.put("/updateLikes/:itemId", incDecLikes)
 
-router.post("/favouriteItems", favouriteItems)
+router.post("/favouriteItems", ensureToken, favouriteItems)
 
-router.delete("/deleteItem/:itemId", deleteItemById);
+router.delete("/deleteItem/:itemId", ensureToken, deleteItemById);
 module.exports = router;

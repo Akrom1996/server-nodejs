@@ -6,12 +6,14 @@ const {
     postComment,
     putThumb
 } = require("./commentController");
+const {
+    ensureToken
+} = require('../../security/jwt')
+router.get("/getComments/:itemId",ensureToken, getComments);
 
-router.get("/getComments/:itemId", getComments);
+router.post("/postComment/:itemId",ensureToken, postComment);
 
-router.post("/postComment/:itemId", postComment);
-
-router.put("/putThumb/:itemId/:commentId/:userId",putThumb);
+router.put("/putThumb/:itemId/:commentId/:userId",ensureToken,putThumb);
 
 
 module.exports = router;

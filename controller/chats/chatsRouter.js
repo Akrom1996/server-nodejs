@@ -6,11 +6,14 @@ const {
     getChatsOfUser,
     getChatsOfUserToSell
 } = require("./chatsController");
+const {
+    ensureToken
+} = require('../../security/jwt')
 
-router.get("/getChats/:id", getChats);
+router.get("/getChats/:id",ensureToken, getChats);
 
-router.get("/getChatsOfUser", getChatsOfUser);
+router.get("/getChatsOfUser",ensureToken, getChatsOfUser);
 
-router.get("/getChatsOfUserToSell", getChatsOfUserToSell);
+router.get("/getChatsOfUserToSell",ensureToken, getChatsOfUserToSell);
 
 module.exports = router;

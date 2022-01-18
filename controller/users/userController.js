@@ -12,7 +12,9 @@ const jwt = require("jsonwebtoken")
 const {
     fcmFunc
 } = require("../firebase/notificationController")
-const {complainModel} = require("../../module/complain")
+const {
+    complainModel
+} = require("../../module/complain")
 
 
 function deleteProfileOrItemImage(images) {
@@ -55,7 +57,7 @@ exports.checkUserForExistance = async (req, res) => {
 exports.registrate = async (req, res) => {
     //console.log("register");
     //console.log(req.body)
-    // let token = jwt.sign(req.body.phoneNumber, 'my_key')
+    let token = jwt.sign(req.body.phoneNumber, 'my_key')
     var user = new userModel(req.body);
     const users = await userModel.find({
         "phoneNumber": req.body.phoneNumber
@@ -87,9 +89,8 @@ exports.registrate = async (req, res) => {
             error: null,
             errorCode: "0",
             message: "SUCCESS",
+            token: token,
             data: result[0],
-            // token: token,
-            // tokenId: tokenId,
         })
     }).catch((error) => {
         return res.status(400).json({
@@ -98,18 +99,6 @@ exports.registrate = async (req, res) => {
             message: "BAD_REQUEST"
         });
     })
-    // var tokenId = jwt.sign(String(userResult._id), 'my_key_id')
-    // //console.log(tokenId);
-
-
-    // } else {
-    //     //console.log("here error");
-    //     return res.status(400).json({
-    //         error: "BAD_REQUEST",
-    //         errorCode: "1",
-    //         message: "Ushbu raqam ro'yxatdan o'tgan"
-    //     })
-    // }
 
 }
 
@@ -316,32 +305,35 @@ exports.updateManner = async (req, res) => {
         manner,
         complainerId
     } = req.body;
-    var complain = new complainModel({"complainerId":complainerId,"userId":id});
+    var complain = new complainModel({
+        "complainerId": complainerId,
+        "userId": id
+    });
     Promise.all([
-        await userModel.findByIdAndUpdate(id, {
-            $push: {
-                manner: Number(manner)
-            }
-        }, {
-            returnOriginal: false
-        }),
-        await complain.save()
-    ])
-    .then((results) => {
-        //console.log(results);
-        return res.status(200).json({
-            error: null,
-            errorCode: "0",
-            message: "SUCCESS",
-            data: results
-        });
-    }).catch((error) => {
-        return res.status(400).json({
-            error: error,
-            errorCode: "1",
-            message: "BAD_REQUEST"
+            await userModel.findByIdAndUpdate(id, {
+                $push: {
+                    manner: Number(manner)
+                }
+            }, {
+                returnOriginal: false
+            }),
+            await complain.save()
+        ])
+        .then((results) => {
+            //console.log(results);
+            return res.status(200).json({
+                error: null,
+                errorCode: "0",
+                message: "SUCCESS",
+                data: results
+            });
+        }).catch((error) => {
+            return res.status(400).json({
+                error: error,
+                errorCode: "1",
+                message: "BAD_REQUEST"
+            })
         })
-    })
 }
 var upload = Multer({
     storage: Multer.memoryStorage(),

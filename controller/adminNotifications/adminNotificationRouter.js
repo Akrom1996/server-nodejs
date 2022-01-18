@@ -6,12 +6,15 @@ const {
     postNotification,
     putView
 } = require("./adminNotificationController");
+const {
+    ensureToken
+} = require('../../security/jwt')
 
-router.get("/getNotifications", getNotifications);
+router.get("/getNotifications",ensureToken, getNotifications);
 
-router.post("/postNotification", postNotification);
+router.post("/postNotification",ensureToken, postNotification);
 
-router.put("/putView/:messageId/:userId",putView);
+router.put("/putView/:messageId/:userId",ensureToken,putView);
 
 
 module.exports = router;
