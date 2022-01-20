@@ -275,7 +275,7 @@ exports.updateToken = async (req, res) => {
     const {
         id,
         fcmToken
-    } = req.params;
+    } = req.query;
     userModel.findByIdAndUpdate(id, {
         fcmToken: fcmToken
     }, {

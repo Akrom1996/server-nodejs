@@ -44,7 +44,7 @@ router.get('/getStats', /*ensureToken, */ getStats)
 // Update user info
 router.put("/update-user-info/:phoneNumber", ensureToken, updateUserInfo);
 //update user fcm token
-router.put("/update-user-fcm/:id/:fcmToken", updateToken);
+router.put("/update-user-fcm", updateToken);
 //update user manner
 router.put("/update-user-manner/:id", ensureToken, updateManner);
 // Upload user image

@@ -5,7 +5,6 @@ exports.ensureToken = (req, res, next) => {
     if (typeof bearerHeader !== 'undefined') {
         const bearer = bearerHeader.split(" ");
         const bearerToken = bearer[1];
-        console.log(bearerToken);
         // req.token = bearerToken;
         jwt.verify(bearerToken, 'my_key', async function (err, data) {
             if (err) {
@@ -25,4 +24,14 @@ exports.ensureToken = (req, res, next) => {
             message: "Unauthorized user"
         })
     }
+}
+
+exports.generateToken = async(req,res)=>{
+    let token = jwt.sign(req.params.phoneNumber, 'my_key')
+    return res.status(200).json({
+        error: null,
+        errorCode: "1",
+        message: "Success",
+        data: token
+    })
 }

@@ -58,6 +58,8 @@ const priceRouter = require("./controller/pricelist/priceRouter.js");
 const download = require("./controller/document/documentation.js");
 const otp = require("./controller/otp/otpRouter.js");
 const complainRouter = require("./controller/complain/complainRouter.js")
+const jwtRouter = require("./security/jwtRouter.js")
+
 // adding user router
 app.use('/user', userRouter);
 
@@ -85,6 +87,10 @@ app.use("/file", download);
 
 //make compilation
 app.use("/complain", complainRouter)
+
+//generate jwt
+app.use("/jwt", jwtRouter)
+
 // 404 Error message
 app.all('*', (req, res) => {
     res.status(401).json({
