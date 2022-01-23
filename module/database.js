@@ -5,12 +5,15 @@ mongoose.set('useFindAndModify', false);
 const {
   MongoClient,
 } = require("mongodb");
-
-mongoose.connect('mongodb://192.168.0.200:27017/myKarrot?authSource=myKarrot&w=1', {
+const HOST_NAME = process.env.DB_HOSTNAME;
+const PORT = process.env.DB_PORT
+const USER_NAME = process.env.DB_USER;
+const PASSWORD = process.env.DB_PASSWORD;
+mongoose.connect(`mongodb://${HOST_NAME}:${PORT}/myKarrot?authSource=myKarrot&w=1`, {
 
     auth: {
-      user: 'akrom96!',
-      password: '12345Akrom'
+      user: USER_NAME,
+      password: PASSWORD,
     },
     authSource: "admin",
     useNewUrlParser: true,
@@ -26,7 +29,7 @@ mongoose.connect('mongodb://192.168.0.200:27017/myKarrot?authSource=myKarrot&w=1
     //console.log("Connected to mongoose")
   }
 );
-const client = new MongoClient("mongodb://akrom96%21:12345Akrom@192.168.0.200:27017/myKarrot?authSource=admin", {
+const client = new MongoClient(`mongodb://${USER_NAME}:${PASSWORD}@${HOST_NAME}:${PORT}/myKarrot?authSource=admin`, {
   useUnifiedTopology: true,
  
   // akrom96%21:12345Akrom@
