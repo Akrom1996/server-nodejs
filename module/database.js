@@ -6,10 +6,17 @@ const {
   MongoClient,
 } = require("mongodb");
 
-mongoose.connect('mongodb://localhost:27017/myKarrot', {
+mongoose.connect('mongodb://192.168.0.200:27017/myKarrot?authSource=myKarrot&w=1', {
+
+    auth: {
+      user: 'akrom96!',
+      password: '12345Akrom'
+    },
+    authSource: "admin",
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    useCreateIndex: true
+    useCreateIndex: true,
+
   },
   (err) => {
     if (err) {
@@ -19,8 +26,10 @@ mongoose.connect('mongodb://localhost:27017/myKarrot', {
     //console.log("Connected to mongoose")
   }
 );
-const client = new MongoClient("mongodb://localhost:27017/myKarrot", {
-    useUnifiedTopology: true
+const client = new MongoClient("mongodb://akrom96%21:12345Akrom@192.168.0.200:27017/myKarrot?authSource=admin", {
+  useUnifiedTopology: true,
+ 
+  // akrom96%21:12345Akrom@
 });
 client.connect();
 db = client.db("myKarrot");
@@ -49,5 +58,10 @@ const priceList = db.collection("price");
 module.exports = {
   // connection,
   mongoose,
-  collection,itemCollection,userCollection,chatCollection,db,priceList
+  collection,
+  itemCollection,
+  userCollection,
+  chatCollection,
+  db,
+  priceList
 };
