@@ -9,7 +9,7 @@ const HOST_NAME = process.env.DB_HOSTNAME;
 const PORT = process.env.DB_PORT
 const USER_NAME = process.env.DB_USER;
 const PASSWORD = process.env.DB_PASSWORD;
-mongoose.connect(`mongodb://${HOST_NAME}:${PORT}/myKarrot?authSource=myKarrot&w=1`, {
+mongoose.connect(`mongodb://${HOST_NAME}:${PORT}/myKarrot?authSource=admin&w=1`, {
 
     auth: {
       user: USER_NAME,
