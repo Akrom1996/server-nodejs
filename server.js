@@ -171,7 +171,7 @@ io.on("connection", (socket) => {
             returnOriginal: false
         })
         // console.log(resultOnline);
-        io.to(data.roomId).emit("user online", resultOnline.onlineUsers)
+        io.to(data.roomId).emit("user online", resultOnline ? [] :resultOnline.onlineUsers)
 
     })
 
