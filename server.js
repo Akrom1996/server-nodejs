@@ -207,7 +207,7 @@ if (cluster.isMaster) {
                 returnOriginal: false
             })
             // console.log(resultOnline);
-            io.to(data.roomId).emit("user online", resultOnline ? [] : resultOnline.onlineUsers)
+            io.to(data.roomId).emit("user online", resultOnline ?resultOnline.onlineUsers :[])
 
         })
 
@@ -342,7 +342,7 @@ if (cluster.isMaster) {
             message.id = new ObjectId()
             // console.log(message);
             await itemCollection.updateOne({
-                "_id": socket.activeRoom
+                "_id": ObjectId(socket.activeRoom)
             }, {
                 "$push": {
                     "comments": message.id
