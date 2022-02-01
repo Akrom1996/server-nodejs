@@ -28,7 +28,6 @@ const fs = require("fs")
 const accessLogStream = fs.createWriteStream(path.join(__dirname, "access.log"), {
     flags: 'a'
 })
-
 const {
     createClient
 } = require("redis");
@@ -42,18 +41,18 @@ if (cluster.isMaster) {
     var io = require('socket.io')(server);
 
 
-    // var redis = require('socket.io-redis');
-    // io.adapter(redis({
-    //     host: 'localhost',
-    //     port: 6379
-    // }));
+    var redis = require('socket.io-redis');
+    io.adapter(redis({
+        host: process.env.HOST,
+        port: 6379
+    }));
+ 
+    // const pubClient = createClient({
+    //     url: "redis://localhost:6379"
+    // });
+    // const subClient = pubClient.duplicate();
+    // io.adapter(createAdapter(pubClient, subClient));
 
-    const pubClient = createClient({
-        url: "redis://localhost:6379"
-    });
-    const subClient = pubClient.duplicate();
-
-    io.adapter(createAdapter(pubClient, subClient));
     for (let i = 0; i < cpus().length; i++) {
         cluster.fork()
 
@@ -72,18 +71,18 @@ if (cluster.isMaster) {
     const io = require("socket.io")(server)
 
 
-    // var redis = require('socket.io-redis');
-    // io.adapter(redis({
-    //     host: 'localhost',
-    //     port: 6379
-    // }));
+    var redis = require('socket.io-redis');
+    io.adapter(redis({
+        host: process.env.HOST,
+        port: 6379
+    }));
 
-    const pubClient = createClient({
-        url: "redis://localhost:6379"
-    });
-    const subClient = pubClient.duplicate();
+    // const pubClient = createClient({
+    //     url: "redis://localhost:6379"
+    // });
+    // const subClient = pubClient.duplicate();
 
-    io.adapter(createAdapter(pubClient, subClient));
+    // io.adapter(createAdapter(pubClient, subClient));
 
     const userRouter = require("./controller/users/userRouter");
     const itemRouter = require("./controller/items/itemRouter.js");
@@ -294,7 +293,7 @@ if (cluster.isMaster) {
                 notification: {
                     title: "message",
                     body: message.content,
-                    image: `http://localhost:9000/p2p-market/images/app-images/carrot.png` //9bf98691-8225-4e3c-93f0-75b61d9ebbc1.jpg`
+                    image: `http://${process.env.HOST}:${process.env.MINIO_PORT}/p2p-market/images/app-images/carrot.png` //9bf98691-8225-4e3c-93f0-75b61d9ebbc1.jpg`
                 },
                 data: {
                     type: "/message_screen",
