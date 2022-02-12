@@ -382,10 +382,11 @@ exports.incDecLikes = async (req, res) => {
             }, {
                 new: false
             }),
-            number === 1 ? await User.findByIdAndUpdate(userId, {
-                $push: {
+            Number(number) === 1 ? await User.findByIdAndUpdate(userId, {
+                $addToSet: {
                     likedItems: itemId
                 }
+                
             }) :
             await User.findByIdAndUpdate(userId, {
                 $pull: {
