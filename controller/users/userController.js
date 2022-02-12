@@ -32,7 +32,6 @@ function deleteProfileOrItemImage(images) {
     });
 }
 
-
 exports.checkUserForExistance = async (req, res) => {
     userModel.find({
         "phoneNumber": req.params.phoneNumber
@@ -275,7 +274,7 @@ exports.updateToken = async (req, res) => {
     const {
         id,
         fcmToken
-    } = req.query;
+    } = req.body;
     userModel.findByIdAndUpdate(id, {
         fcmToken: fcmToken
     }, {

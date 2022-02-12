@@ -106,7 +106,7 @@ const generateOTP = async () => {
 router.post("/send-otp", async (req, res) => {
     const {
         phoneNumber
-    } = req.query;
+    } = req.body;
     let otp = await generateOTP();
     console.log(otp);
     //check
@@ -149,8 +149,8 @@ router.post("/send-otp", async (req, res) => {
     if (fs.existsSync(__dirname + "/sms_token.txt")) {
         fs.readFile(__dirname + "/sms_token.txt", 'utf8', async (err, data) => {
             if (err) console.log(err)
-            var response = await sendOTP(data, phoneNumber, otp);
-            console.log("res data: ", response.status);
+            //var response = await sendOTP(data, phoneNumber, otp);
+            // console.log("res data: ", response.status);
             return res.status(200).json({
                 error: null,
                 errorCode: "0",
@@ -161,7 +161,7 @@ router.post("/send-otp", async (req, res) => {
     } else {
         var token = await getToken();
          var response = await
-        sendOTP(token, phoneNumber, otp)
+       // sendOTP(token, phoneNumber, otp)
         console.log("result: ", response);
         return res.status(200).json({
             error: null,
