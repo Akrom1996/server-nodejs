@@ -12,7 +12,8 @@ const {
     getUserById,
     getStats,
     checkUserForExistance,
-    updateManner
+    updateManner,
+    deleteUserImage
 } = require("./userController")
 const Multer = require("multer");
 const {
@@ -35,6 +36,8 @@ router.post('/registrate',
     }).single("upload"), registrate);
 // User delete
 router.delete('/deleteUser/:id/:type', ensureToken, deleteUser);
+// User Image delete
+router.delete('/delete-user-image/:id', ensureToken, deleteUserImage);
 // Get user info
 router.get('/getUser/:phoneNumber', ensureToken, getUserInfo);
 //Get user by id

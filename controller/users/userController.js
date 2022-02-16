@@ -154,6 +154,32 @@ exports.deleteUser = async (req, res) => {
         });
     })
 }
+exports.deleteUserImage = async (req, res) => {
+    const {
+        id
+    } = req.params;
+    Promise.all([
+        await userModel.findByIdAndUpdate(id, {
+            "image": "null"
+        }, {
+            returnOriginal: false
+        }),
+        await deleteProfileOrItemImage([req.body.image]),
+    ]).then((results) => {
+        return res.status(200).json({
+            error: null,
+            errorCode: "0",
+            message: "SUCCESS",
+            data: results
+        });
+    }).catch((err) => {
+        return res.status(400).json({
+            error: err.message,
+            errorCode: "1",
+            message: "BAD_REQUEST"
+        });
+    })
+}
 
 exports.getUserInfo = async (req, res) => {
     //console.log(req.params);
