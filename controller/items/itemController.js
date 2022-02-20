@@ -77,36 +77,36 @@ exports.getItemsByLocation = async (req, res) => {
     //console.log(currentLocation);
     try {
         await itemModel.find({
-            "location": currentLocation,
-            "status": {
-                $nin: ["unpaid", "paid"]
-            }
-        })
-        .skip(Number(skip))
-        .limit(15)
-        .sort({
-            "postTime": -1
-        }).exec((err, results) => {
-            if (err) {
-                return res.status(400).json({
-                    error: err.message,
-                    errorCode: "1",
-                    message: "BAD_REQUEST"
-                })
-            } else if (results === null) {
-                return res.status(403).json({
-                    error: "BAD_REQUEST",
-                    errorCode: "1",
-                    message: "Ushbu jihoz tarmoqda mavjud emas"
-                })
-            }
-            return res.status(200).json({
-                error: null,
-                errorCode: "0",
-                message: "SUCCESS",
-                data: results
-            });
-        })
+                "location": currentLocation,
+                "status": {
+                    $nin: ["unpaid", "paid"]
+                }
+            })
+            .skip(Number(skip))
+            .limit(15)
+            .sort({
+                "postTime": -1
+            }).exec((err, results) => {
+                if (err) {
+                    return res.status(400).json({
+                        error: err.message,
+                        errorCode: "1",
+                        message: "BAD_REQUEST"
+                    })
+                } else if (results === null) {
+                    return res.status(403).json({
+                        error: "BAD_REQUEST",
+                        errorCode: "1",
+                        message: "Ushbu jihoz tarmoqda mavjud emas"
+                    })
+                }
+                return res.status(200).json({
+                    error: null,
+                    errorCode: "0",
+                    message: "SUCCESS",
+                    data: results
+                });
+            })
     } catch (error) {
         return res.status(400).json({
             error: error,
@@ -129,7 +129,7 @@ exports.getItemsByLocationStartsWith = async (req, res) => {
         await itemModel.find({
             "location": currentLocation,
             "title": {
-                $regex: value,//value + ".*",/^value/
+                $regex: value, //value + ".*",/^value/
                 $options: 'i'
             },
             "status": {
@@ -250,27 +250,27 @@ exports.getItemsById = async (req, res) => {
 
     Array.isArray(itemIds) ? queryParam = itemIds : queryParam.push(itemIds)
     itemModel.find({
-        "_id": {
-            $in: [...queryParam]
-        }
-    })
-    .sort({
-        "postTime": -1
-    })
-    .then((results) => {
-        return res.status(200).json({
-            error: null,
-            errorCode: "0",
-            message: "SUCCESS",
-            data: results
-        });
-    }).catch((error) => {
-        return res.status(400).json({
-            error: error,
-            errorCode: "1",
-            message: "BAD_REQUEST"
-        });
-    })
+            "_id": {
+                $in: [...queryParam]
+            }
+        })
+        .sort({
+            "postTime": -1
+        })
+        .then((results) => {
+            return res.status(200).json({
+                error: null,
+                errorCode: "0",
+                message: "SUCCESS",
+                data: results
+            });
+        }).catch((error) => {
+            return res.status(400).json({
+                error: error,
+                errorCode: "1",
+                message: "BAD_REQUEST"
+            });
+        })
 }
 
 exports.getItemsOfUser = async (req, res) => {
@@ -380,13 +380,13 @@ exports.incDecLikes = async (req, res) => {
             await itemModel.findByIdAndUpdate(itemId, {
                 $inc: obj
             }, {
-                new: false
+                returnOriginal: false,
             }),
             Number(number) === 1 ? await User.findByIdAndUpdate(userId, {
                 $addToSet: {
                     likedItems: itemId
                 }
-                
+
             }) :
             await User.findByIdAndUpdate(userId, {
                 $pull: {
@@ -581,7 +581,7 @@ exports.favouriteItems = async (req, res) => {
     }
     var element = [];
     for (let i = skip; i < skip + 15; i++) {
-        if(items[i] == null) break;
+        if (items[i] == null) break;
         element.push(items[i])
     }
 
@@ -589,7 +589,10 @@ exports.favouriteItems = async (req, res) => {
     await itemModel.find({
             "_id": {
                 $in: [...element]
-            }
+            },
+
+        }).sort({
+            "postTime": -1
         })
         .exec((err, result) => {
             if (err) {
