@@ -13,7 +13,7 @@ exports.fcmFunc = async (data) => {
         }).then((userFCM) => {
             //update if user exists
             if (userFCM) {
-                userFCM.fcmId = id;
+                userFCM.fcmId = data.fcmToken;
                 userFCM.save().then((result) => console.log("fcm updated ", result));
             }
             // save
