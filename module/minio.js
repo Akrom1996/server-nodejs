@@ -1,6 +1,4 @@
 const Minio = require("minio");
-// const uuid = require("uuid").v4;
-// const path = require("path")
 require('dotenv').config();
 
 exports.minioClient = new Minio.Client({
