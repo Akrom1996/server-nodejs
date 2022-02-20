@@ -6,23 +6,27 @@ const {
 exports.fcmFunc = async (data) => {
     //console.log(data);
     const fcm = fcmModel(data);
-    fcmModel.findOne({
-        "userId": data.userId
-    }).then((userFCM) => {
-        //update if user exists
-        if (userFCM) {
-            userFCM.fcmId = id;
-            userFCM.save().then((result) => console.log("fcm updated ", result));
-        }
-        // save
-        else {
-            fcm.save().then((result) => console.log("fcm saved ", result));
-        }
-        return;
-    }).catch((error) => {
-        //console.log("error ", error);
-        return;
+
+    return new Promise((resolve, reject) => {
+        fcmModel.findOne({
+            "userId": data.userId
+        }).then((userFCM) => {
+            //update if user exists
+            if (userFCM) {
+                userFCM.fcmId = id;
+                userFCM.save().then((result) => console.log("fcm updated ", result));
+            }
+            // save
+            else {
+                fcm.save().then((result) => console.log("fcm saved ", result));
+            }
+            resolve();
+        }).catch((error) => {
+            //console.log("error ", error);
+            reject(error);
+        })
     })
+
 }
 
 exports.saveFCM = async (req, res) => {
@@ -118,7 +122,7 @@ exports.unsubscribe = async (req, res) => {
 }
 
 exports.sendToTopicFunction = async (data, topic) => {
-     var payload = {
+    var payload = {
         "notification": {
             title: topic,
             body: "Yangi e'lon berildi. Bilidirishnomalarni tekshiring"
@@ -132,17 +136,17 @@ exports.sendToTopicFunction = async (data, topic) => {
     };
     console.log("data ", topic);
     //console.log("payload ", payload);
-    return new Promise((resolve, reject)=>{
+    return new Promise((resolve, reject) => {
         admin.messaging().sendToTopic(topic.toLowerCase(), payload)
-        .then((result) => {
-            //console.log(`successfully send to ${result}`);
-            resolve( result);
-        }).catch((error) => {
-            //console.log(error);
-            reject(error);
-        })
+            .then((result) => {
+                //console.log(`successfully send to ${result}`);
+                resolve(result);
+            }).catch((error) => {
+                //console.log(error);
+                reject(error);
+            })
     })
-    
+
 }
 
 exports.sendToTopic = async (req, res) => {
@@ -150,7 +154,7 @@ exports.sendToTopic = async (req, res) => {
         data,
         topic
     } = req.body;
-    
+
     delete data.user
     //console.log(data);
     var payload = {
