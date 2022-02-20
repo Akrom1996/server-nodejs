@@ -9,6 +9,8 @@ require('dotenv').config();
 const Multer = require("multer");
 const Item = require("../../module/Item");
 const jwt = require("jsonwebtoken")
+const fcmModel = require("../../module/notification.js")
+
 const {
     fcmFunc
 } = require("../firebase/notificationController")
@@ -301,25 +303,34 @@ exports.updateToken = async (req, res) => {
         id,
         fcmToken
     } = req.body;
-    userModel.findByIdAndUpdate(id, {
-        fcmToken: fcmToken
-    }, {
-        returnOriginal: false
-    }).then((results) => {
-        //console.log(results);
-        return res.status(200).json({
-            error: null,
-            errorCode: "0",
-            message: "SUCCESS",
-            data: results
-        });
-    }).catch((error) => {
-        return res.status(400).json({
-            error: error,
-            errorCode: "1",
-            message: "BAD_REQUEST"
+    Promise.all([
+            await userModel.findByIdAndUpdate(id, {
+                fcmToken: fcmToken
+            }, {
+                returnOriginal: false
+            }),
+
+            await fcmFunc({
+                fcmId: fcmToken,
+                userId: id
+            }),
+        ])
+
+        .then((results) => {
+            //console.log(results);
+            return res.status(200).json({
+                error: null,
+                errorCode: "0",
+                message: "SUCCESS",
+                data: results
+            });
+        }).catch((error) => {
+            return res.status(400).json({
+                error: error,
+                errorCode: "1",
+                message: "BAD_REQUEST"
+            })
         })
-    })
 }
 
 exports.updateManner = async (req, res) => {
