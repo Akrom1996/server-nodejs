@@ -4,7 +4,7 @@ const {
 } = require('../../controller/firebase/getToken')
 
 exports.fcmFunc = async (data) => {
-    //console.log(data);
+    console.log(data);
     const fcm = fcmModel(data);
 
     return new Promise((resolve, reject) => {
@@ -12,8 +12,10 @@ exports.fcmFunc = async (data) => {
             "userId": data.userId
         }).then((userFCM) => {
             //update if user exists
+            console.log("userFCM:",userFCM);
             if (userFCM) {
                 userFCM.fcmId = data.fcmToken;
+                console.log("NEW userFCM:",userFCM);
                 userFCM.save().then((result) => console.log("fcm updated ", result));
             }
             // save
