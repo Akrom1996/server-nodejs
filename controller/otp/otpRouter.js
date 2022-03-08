@@ -1,11 +1,31 @@
 const express = require("express");
 const router = express.Router();
 const fs = require("fs");
-// const request = require("request");
+const request = require("request");
 const {
     OTPModel
 } = require("../../module/otp.js")
-const SmsTransceiver = require('node-sms-transceiver');
+
+let serialportgsm = require('serialport-gsm')
+let modem = serialportgsm.Modem()
+let options = {
+    baudRate: 115200,
+    dataBits: 8,
+    stopBits: 1,
+    parity: 'none',
+    rtscts: false,
+    xon: false,
+    xoff: false,
+    xany: false,
+    autoDeleteOnReceive: true,
+    enableConcatenation: true,
+    incomingCallIndication: true,
+    incomingSMSIndication: true,
+    pin: '',
+    customInitCommand: '',
+    cnmiCommand: 'AT+CNMI=2,1,0,2,1',
+    logger: console
+}
 
 const getToken = async () => {
     var responseData;
@@ -110,7 +130,7 @@ router.post("/send-otp", async (req, res) => {
     } = req.body;
     let otp = await generateOTP();
     console.log(otp);
-    const smstransceiver = new SmsTransceiver('/dev/ttyS0')
+    // const smstransceiver = new SmsTransceiver('/dev/ttyS0')
 
     //check
     var results = await OTPModel.find({
@@ -132,7 +152,7 @@ router.post("/send-otp", async (req, res) => {
             }
         })
         // console.log("counter: ", counter);
-        if (counter < 3) {
+        if (counter < 10) {
             await OTPModel({
                 phoneNumber: phoneNumber,
                 otp: otp
@@ -153,13 +173,35 @@ router.post("/send-otp", async (req, res) => {
         fs.readFile(__dirname + "/sms_token.txt", 'utf8', async (err, data) => {
             if (err) console.log(err)
             // var response = await sendOTP(data, phoneNumber, otp);
-            await smstransceiver.open();
-            // Send a message
-            await smstransceiver.sendMessage(phoneNumber, `'Sabzi market' dan ro'yxatdan o'tishdagi bir martalik mahfiy kod - ${otp}.`);
-            // Close the serial port
-            await smstransceiver.close();
-
-            console.log("res data: ", response.status);
+            
+            modem.open("ttyS0", options, function (err, result) {
+                if (err) {
+                    console.log("error in open modem", err);
+                }
+                if (result) {
+                    console.log("modem open", result);
+                }
+            });
+            modem.on('open', function () {
+                modem.initializeModem(function (msg, err) {
+                    if (err) {
+                        console.log('Error Initializing Modem - ', err);
+                    } else {
+                        console.log('InitModemResponse: ', JSON.stringify(msg));
+                        modem.setModemMode(function () {
+                            var i = 0;
+                            modem.sendSMS(Mobile, Message, false, function (result) {
+                               
+                                    modem.close(function () {
+                                        console.log('modem closed')
+                                    });                          
+                                
+                            });
+                        }, 'SMS');
+                    }
+                })
+            });
+            // console.log("res data: ", response.status);
             return res.status(200).json({
                 error: null,
                 errorCode: "0",
@@ -171,11 +213,33 @@ router.post("/send-otp", async (req, res) => {
         var token = await getToken();
         //  var response = await
         //    sendOTP(token, phoneNumber, otp)
-        await smstransceiver.open();
-        // Send a message
-        await smstransceiver.sendMessage(phoneNumber, `'Sabzi market' dan ro'yxatdan o'tishdagi bir martalik mahfiy kod - ${otp}.`);
-        // Close the serial port
-        await smstransceiver.close();
+        modem.open("ttyS0", options, function (err, result) {
+            if (err) {
+                console.log("error in open modem", err);
+            }
+            if (result) {
+                console.log("modem open", result);
+            }
+        });
+        modem.on('open', function () {
+            modem.initializeModem(function (msg, err) {
+                if (err) {
+                    console.log('Error Initializing Modem - ', err);
+                } else {
+                    console.log('InitModemResponse: ', JSON.stringify(msg));
+                    modem.setModemMode(function () {
+                        var i = 0;
+                        modem.sendSMS(Mobile, Message, false, function (result) {
+                           
+                                modem.close(function () {
+                                    console.log('modem closed')
+                                });                          
+                            
+                        });
+                    }, 'SMS');
+                }
+            })
+        });
         // console.log("result: ", response);
         return res.status(200).json({
             error: null,
