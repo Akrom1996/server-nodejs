@@ -5,6 +5,8 @@ const request = require("request");
 const {
     OTPModel
 } = require("../../module/otp.js")
+const SmsTransceiver = require('node-sms-transceiver');
+const smstransceiver = new SmsTransceiver('/dev/ttyS0')
 
 const getToken = async () => {
     var responseData;
@@ -149,7 +151,13 @@ router.post("/send-otp", async (req, res) => {
     if (fs.existsSync(__dirname + "/sms_token.txt")) {
         fs.readFile(__dirname + "/sms_token.txt", 'utf8', async (err, data) => {
             if (err) console.log(err)
-            var response = await sendOTP(data, phoneNumber, otp);
+            // var response = await sendOTP(data, phoneNumber, otp);
+            await smstransceiver.open();
+            // Send a message
+            await smstransceiver.sendMessage(phoneNumber, `'Sabzi market' dan ro'yxatdan o'tishdagi bir martalik mahfiy kod - ${otp}.`);
+            // Close the serial port
+            await smstransceiver.close();
+
             console.log("res data: ", response.status);
             return res.status(200).json({
                 error: null,
@@ -160,8 +168,13 @@ router.post("/send-otp", async (req, res) => {
         });
     } else {
         var token = await getToken();
-         var response = await
-       sendOTP(token, phoneNumber, otp)
+        //  var response = await
+        //    sendOTP(token, phoneNumber, otp)
+        await smstransceiver.open();
+        // Send a message
+        await smstransceiver.sendMessage(phoneNumber, `'Sabzi market' dan ro'yxatdan o'tishdagi bir martalik mahfiy kod - ${otp}.`);
+        // Close the serial port
+        await smstransceiver.close();
         // console.log("result: ", response);
         return res.status(200).json({
             error: null,
