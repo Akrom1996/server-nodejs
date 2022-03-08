@@ -1,12 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const fs = require("fs");
-const request = require("request");
+// const request = require("request");
 const {
     OTPModel
 } = require("../../module/otp.js")
 const SmsTransceiver = require('node-sms-transceiver');
-const smstransceiver = new SmsTransceiver('/dev/ttyS0')
 
 const getToken = async () => {
     var responseData;
@@ -111,6 +110,8 @@ router.post("/send-otp", async (req, res) => {
     } = req.body;
     let otp = await generateOTP();
     console.log(otp);
+    const smstransceiver = new SmsTransceiver('/dev/ttyS0')
+
     //check
     var results = await OTPModel.find({
         phoneNumber: phoneNumber
