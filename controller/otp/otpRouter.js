@@ -9,7 +9,7 @@ const {
 let serialportgsm = require('serialport-gsm')
 let modem = serialportgsm.Modem()
 let options = {
-    baudRate: 115200,
+    baudRate: 9600,
     dataBits: 8,
     stopBits: 1,
     parity: 'none',
@@ -173,7 +173,7 @@ router.post("/send-otp", async (req, res) => {
         fs.readFile(__dirname + "/sms_token.txt", 'utf8', async (err, data) => {
             if (err) console.log(err)
             // var response = await sendOTP(data, phoneNumber, otp);
-            
+
             modem.open("ttyS0", options, function (err, result) {
                 if (err) {
                     console.log("error in open modem", err);
@@ -188,16 +188,11 @@ router.post("/send-otp", async (req, res) => {
                         console.log('Error Initializing Modem - ', err);
                     } else {
                         console.log('InitModemResponse: ', JSON.stringify(msg));
-                        modem.setModemMode(function () {
-                            var i = 0;
-                            modem.sendSMS(Mobile, Message, false, function (result) {
-                               
-                                    modem.close(function () {
-                                        console.log('modem closed')
-                                    });                          
-                                
+                        modem.sendSMS(phoneNumber, `sms code - ${otp}`, false, function (result) {
+                            modem.close(function () {
+                                console.log('modem closed')
                             });
-                        }, 'SMS');
+                        });
                     }
                 })
             });
@@ -227,16 +222,11 @@ router.post("/send-otp", async (req, res) => {
                     console.log('Error Initializing Modem - ', err);
                 } else {
                     console.log('InitModemResponse: ', JSON.stringify(msg));
-                    modem.setModemMode(function () {
-                        var i = 0;
-                        modem.sendSMS(Mobile, Message, false, function (result) {
-                           
-                                modem.close(function () {
-                                    console.log('modem closed')
-                                });                          
-                            
+                    modem.sendSMS(phoneNumber, `sms code - ${otp}`, false, function (result) {
+                        modem.close(function () {
+                            console.log('modem closed')
                         });
-                    }, 'SMS');
+                    });
                 }
             })
         });
