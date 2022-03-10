@@ -129,9 +129,7 @@ router.post("/send-otp", async (req, res) => {
         phoneNumber
     } = req.body;
     let otp = await generateOTP();
-    console.log(otp);
-    // const smstransceiver = new SmsTransceiver('/dev/ttyS0')
-
+    console.log(otp, " ", phoneNumber);
     //check
     var results = await OTPModel.find({
         phoneNumber: phoneNumber
@@ -169,7 +167,49 @@ router.post("/send-otp", async (req, res) => {
     }
 
     //send otp
-    if (fs.existsSync(__dirname + "/sms_token.txt")) {
+    modem.open("/dev/ttyUSB0", options, function (err, result) {
+        if (err) {
+            console.log("error in open modem", err);
+        }
+        if (result) {
+            console.log("modem open", result);
+        }
+    });
+    modem.on('open', function () {
+        modem.initializeModem(function (msg, err) {
+            if (err) {
+                console.log('Error Initializing Modem - ', err);
+            } else {
+                console.log('InitModemResponse: ', JSON.stringify(msg));
+                setTimeout(() => {
+                    modem.sendSMS(phoneNumber, `'Sabzi market' dan ro'yxatdan o'tishdagi bir martalik mahfiy kod - ${otp}.`, false, function (result) {
+                        console.log(result)
+                    });
+                }, 1000);
+            }
+        })
+    });
+    modem.on("onSendingMessage", result => {
+        console.log("result: ", result)
+        modem.close(() => {
+            console.log("modem closed")
+        })
+    })
+    // console.log("result: ", response);
+    return res.status(200).json({
+        error: null,
+        errorCode: "0",
+        message: "SUCCESS",
+        otp: otp
+    });
+
+
+})
+
+module.exports = router;
+
+/**
+ *  if (fs.existsSync(__dirname + "/sms_token.txt")) {
         fs.readFile(__dirname + "/sms_token.txt", 'utf8', async (err, data) => {
             if (err) console.log(err)
             // var response = await sendOTP(data, phoneNumber, otp);
@@ -248,8 +288,4 @@ router.post("/send-otp", async (req, res) => {
             otp: otp
         });
     }
-
-
-})
-
-module.exports = router;
+ */
