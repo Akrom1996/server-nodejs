@@ -174,7 +174,7 @@ router.post("/send-otp", async (req, res) => {
             if (err) console.log(err)
             // var response = await sendOTP(data, phoneNumber, otp);
 
-            modem.open("ttyS0", options, function (err, result) {
+            modem.open("/dev/ttyUSB0", options, function (err, result) {
                 if (err) {
                     console.log("error in open modem", err);
                 }
@@ -189,13 +189,18 @@ router.post("/send-otp", async (req, res) => {
                     } else {
                         console.log('InitModemResponse: ', JSON.stringify(msg));
                         modem.sendSMS(phoneNumber, `sms code - ${otp}`, false, function (result) {
-                            modem.close(function () {
-                                console.log('modem closed')
-                            });
+                            console.log(result)
                         });
+    
                     }
                 })
             });
+            modem.on("onSendingMessage", result=>{
+                console.log("result: ", result)
+                modem.close(()=>{
+                    console.log("modem closed")
+                })
+            })
             // console.log("res data: ", response.status);
             return res.status(200).json({
                 error: null,
@@ -208,7 +213,7 @@ router.post("/send-otp", async (req, res) => {
         var token = await getToken();
         //  var response = await
         //    sendOTP(token, phoneNumber, otp)
-        modem.open("ttyS0", options, function (err, result) {
+        modem.open("/dev/ttyUSB0", options, function (err, result) {
             if (err) {
                 console.log("error in open modem", err);
             }
@@ -223,13 +228,18 @@ router.post("/send-otp", async (req, res) => {
                 } else {
                     console.log('InitModemResponse: ', JSON.stringify(msg));
                     modem.sendSMS(phoneNumber, `sms code - ${otp}`, false, function (result) {
-                        modem.close(function () {
-                            console.log('modem closed')
-                        });
+                        console.log(result)
                     });
+
                 }
             })
         });
+        modem.on("onSendingMessage", result=>{
+            console.log("result: ", result)
+            modem.close(()=>{
+                console.log("modem closed")
+            })
+        })
         // console.log("result: ", response);
         return res.status(200).json({
             error: null,
