@@ -176,16 +176,10 @@ router.post("/send-otp", async (req, res) => {
         }
     });
     modem.on('open', function () {
-        modem.initializeModem(function (msg, err) {
-            if (err) {
-                console.log('Error Initializing Modem - ', err);
-            } else {
-                console.log('InitModemResponse: ', JSON.stringify(msg));
-                    modem.sendSMS(phoneNumber, `'Sabzi market' dan ro'yxatdan o'tishdagi bir martalik mahfiy kod - ${otp}.`, false, function (result) {
-                        console.log(result)
-                    });
-            }
-        })
+        console.log('InitModemResponse: ', JSON.stringify(msg));
+        modem.sendSMS(phoneNumber, `'Sabzi market' dan ro'yxatdan o'tishdagi bir martalik mahfiy kod - ${otp}.`, false, function (result) {
+            console.log(result)
+        });
     });
     modem.on("onSendingMessage", result => {
         modem.close(() => {
