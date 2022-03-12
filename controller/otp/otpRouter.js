@@ -176,7 +176,6 @@ router.post("/send-otp", async (req, res) => {
         }
     });
     modem.on('open', function () {
-        console.log('InitModemResponse: ', JSON.stringify(msg));
         modem.sendSMS(phoneNumber, `'Sabzi market' dan ro'yxatdan o'tishdagi bir martalik mahfiy kod - ${otp}.`, false, function (result) {
             console.log(result)
         });
