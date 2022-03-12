@@ -181,16 +181,13 @@ router.post("/send-otp", async (req, res) => {
                 console.log('Error Initializing Modem - ', err);
             } else {
                 console.log('InitModemResponse: ', JSON.stringify(msg));
-                setTimeout(() => {
                     modem.sendSMS(phoneNumber, `'Sabzi market' dan ro'yxatdan o'tishdagi bir martalik mahfiy kod - ${otp}.`, false, function (result) {
                         console.log(result)
                     });
-                }, 1000);
             }
         })
     });
     modem.on("onSendingMessage", result => {
-        console.log("result: ", result)
         modem.close(() => {
             console.log("modem closed")
         })
