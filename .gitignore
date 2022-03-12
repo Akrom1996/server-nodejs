@@ -4,3 +4,6 @@ node_modules
 !package.json
 *.log
 sms_token.txt
+dockerFile
+*.sh
+.dockerignore
