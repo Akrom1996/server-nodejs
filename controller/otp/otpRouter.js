@@ -180,13 +180,15 @@ router.post("/send-otp", async (req, res) => {
             console.log("sendSMS: ", result)
         });
     });
-    modem.on("onSendingMessage",()=>{
-        setTimeout(modem.close(() => {
-            console.log("modem closed")
-        }), 1000)
-        
+    modem.on("onSendingMessage", () => {
+        setTimeout(() => {
+            modem.close(() => {
+                console.log("modem closed")
+            })
+        }, 1000)
+
     })
-    
+
     // console.log("result: ", response);
     return res.status(200).json({
         error: null,
