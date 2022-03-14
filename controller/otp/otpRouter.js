@@ -5,11 +5,10 @@ const request = require("request");
 const {
     OTPModel
 } = require("../../module/otp.js")
-
 let serialportgsm = require('serialport-gsm')
 let modem = serialportgsm.Modem()
 let options = {
-    baudRate: 9600,
+    baudRate: 115200,
     dataBits: 8,
     stopBits: 1,
     parity: 'none',
@@ -167,6 +166,7 @@ router.post("/send-otp", async (req, res) => {
     }
 
     //send otp
+
     modem.open("/dev/ttyUSB0", options, function (err, result) {
         if (err) {
             console.log("error in open modem", err);
@@ -175,18 +175,18 @@ router.post("/send-otp", async (req, res) => {
             console.log("modem open", result);
             modem.sendSMS(phoneNumber, `'Sabzi market' dan ro'yxatdan o'tishdagi bir martalik mahfiy kod - ${otp}.`, false, function (result) {
                 console.log(result)
-                modem.close(() => {
-                    console.log("modem closed")
-                })
+        
             });
         }
     });
     // modem.on('open', function () {
 
     // });
-    // modem.on("onSendingMessage", result => {
-
-    // })
+    modem.on("close", result => {
+        modem.close(() => {
+            console.log("modem closed")
+        })
+    })
     // console.log("result: ", response);
     return res.status(200).json({
         error: null,
