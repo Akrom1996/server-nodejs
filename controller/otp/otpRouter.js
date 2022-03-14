@@ -181,9 +181,10 @@ router.post("/send-otp", async (req, res) => {
         });
     });
     modem.on("onSendingMessage",()=>{
-        modem.close(() => {
+        setTimeout(modem.close(() => {
             console.log("modem closed")
-        })
+        }), 1000)
+        
     })
     
     // console.log("result: ", response);
