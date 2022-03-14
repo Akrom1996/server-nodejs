@@ -181,7 +181,7 @@ router.post("/send-otp", async (req, res) => {
         });
     });
     modem.close(() => {
-        console.log("modem closed", result)
+        console.log("modem closed")
     })
     // console.log("result: ", response);
     return res.status(200).json({
