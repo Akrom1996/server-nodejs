@@ -176,16 +176,12 @@ router.post("/send-otp", async (req, res) => {
         }
     });
     modem.on('open', function () {
-        modem.setModemMode(callback, 'SMS')
         modem.sendSMS(phoneNumber, `'Sabzi market' dan ro'yxatdan o'tishdagi bir martalik mahfiy kod - ${otp}.`, false, function (result) {
             console.log("sendSMS: ", result)
         });
     });
-    modem.on("onSendingMessage", result => {
-        setTimeout(() => modem.close(() => {
-            console.log("modem closed",result)
-        }), 1000);
-
+    modem.close(() => {
+        console.log("modem closed", result)
     })
     // console.log("result: ", response);
     return res.status(200).json({
