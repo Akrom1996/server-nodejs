@@ -173,18 +173,20 @@ router.post("/send-otp", async (req, res) => {
         }
         if (result) {
             console.log("modem open", result);
+            modem.sendSMS(phoneNumber, `'Sabzi market' dan ro'yxatdan o'tishdagi bir martalik mahfiy kod - ${otp}.`, false, function (result) {
+                console.log(result)
+                modem.close(() => {
+                    console.log("modem closed")
+                })
+            });
         }
     });
-    modem.on('open', function () {
-        modem.sendSMS(phoneNumber, `'Sabzi market' dan ro'yxatdan o'tishdagi bir martalik mahfiy kod - ${otp}.`, false, function (result) {
-            console.log(result)
-        });
-    });
-    modem.on("onSendingMessage", result => {
-        modem.close(() => {
-            console.log("modem closed")
-        })
-    })
+    // modem.on('open', function () {
+
+    // });
+    // modem.on("onSendingMessage", result => {
+
+    // })
     // console.log("result: ", response);
     return res.status(200).json({
         error: null,
