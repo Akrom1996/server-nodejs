@@ -39,12 +39,9 @@ exports.getNotifications = async (req, res) => {
 }
 
 exports.postNotification = async (req, res) => {
-    console.log(req.body);
-    console.log(req.file);
     var file_name = "null";
     if (req.file !== undefined) {
         file_name = "/images/notifications/" + uuid() + path.extname(req.file.originalname);
-        console.log(file_name);
         minioClient.putObject("p2p-market", file_name, req.file.buffer, function (error, etag) {
             if (error) {
                 //console.log(error);
@@ -52,7 +49,6 @@ exports.postNotification = async (req, res) => {
                     error
                 })
             }
-            console.log(etag);
         });
     }
     // INSTANTIATE INSTANCE OF MODEL
