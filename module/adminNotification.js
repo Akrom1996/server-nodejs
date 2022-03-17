@@ -13,7 +13,7 @@ const adminNotificationSchema = mongoose.Schema({
 
     views: {
         type: Array,
-        default: 0
+        default: null
     }
 
 }, {
