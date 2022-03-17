@@ -16,6 +16,9 @@ exports.getNotifications = async (req, res) => {
 
     adminNotificationModel
         .find()
+        .sort({
+            "createdAt":-1
+        })
         .then((data) => {
 
             return res.status(200).json({
