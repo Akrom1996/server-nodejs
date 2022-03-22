@@ -13,7 +13,8 @@ const {
     favouriteItems,
     deleteItemById,
     getItemsByLocationStartsWith,
-    getItemsById
+    getItemsById,
+    updateTable
 } = require("./itemController");
 const Multer = require("multer");
 const path = require("path")
@@ -76,4 +77,7 @@ router.put("/updateLikes/:itemId", incDecLikes)
 router.post("/favouriteItems", ensureToken, favouriteItems)
 
 router.delete("/deleteItem/:itemId", ensureToken, deleteItemById);
+
+router.put("/update",updateTable);
+
 module.exports = router;

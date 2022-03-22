@@ -30,6 +30,18 @@ function deleteProfileOrItemImage(images) {
     });
 }
 
+exports.updateTable = async (req, res) => {
+    console.log("update");
+    await itemModel.updateMany({}, [{
+        $set: {
+            likes: []
+        }
+    }], {
+        multi: true
+    })
+    res.end();
+}
+
 exports.getItemInfo = async (req, res) => {
     const {
         itemId
@@ -371,14 +383,21 @@ exports.incDecLikes = async (req, res) => {
         userId
     } = req.body;
     //console.log(req.body);
-    let obj = {}
 
     if (type === "likes") {
-        obj[type] = Number(number);
-        //console.log(obj);
         Promise.all([
+            Number(number) === 1 ?
             await itemModel.findByIdAndUpdate(itemId, {
-                $inc: obj
+                $addToSet: {
+                    likes: userId
+                }
+            }, {
+                returnOriginal: false,
+            }) :
+            await itemModel.findByIdAndUpdate(itemId, {
+                $pull: {
+                    likes: userId
+                }
             }, {
                 returnOriginal: false,
             }),
@@ -436,32 +455,6 @@ exports.incDecLikes = async (req, res) => {
             }
         )
     }
-    // await itemModel.findByIdAndUpdate(itemId, {
-    //     $inc: obj
-    // }, {
-    //     new: true
-    // }, ).exec((err, results) => {
-    //     if (err) {
-    //         return res.status(400).json({
-    //             error: err.message,
-    //             errorCode: "1",
-    //             message: "BAD_REQUEST"
-    //         })
-    //     } else if (results === null) {
-    //         return res.status(403).json({
-    //             error: "BAD_REQUEST",
-    //             errorCode: "1",
-    //             message: "Ushbu jihoz tarmoqda mavjud emas"
-    //         })
-    //     }
-    //     return res.status(200).json({
-    //         error: null,
-    //         errorCode: "0",
-    //         message: "SUCCESS",
-    //         data: results
-    //     });
-    // })
-
 }
 
 exports.getGlobalItems = async (req, res) => {
