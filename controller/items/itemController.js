@@ -464,6 +464,9 @@ exports.getGlobalItems = async (req, res) => {
     itemModel.find({
             "status": status
         }, )
+        .sort({
+            "postTime": -1
+        })
         .limit(30)
         .then((data) => {
             return res.status(200).json({
