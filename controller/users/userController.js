@@ -392,24 +392,31 @@ function checkFileType(file, cb) {
     if (extname) {
         return cb(null, true);
     } else {
-        cb("Error: Images Only!");
+        cb("E`lon joylashda muammo bor. Qoidalarga ko'ra .jpeg, .jpg, .png, .gif turidagi va 10 MB gacha rasmlarni joylashingiz mumkin.");
     }
 }
 
 exports.uploadProfileImage = async (req, res) => {
+    console.log(req.query);
     try {
-        if (req.query.oldImagePath) await deleteProfileOrItemImage([req.query.oldImagePath]) // delete old image on updating user image
+        if (req.query.oldImagePath)
+        console.log("nullll")
+        if (req.query.oldImagePath !=="null") await deleteProfileOrItemImage([req.query.oldImagePath]) // delete old image on updating user image
         upload(req, res, function (error) {
             if (error instanceof Multer.MulterError) {
                 // A Multer error occurred when uploading.
                 return res.status(500).json({
-                    error
+                    error: "error",
+                    errorCode: "1",
+                    message: "Joylashda muammo sodir bo'ldi"
                 })
             } else if (error) {
                 // An unknown error occurred when uploading.
                 //console.log(error)
                 return res.status(500).json({
-                    error
+                    error: "error",
+                    errorCode: "1",
+                    message: "Noma'lum xatolik sodir bo'ldi"
                 })
             }
 

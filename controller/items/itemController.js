@@ -329,8 +329,10 @@ exports.updatePosition = async (req, res) => {
     } = req.params;
     const {
         toUser,
-        position
+        position,
+        postTime
     } = req.body;
+    console.log(postTime);
     try {
         if (toUser) {
             await User.findByIdAndUpdate(toUser, {
@@ -339,31 +341,55 @@ exports.updatePosition = async (req, res) => {
                 }
             }, )
         }
-
-        await itemModel.findByIdAndUpdate(itemId, {
-            "position": position
-        }, (err, results) => {
-            if (err) {
-                return res.status(400).json({
-                    error: err,
-                    errorCode: "1",
-                    message: "BAD_REQUEST"
-                })
-            } else if (results === null) {
-                return res.status(403).json({
-                    error: "BAD_REQUEST",
-                    errorCode: "1",
-                    message: "Ushbu jihoz tarmoqda mavjud emas"
-                })
-            }
-
-            return res.status(200).json({
-                error: null,
-                errorCode: "0",
-                message: "SUCCESS",
-                data: results
-            });
-        })
+        if (postTime) {
+            console.log("updating post time");
+            await itemModel.findByIdAndUpdate(itemId, {
+                "postTime": postTime
+            }, (err, results) => {
+                if (err) {
+                    return res.status(400).json({
+                        error: err,
+                        errorCode: "1",
+                        message: "BAD_REQUEST"
+                    })
+                } else if (results === null) {
+                    return res.status(403).json({
+                        error: "BAD_REQUEST",
+                        errorCode: "1",
+                        message: "Ushbu jihoz tarmoqda mavjud emas"
+                    })
+                }
+                return res.status(200).json({
+                    error: null,
+                    errorCode: "0",
+                    message: "SUCCESS",
+                    data: results
+                });
+            })
+        } else
+            await itemModel.findByIdAndUpdate(itemId, {
+                "position": position
+            }, (err, results) => {
+                if (err) {
+                    return res.status(400).json({
+                        error: err,
+                        errorCode: "1",
+                        message: "BAD_REQUEST"
+                    })
+                } else if (results === null) {
+                    return res.status(403).json({
+                        error: "BAD_REQUEST",
+                        errorCode: "1",
+                        message: "Ushbu jihoz tarmoqda mavjud emas"
+                    })
+                }
+                return res.status(200).json({
+                    error: null,
+                    errorCode: "0",
+                    message: "SUCCESS",
+                    data: results
+                });
+            })
     } catch (error) {
         return res.status(400).json({
             error: error,
@@ -486,7 +512,33 @@ exports.getGlobalItems = async (req, res) => {
 
 //post item
 exports.uploadItemImages = async (req, res) => {
-    //console.log(req.files);
+    console.log(req.params);
+    //check
+    var results = await User.findOne({
+        phoneNumber: req.params.phoneNumber
+    })
+    var items = await itemModel.find({
+        "_id": {
+            $in: [...results.items]
+        }
+    });
+
+    let counter = 0;
+    items.forEach((element) => {
+        var createdDate = new Date(element.createdAt);
+        var today = new Date();
+        if (createdDate.getDate() == today.getDate() && createdDate.getMonth() == today.getMonth() && createdDate.getFullYear() == today.getFullYear()) {
+            counter++
+        }
+    })
+    if (counter > 20)
+        return res.status(500).json({
+            error: "error",
+            errorCode: "1",
+            message: "Kechirasiz foydalanuvchilar bir kunda ko'pi bilan 20 ta e`lon joylashlari mumkin"
+        })
+
+
     let file_name = [];
     //first upload item images to minio
     if (req.files !== undefined)
@@ -497,7 +549,9 @@ exports.uploadItemImages = async (req, res) => {
                 if (error) {
                     //console.log(error);
                     return res.status(500).json({
-                        error
+                        error: error,
+                        errorCode: "0",
+                        message: "E`lon joylashda muammo bor. Qoidalarga ko'ra .jpeg, .jpg, .png, .gif turidagi va 10 MB gacha rasmlarni joylashingiz mumkin.",
                     })
                 }
                 // //console.log(etag);
@@ -531,7 +585,7 @@ exports.uploadItemImages = async (req, res) => {
             //console.log("item ", item);
             if (item["status"] == "unpaid") return;
 
-            return await sendToTopicFunction(item._id, title)
+            return //await sendToTopicFunction(item._id, title)
         })
         .then((data) => {
             // //console.log(data);
@@ -542,7 +596,7 @@ exports.uploadItemImages = async (req, res) => {
                 message: "SUCCESS",
             });
         })).catch((err) => {
-        //console.log(err);
+        console.log(err);
         return res.status(400).json({
             error: err,
             errorCode: "1",
