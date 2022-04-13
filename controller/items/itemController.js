@@ -585,7 +585,7 @@ exports.uploadItemImages = async (req, res) => {
             //console.log("item ", item);
             if (item["status"] == "unpaid") return;
 
-            return //await sendToTopicFunction(item._id, title)
+            return await sendToTopicFunction(item._id, title)
         })
         .then((data) => {
             // //console.log(data);
