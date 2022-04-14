@@ -43,7 +43,7 @@ exports.getChatsOfUser = async (req, res) => {
         id
     } = req.query;
     var user = await userModel.findById(id) //.lean().populate('chats').then(data=>res.json(data));
-    // console.log("user chats: ", user.chats);
+    console.log("user chats: ", user);
     if (user.chats.length > 0) {
         var chats = [];
         for (let i = 0; i < user.chats.length; i++) {
