@@ -4,7 +4,7 @@ const {
 } = require('../../controller/firebase/getToken')
 
 exports.fcmFunc = async (data) => {
-    console.log(data);
+    // console.log(data);
     const fcm = fcmModel(data);
 
     return new Promise((resolve, reject) => {
@@ -136,7 +136,7 @@ exports.sendToTopicFunction = async (data, topic) => {
         }
 
     };
-    console.log("data ", topic);
+    // console.log("data ", topic);
     //console.log("payload ", payload);
     return new Promise((resolve, reject) => {
         admin.messaging().sendToTopic("/topics/" + topic.toLowerCase(), payload)

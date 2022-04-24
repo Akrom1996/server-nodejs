@@ -332,7 +332,7 @@ exports.updatePosition = async (req, res) => {
         position,
         postTime
     } = req.body;
-    console.log(postTime);
+    // console.log(postTime);
     try {
         if (toUser) {
             await User.findByIdAndUpdate(toUser, {
@@ -342,7 +342,7 @@ exports.updatePosition = async (req, res) => {
             }, )
         }
         if (postTime) {
-            console.log("updating post time");
+            // console.log("updating post time");
             await itemModel.findByIdAndUpdate(itemId, {
                 "postTime": postTime
             }, (err, results) => {

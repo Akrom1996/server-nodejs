@@ -57,7 +57,7 @@ exports.checkUserForExistance = async (req, res) => {
 
 exports.registrate = async (req, res) => {
     //console.log("register");
-    console.log(req.body)
+    // console.log(req.body)
     let token = jwt.sign(req.body.phoneNumber, 'my_key')
     var user = new userModel(req.body);
     const users = await userModel.find({
@@ -397,10 +397,8 @@ function checkFileType(file, cb) {
 }
 
 exports.uploadProfileImage = async (req, res) => {
-    console.log(req.query);
+    // console.log(req.query);
     try {
-        if (req.query.oldImagePath)
-        console.log("nullll")
         if (req.query.oldImagePath !=="null") await deleteProfileOrItemImage([req.query.oldImagePath]) // delete old image on updating user image
         upload(req, res, function (error) {
             if (error instanceof Multer.MulterError) {
