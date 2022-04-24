@@ -584,8 +584,12 @@ exports.uploadItemImages = async (req, res) => {
             // item["user"] = item.user._id;
             console.log("item ", item);
             if (item["status"] == "unpaid") return;
+            try {
+                return await sendToTopicFunction(item._id, title);
+            } catch (error) {
+                return;
+            }
 
-            return await sendToTopicFunction(item._id, title)
         })
         .then((data) => {
             // //console.log(data);

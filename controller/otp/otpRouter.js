@@ -94,7 +94,7 @@ const sendOTP = async (token, phoneNumber, otp) => {
         },
         formData: {
             "mobile_phone": phoneNumber,
-            "message": `'Sabzi market' dan ro'yxatdan o'tishdagi bir martalik mahfiy kod - ${otp}.`,
+            "message": `'Alibazar' dan ro'yxatdan o'tishdagi bir martalik mahfiy kod - ${otp}.`,
             "from": "4546"
         }
     }
@@ -176,7 +176,7 @@ router.post("/send-otp", async (req, res) => {
         }
     });
     modem.on('open', function () {
-        modem.sendSMS(phoneNumber, `'Ozone market' dan ro'yxatdan o'tishdagi bir martalik mahfiy kod - ${otp}.`, false, function (result) {
+        modem.sendSMS(phoneNumber, `'Alibazar' dan ro'yxatdan o'tishdagi bir martalik mahfiy kod - ${otp}.`, false, function (result) {
             console.log("sendSMS: ", result)
         });
     });
