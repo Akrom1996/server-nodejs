@@ -582,7 +582,7 @@ exports.uploadItemImages = async (req, res) => {
             var title = item.title.split(' ')[0]
             //console.log("title ", title);
             // item["user"] = item.user._id;
-            console.log("item ", item);
+            // console.log("item ", item);
             if (item["status"] == "unpaid") return;
             try {
                 return await sendToTopicFunction(item._id, title);
