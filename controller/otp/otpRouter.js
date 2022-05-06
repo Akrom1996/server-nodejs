@@ -170,6 +170,7 @@ router.post("/send-otp", async (req, res) => {
     modem.open("/dev/ttyUSB0", options, function (err, result) {
         if (err) {
             console.log("error in open modem", err);
+            modem.close();
         }
         if (result) {
             console.log("modem open", result);
@@ -188,9 +189,8 @@ router.post("/send-otp", async (req, res) => {
     modem.on('onSendingMessage', (result) => {
         console.log("sending result ", result);
         setTimeout(() => {
-            modem.close((result) => {
-                console.log("modem closed: ", result)
-
+            modem.close(() => {
+                console.log("modem closed: ")
             })
         }, 2000)
     })
