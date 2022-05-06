@@ -175,18 +175,22 @@ router.post("/send-otp", async (req, res) => {
             console.log("modem open", result);
         }
     });
-    modem.on('open', function () {
-        modem.sendSMS(phoneNumber, `'Alibazar' dan ro'yxatdan o'tishdagi bir martalik mahfiy kod - ${otp}.`, false, function (result) {
+    modem.on('open', function (open) {
+        console.log("open: ",open);
+        modem.sendSMS(phoneNumber, 
+            `'Alibazar' dan ro'yxatdan o'tishdagi bir martalik mahfiy kod - ${otp}.`,
+             true, function (result) {
             console.log("sendSMS: ", result)
-            modem.close(() => {
-                console.log("modem closed")
+            modem.close((result) => {
+                console.log("modem closed: ", result)
+                return res.status(200).json({
+                    error: null,
+                    errorCode: "0",
+                    message: "SUCCESS",
+                    otp: otp
+                });
             })
-            return res.status(200).json({
-                error: null,
-                errorCode: "0",
-                message: "SUCCESS",
-                otp: otp
-            });
+
         });
     });
     // modem.on("onSendingMessage", () => {
@@ -200,13 +204,13 @@ router.post("/send-otp", async (req, res) => {
     //             message: "SUCCESS",
     //             otp: otp
     //         });
-        
+
     //     }, 1000)
 
     // })
 
     // console.log("result: ", response);
-    
+
 
 })
 
