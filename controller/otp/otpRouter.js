@@ -175,13 +175,12 @@ router.post("/send-otp", async (req, res) => {
             console.log("modem open", result);
         }
     });
-    modem.on('open', function (open) {
-        console.log("open: ", open);
-
-    });
+    // modem.on('open', function (open) {
+    //     console.log("open: ", open);
+    // });
     modem.sendSMS(phoneNumber,
         `'Alibazar' dan ro'yxatdan o'tishdagi bir martalik mahfiy kod - ${otp}.`,
-        true,
+        false,
         function (result) {
             console.log("sendSMS: ", result)
         });
