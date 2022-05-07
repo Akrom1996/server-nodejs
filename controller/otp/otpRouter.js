@@ -5,26 +5,7 @@ const request = require("request");
 const {
     OTPModel
 } = require("../../module/otp.js")
-let serialportgsm = require('serialport-gsm')
-let modem = serialportgsm.Modem()
-let options = {
-    baudRate: 115200,
-    dataBits: 8,
-    stopBits: 1,
-    parity: 'none',
-    rtscts: false,
-    xon: false,
-    xoff: false,
-    xany: false,
-    autoDeleteOnReceive: true,
-    enableConcatenation: true,
-    incomingCallIndication: true,
-    incomingSMSIndication: true,
-    pin: '',
-    customInitCommand: '',
-    cnmiCommand: 'AT+CNMI=2,1,0,2,1',
-    logger: console
-}
+const {publishMessage,consumeMessage} = require("../../mq/rabbit")
 
 const getToken = async () => {
     var responseData;
@@ -166,38 +147,8 @@ router.post("/send-otp", async (req, res) => {
     }
 
     //send otp
-
-    modem.open("/dev/ttyUSB0", options, function (err, result) {
-        if (err) {
-            console.log("error in open modem", err);
-            modem.close(() => {
-                console.log("modem closed: ")
-            });
-            modem.open("/dev/ttyUSB0", options,function(err,result){console.log("modem open", result);});
-
-        }
-        if (result) {
-            console.log("modem open", result);
-        }
-    });
-    modem.on('open', function (open) {
-        console.log("open: ", open);
-        modem.sendSMS(phoneNumber,
-            `'Alibazar' dan ro'yxatdan o'tishdagi bir martalik mahfiy kod - ${otp}.`,
-            false,
-            function (result) {
-                console.log("sendSMS: ", result)
-            });
-    });
-
-    modem.on('onSendingMessage', (result) => {
-        console.log("sending result ", result);
-        setTimeout(() => {
-            modem.close(() => {
-                console.log("modem closed: ")
-            })
-        }, 2000)
-    })
+    publishMessage(otp);
+    consumeMessage()
     return res.status(200).json({
         error: null,
         errorCode: "0",
