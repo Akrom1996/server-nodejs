@@ -11,6 +11,7 @@ const consumeMessage = () => {
         console.log(' [*] Waiting for messages in %s. To exit press CTRL+C', queue);
         return channel.consume(queue, (msg) => {
             if (msg !== null) {
+                const {phoneNumber, otp} = JSON.stringify(msg.content.toString())
                 modem.open("/dev/ttyUSB0", options, function (err, result) {
                     if (err) {
                         console.log("error in open modem", err);
@@ -22,7 +23,7 @@ const consumeMessage = () => {
                 modem.on('open', function (open) {
                     console.log("open: ", open);
                     modem.sendSMS(phoneNumber,
-                        `'Alibazar' dan ro'yxatdan o'tishdagi bir martalik mahfiy kod - ${JSON.stringify(msg.content.toString())}.`,
+                        `'Alibazar' dan ro'yxatdan o'tishdagi bir martalik mahfiy kod - ${otp}.`,
                         false,
                         function (result) {
                             console.log("sendSMS: ", result)
