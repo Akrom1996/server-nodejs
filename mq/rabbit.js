@@ -38,17 +38,17 @@ const consumeMessage = () => {
                         `'Alibazar' dan ro'yxatdan o'tishdagi bir martalik mahfiy kod - ${otp}.`,
                         false,
                         function (result) {
-                            console.log("sendSMS: ", result)
+                            if(result.data.response == "Message Successfully Sent"){
+                                modem.close(() => {
+                                    console.log("modem closed: ")       
+                                })
+                                channel.ack(msg);
+                            }
                         });
                 });
                 modem.on('onSendingMessage', (result) => {
                     console.log("sending result ", result);
-                    setTimeout(() => {
-                        modem.close(() => {
-                            console.log("modem closed: ")
-                            channel.ack(msg);
-                        })
-                    }, 2000)
+                    
                 })
                 console.log(' [x] Received %s', msg); // send email via aws ses	
             }
