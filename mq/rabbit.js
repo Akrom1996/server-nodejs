@@ -34,22 +34,25 @@ const consumeMessage = () => {
                             `'Alibazar' dan ro'yxatdan o'tishdagi bir martalik mahfiy kod - ${otp}.`,
                             false,
                             function (result) {
-                                if(result.data.response == "Message Successfully Sent"){
-                                    modem.close(() => {
-                                        console.log("modem closed: ")       
-                                    })
-                                    channel.ack(msg);
-                                }
+                                // if(result.data.response == "Message Successfully Sent"){
+
+                                // }
                             });
                     }
                 });
                 // modem.on('open', function (open) {
                 //     console.log("open: ", open);
-                    
+
                 // });
                 modem.on('onSendingMessage', (result) => {
                     console.log("sending result ", result);
-                    
+                    if (result.data.response == "Message Successfully Sent") {
+                        modem.close(() => {
+                            console.log("modem closed: ")
+                        })
+                        channel.ack(msg);
+                    }
+
                 })
                 console.log(' [x] Received %s', msg); // send email via aws ses	
             }
