@@ -55,7 +55,7 @@ const consumeMessage = () => {
                 // });
             }
         }, {
-            noAck: true
+            noAck: false
         });
     })).catch(error => console.warn(error));
 };
