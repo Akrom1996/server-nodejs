@@ -45,7 +45,7 @@ const consumeMessage = () => {
                         modem.close(() => {
                             console.log("modem closed: ")
                         })
-                        channel.ack(msg);
+                        // channel.ack(msg);
                     }, 2000)
                 })
                 console.log(' [x] Received %s', msg); // send email via aws ses	
@@ -54,7 +54,7 @@ const consumeMessage = () => {
                 // });
             }
         }, {
-            noAck: false
+            noAck: true
         });
     })).catch(error => console.warn(error));
 };
