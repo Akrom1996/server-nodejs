@@ -35,9 +35,9 @@ const consumeMessage = () => {
                             false,
                             function (result) {
                                 console.log("sendSMS: ", result);
-                                setTimeout(() => {
+                                if(result.data.recipient != undefined){
                                     modem.close(() => {
-                                        console.log("modem closed: ")
+                                        console.log("modem closed: ",result.data.recipient)
                                         try {
                                             channel.ack(msg);
                                         } catch (error) {
@@ -45,7 +45,18 @@ const consumeMessage = () => {
                                         }
 
                                     })
-                                }, 1000)
+                                }
+                                // setTimeout(() => {
+                                //     modem.close(() => {
+                                //         console.log("modem closed: ")
+                                //         try {
+                                //             channel.ack(msg);
+                                //         } catch (error) {
+                                //             console.log(error);
+                                //         }
+
+                                //     })
+                                // }, 1000)
                             });
                     }
                 });
