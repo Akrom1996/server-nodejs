@@ -46,7 +46,7 @@ const consumeMessage = () => {
                 // });
                 modem.on('onSendingMessage', (result) => {
                     console.log("sending result ", result);
-                    if (result.data.response == "Message Successfully Sent") {
+                    if (result.data.response == "Message Currently Sending") {
                         modem.close(() => {
                             console.log("modem closed: ")
                         })
