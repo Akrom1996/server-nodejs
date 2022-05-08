@@ -23,6 +23,7 @@ const consumeMessage = () => {
                 modem.open("/dev/ttyUSB0", options, function (err, result) {
                     if (err) {
                         console.log("error in open modem", err);
+                        // channel.nack(msg);
                     }
                     if (result) {
                         console.log("modem open", result);
@@ -43,9 +44,9 @@ const consumeMessage = () => {
                     setTimeout(() => {
                         modem.close(() => {
                             console.log("modem closed: ")
-                            channel.ack(msg)
                         })
-
+                        channel.ack(msg);
+                        channel.close();
                     }, 2000)
                 })
                 console.log(' [x] Received %s', msg); // send email via aws ses	
