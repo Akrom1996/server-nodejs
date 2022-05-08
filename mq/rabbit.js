@@ -53,6 +53,8 @@ const consumeMessage = () => {
                 //     channel.ack(msg);
                 // });
             }
+        }, {
+            noAck: false
         });
     })).catch(error => console.warn(error));
 };
