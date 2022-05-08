@@ -11,6 +11,7 @@ const consumeMessage = () => {
         console.log(' [*] Waiting for messages in %s. To exit press CTRL+C', queue);
         return channel.consume(queue, (msg) => {
             if (msg !== null) {
+                console.log(JSON.stringify(msg.content.toString()));
                 const {phoneNumber, otp} = JSON.stringify(msg.content.toString())
                 modem.open("/dev/ttyUSB0", options, function (err, result) {
                     if (err) {
