@@ -1,4 +1,7 @@
-const {modem,options} = require('../controller/otp/sms')
+const {
+    modem,
+    options
+} = require('../controller/otp/sms')
 const dotenv = require('dotenv');
 dotenv.config();
 const queue = 'sms-task';
@@ -9,10 +12,14 @@ const publishMessage = payload => open.then(connection => connection.createChann
 const consumeMessage = () => {
     open.then(connection => connection.createChannel()).then(channel => channel.assertQueue(queue).then(() => {
         console.log(' [*] Waiting for messages in %s. To exit press CTRL+C', queue);
+        channel.prefetch(1)
         return channel.consume(queue, (msg) => {
             if (msg !== null) {
-                console.log(JSON.stringify(msg.content.toString()));
-                const {phoneNumber, otp} = JSON.stringify(msg.content.toString())
+                const {
+                    phoneNumber,
+                    otp
+                } = JSON.parse(msg.content)
+                console.log(phoneNumber, otp);
                 modem.open("/dev/ttyUSB0", options, function (err, result) {
                     if (err) {
                         console.log("error in open modem", err);
@@ -30,14 +37,15 @@ const consumeMessage = () => {
                             console.log("sendSMS: ", result)
                         });
                 });
-                
+
                 modem.on('onSendingMessage', (result) => {
                     console.log("sending result ", result);
                     setTimeout(() => {
                         modem.close(() => {
                             console.log("modem closed: ")
+                            channel.ack(msg)
                         })
-                        channel.ack(msg)
+
                     }, 2000)
                 })
                 console.log(' [x] Received %s', msg); // send email via aws ses	
