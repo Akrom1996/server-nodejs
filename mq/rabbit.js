@@ -34,7 +34,18 @@ const consumeMessage = () => {
                             `'Alibazar' dan ro'yxatdan o'tishdagi bir martalik mahfiy kod - ${otp}.`,
                             false,
                             function (result) {
-                            console.log("sendSMS: ", result);
+                                console.log("sendSMS: ", result);
+                                setTimeout(() => {
+                                    modem.close(() => {
+                                        console.log("modem closed: ")
+                                        try {
+                                            channel.ack(msg);
+                                        } catch (error) {
+                                            console.log(error);
+                                        }
+
+                                    })
+                                }, 1000)
                             });
                     }
                 });
@@ -42,22 +53,12 @@ const consumeMessage = () => {
                 //     console.log("open: ", open);
 
                 // });
-                modem.on('onSendingMessage', (result) => {
-                    console.log("sending result ", result);
-                    if (result.data.response == "Message Currently Sending") {
-                        setTimeout(() => {
-                            modem.close(() => {
-                                console.log("modem closed: ")
-                                try {
-                                    channel.ack(msg);
-                                } catch (error) {
-                                    console.log(error);
-                                }
-                                
-                            })
-                        }, 1000)
-                    }
-                })
+                // modem.on('onSendingMessage', (result) => {
+                //     console.log("sending result ", result);
+                //     if (result.data.response == "Message Currently Sending") {
+
+                //     }
+                // })
                 console.log(' [x] Received %s', msg); // send email via aws ses	
             }
         }, {
