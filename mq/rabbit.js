@@ -30,22 +30,23 @@ const consumeMessage = () => {
                     }
                     if (result) {
                         console.log("modem open", result);
+                        modem.sendSMS(phoneNumber,
+                            `'Alibazar' dan ro'yxatdan o'tishdagi bir martalik mahfiy kod - ${otp}.`,
+                            false,
+                            function (result) {
+                                if(result.data.response == "Message Successfully Sent"){
+                                    modem.close(() => {
+                                        console.log("modem closed: ")       
+                                    })
+                                    channel.ack(msg);
+                                }
+                            });
                     }
                 });
-                modem.on('open', function (open) {
-                    console.log("open: ", open);
-                    modem.sendSMS(phoneNumber,
-                        `'Alibazar' dan ro'yxatdan o'tishdagi bir martalik mahfiy kod - ${otp}.`,
-                        false,
-                        function (result) {
-                            if(result.data.response == "Message Successfully Sent"){
-                                modem.close(() => {
-                                    console.log("modem closed: ")       
-                                })
-                                channel.ack(msg);
-                            }
-                        });
-                });
+                // modem.on('open', function (open) {
+                //     console.log("open: ", open);
+                    
+                // });
                 modem.on('onSendingMessage', (result) => {
                     console.log("sending result ", result);
                     
