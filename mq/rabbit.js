@@ -7,7 +7,10 @@ dotenv.config();
 const queue = 'sms-task';
 const open = require('amqplib').connect(process.env.AMQP_SERVER);
 // Publisher		
-const publishMessage = payload => open.then(connection => connection.createChannel()).then(channel => channel.assertQueue(queue).then(() => channel.sendToQueue(queue, Buffer.from(JSON.stringify(payload))))).catch(error => console.warn(error));
+const publishMessage = payload => open.then(connection => connection.createChannel())
+    .then(channel => channel.assertQueue(queue)
+        .then(() => channel.sendToQueue(queue, Buffer.from(JSON.stringify(payload)))))
+    .catch(error => console.warn(error));
 // Consumer		
 const consumeMessage = () => {
     open.then(connection => connection.createChannel()).then(channel => channel.assertQueue(queue).then(() => {
@@ -38,21 +41,16 @@ const consumeMessage = () => {
                             console.log("sendSMS: ", result)
                         });
                 });
-
                 modem.on('onSendingMessage', (result) => {
                     console.log("sending result ", result);
                     setTimeout(() => {
                         modem.close(() => {
                             console.log("modem closed: ")
+                            channel.ack(msg);
                         })
-                        
                     }, 2000)
-                    channel.ack(msg);
                 })
                 console.log(' [x] Received %s', msg); // send email via aws ses	
-                // EmailService.sendMail(mail, subject, template).then(() => {
-                //     channel.ack(msg);
-                // });
             }
         }, {
             noAck: false
