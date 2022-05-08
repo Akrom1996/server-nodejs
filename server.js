@@ -25,15 +25,19 @@ const fs = require("fs")
 const accessLogStream = fs.createWriteStream(path.join(__dirname, "access.log"), {
     flags: 'a'
 })
-const {
-    createClient
-} = require("redis");
-const {
-    createAdapter
-} = require("@socket.io/redis-adapter");
+// const {
+//     createClient
+// } = require("redis");
+// const {
+//     createAdapter
+// } = require("@socket.io/redis-adapter");
+
 
 if (cluster.isMaster) {
-
+    const {
+        consumeMessage
+    } = require("./mq/rabbit")
+    consumeMessage()
     var server = require('http').createServer();
     var io = require('socket.io')(server);
 
@@ -43,7 +47,7 @@ if (cluster.isMaster) {
         host: process.env.HOST,
         port: 6379
     }));
- 
+
     // const pubClient = createClient({
     //     url: "redis://localhost:6379"
     // });
@@ -204,7 +208,7 @@ if (cluster.isMaster) {
                 returnOriginal: false
             })
             // console.log(resultOnline);
-            io.to(data.roomId).emit("user online", resultOnline ?resultOnline.onlineUsers :[])
+            io.to(data.roomId).emit("user online", resultOnline ? resultOnline.onlineUsers : [])
 
         })
 

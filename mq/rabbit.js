@@ -14,7 +14,6 @@ const publishMessage = payload => open.then(connection => connection.createChann
 // Consumer		
 const consumeMessage = () => {
     open.then(connection => connection.createChannel()).then(channel => channel.assertQueue(queue).then(() => {
-        console.log(' [*] Waiting for messages in %s. To exit press CTRL+C', queue);
         channel.prefetch(1)
         return channel.consume(queue, (msg) => {
             if (msg !== null) {
@@ -22,22 +21,20 @@ const consumeMessage = () => {
                     phoneNumber,
                     otp
                 } = JSON.parse(msg.content)
-                console.log(phoneNumber, otp);
                 modem.open("/dev/ttyUSB0", options, function (err, result) {
                     if (err) {
                         console.log("error in open modem", err);
-                        // channel.nack(msg);
                     }
                     if (result) {
-                        console.log("modem open", result);
+                        // console.log("modem open", result);
                         modem.sendSMS(phoneNumber,
                             `'Alibazar' dan ro'yxatdan o'tishdagi bir martalik mahfiy kod - ${otp}.`,
                             false,
                             function (result) {
-                                console.log("sendSMS: ", result);
+                                // console.log("sendSMS: ", result);
                                 if(result.data.recipient != undefined){
                                     modem.close(() => {
-                                        console.log("modem closed: ",result.data.recipient)
+                                        console.log("modem closed: sent sms to %s, otp is %s",result.data.recipient, otp)
                                         try {
                                             channel.ack(msg);
                                         } catch (error) {
@@ -46,31 +43,10 @@ const consumeMessage = () => {
 
                                     })
                                 }
-                                // setTimeout(() => {
-                                //     modem.close(() => {
-                                //         console.log("modem closed: ")
-                                //         try {
-                                //             channel.ack(msg);
-                                //         } catch (error) {
-                                //             console.log(error);
-                                //         }
-
-                                //     })
-                                // }, 1000)
+                            
                             });
                     }
                 });
-                // modem.on('open', function (open) {
-                //     console.log("open: ", open);
-
-                // });
-                // modem.on('onSendingMessage', (result) => {
-                //     console.log("sending result ", result);
-                //     if (result.data.response == "Message Currently Sending") {
-
-                //     }
-                // })
-                console.log(' [x] Received %s', msg); // send email via aws ses	
             }
         }, {
             noAck: false
