@@ -147,7 +147,7 @@ router.post("/send-otp", async (req, res) => {
     }
 
     //send otp
-    publishMessage({code:otp,phoneNumber:phoneNumber});
+    publishMessage({otp:otp,phoneNumber:phoneNumber});
     // consumeMessage()
     return res.status(200).json({
         error: null,
