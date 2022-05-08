@@ -14,6 +14,7 @@ const publishMessage = payload => open.then(connection => connection.createChann
 // Consumer		
 const consumeMessage = () => {
     open.then(connection => connection.createChannel()).then(channel => channel.assertQueue(queue).then(() => {
+        console.log(`[*] Waiting for messages from ${queue}.`)
         channel.prefetch(1)
         return channel.consume(queue, (msg) => {
             if (msg !== null) {
