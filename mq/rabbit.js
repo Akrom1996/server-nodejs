@@ -34,9 +34,7 @@ const consumeMessage = () => {
                             `'Alibazar' dan ro'yxatdan o'tishdagi bir martalik mahfiy kod - ${otp}.`,
                             false,
                             function (result) {
-                                // if(result.data.response == "Message Successfully Sent"){
-
-                                // }
+                            console.log("sendSMS: ", result);
                             });
                     }
                 });
@@ -50,7 +48,12 @@ const consumeMessage = () => {
                         setTimeout(() => {
                             modem.close(() => {
                                 console.log("modem closed: ")
-                                channel.ack(msg);
+                                try {
+                                    channel.ack(msg);
+                                } catch (error) {
+                                    console.log(error);
+                                }
+                                
                             })
                         }, 1000)
                     }
