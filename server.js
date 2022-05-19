@@ -294,7 +294,7 @@ if (cluster.isMaster) {
                 notification: {
                     title: "message",
                     body: message.content,
-                    image: `http://${process.env.HOST}:${process.env.MINIO_PORT}/p2p-market/images/app-images/carrot.png` //9bf98691-8225-4e3c-93f0-75b61d9ebbc1.jpg`
+                    image: `http://${process.env.HOST}:${process.env.MINIO_PORT}/p2p-market/images/app-images/logo.png` //9bf98691-8225-4e3c-93f0-75b61d9ebbc1.jpg`
                 },
                 data: {
                     type: "/message_screen",

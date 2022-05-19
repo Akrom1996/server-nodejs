@@ -75,7 +75,7 @@ const sendOTP = async (token, phoneNumber, otp) => {
         },
         formData: {
             "mobile_phone": phoneNumber,
-            "message": `'Alibazar' dan ro'yxatdan o'tishdagi bir martalik mahfiy kod - ${otp}.`,
+            "message": `'Mandarin' dan ro'yxatdan o'tishdagi bir martalik mahfiy kod - ${otp}.`,
             "from": "4546"
         }
     }

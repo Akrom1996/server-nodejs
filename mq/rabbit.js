@@ -29,7 +29,7 @@ const consumeMessage = () => {
                     if (result) {
                         // console.log("modem open", result);
                         modem.sendSMS(phoneNumber,
-                            `'Alibazar' dan ro'yxatdan o'tishdagi bir martalik mahfiy kod - ${otp}.`,
+                            `'Mandarin' dan ro'yxatdan o'tishdagi bir martalik mahfiy kod - ${otp}.`,
                             false,
                             function (result) {
                                 // console.log("sendSMS: ", result);
