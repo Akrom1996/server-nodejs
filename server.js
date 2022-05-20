@@ -96,7 +96,7 @@ if (cluster.isMaster) {
     const otp = require("./controller/otp/otpRouter.js");
     const complainRouter = require("./controller/complain/complainRouter.js")
     const jwtRouter = require("./security/jwtRouter.js")
-
+    const walletRouter = require("./controller/wallet/walletRouter")
     // adding user router
     app.use('/user', userRouter);
 
@@ -124,6 +124,9 @@ if (cluster.isMaster) {
 
     //make compilation
     app.use("/complain", complainRouter)
+
+    //user wallet
+    app.use("/wallet", walletRouter)
 
     //generate jwt
     app.use("/jwt", jwtRouter)
