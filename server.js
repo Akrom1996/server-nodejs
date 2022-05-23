@@ -35,9 +35,11 @@ const accessLogStream = fs.createWriteStream(path.join(__dirname, "access.log"),
 
 if (cluster.isMaster) {
     const {
-        consumeMessage
+        consumeMessage,
+        consumeMessageAdvert
     } = require("./mq/rabbit")
-    consumeMessage()
+    consumeMessage("sms-task")
+    consumeMessageAdvert("advert-task")
     var server = require('http').createServer();
     var io = require('socket.io')(server);
 
@@ -97,6 +99,7 @@ if (cluster.isMaster) {
     const complainRouter = require("./controller/complain/complainRouter.js")
     const jwtRouter = require("./security/jwtRouter.js")
     const walletRouter = require("./controller/wallet/walletRouter")
+    const advertRouter = require("./controller/sentAdverts/advertRouter")
     // adding user router
     app.use('/user', userRouter);
 
@@ -127,6 +130,9 @@ if (cluster.isMaster) {
 
     //user wallet
     app.use("/wallet", walletRouter)
+
+    //advert sent
+    app.use("/adverts", advertRouter)
 
     //generate jwt
     app.use("/jwt", jwtRouter)

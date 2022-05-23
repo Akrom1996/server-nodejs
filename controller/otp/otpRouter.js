@@ -5,7 +5,9 @@ const request = require("request");
 const {
     OTPModel
 } = require("../../module/otp.js")
-const {publishMessage,consumeMessage} = require("../../mq/rabbit")
+const {
+    publishMessage
+} = require("../../mq/rabbit")
 
 const getToken = async () => {
     var responseData;
@@ -147,7 +149,10 @@ router.post("/send-otp", async (req, res) => {
     }
 
     //send otp
-    publishMessage({otp:otp,phoneNumber:phoneNumber});
+    publishMessage({
+        otp: otp,
+        phoneNumber: phoneNumber
+    }, 'sms-task');
     // consumeMessage()
     return res.status(200).json({
         error: null,
