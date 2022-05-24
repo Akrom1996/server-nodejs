@@ -77,7 +77,7 @@ const consumeMessageAdvert = (queue) => {
                                 // console.log("sendSMS: ", result);
                                 if(result.data.recipient != undefined){
                                     modem.close(() => {
-                                        console.log("modem closed: sent sms to %s",result.data.recipient)
+                                        console.log("modem closed: sent sms to %s, message is %s",result.data.recipient, message)
                                         try {
                                             channel.ack(msg);
                                         } catch (error) {
