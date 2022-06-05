@@ -2,21 +2,13 @@ const cluster = require("cluster");
 const cpus = require("os").cpus
 const express = require("express")
 require('dotenv').config();
-const {
-    ObjectId
-} = require("mongodb");
-const {
-    collection,
-    chatCollection,
-    userCollection,
-    itemCollection,
 
-} = require("./module/database")
-const OnlineSchema = require("./module/online.js")
 
+const {collection}  = require("./module/database")
 const {
     admin
 } = require('./controller/firebase/getToken')
+const OnlineSchema = require("./module/online.js")
 
 
 const path = require("path")
@@ -31,7 +23,15 @@ const accessLogStream = fs.createWriteStream(path.join(__dirname, "access.log"),
 // const {
 //     createAdapter
 // } = require("@socket.io/redis-adapter");
-
+const {
+    getComments,
+    getMessagesFromPrivate,
+    createAndGetPrivateMessages,
+    joinToComments,
+    joinToPrivateChats,
+    setOnline,
+    createAndGetComments
+} = require("./sockets/socketController")
 
 if (cluster.isMaster) {
     const {
@@ -146,154 +146,29 @@ if (cluster.isMaster) {
     })
 
 
-    const getMessages = async (comments) => {
-        // console.log("comments: ", comments);
-        return new Promise((resolve, reject) => {
-            var messages = []
-            if (comments.length == 0) resolve([])
-            comments.forEach(async (comment) => {
-                userCollection.findOne({
-                    "_id": ObjectId(comment.userId)
-                }).then((user) => {
-                    if (user)
-                        messages.push({
-                            "id": comment.id,
-                            "userName": user.userName,
-                            "address": user.address1,
-                            "image": user.image,
-                            "postedTime": comment.postedTime,
-                            "thumb": comment.thumb,
-                            "content": comment.content
-                        })
-                    else
-                        messages.push({
-                            "id": comment.id,
-                            "userName": "O'chirilgan Profil",
-                            "address": "",
-                            "image": "/images/app-images/images.jpeg",
-                            "postedTime": comment.postedTime,
-                            "thumb": comment.thumb,
-                            "content": comment.content
-                        })
-                    if (messages.length === comments.length) {
-                        resolve(messages);
-                    }
-                })
-            })
-        })
-    }
+
 
     io.on("connection", (socket) => {
         // join to comments
         socket.on("join", async (roomId) => {
             //console.log("join ", roomId);
-            try {
-                let result = await collection.findOne({
-                    "_id": roomId
-                });
-                if (!result) {
-                    await collection.insertOne({
-                        "_id": roomId,
-                        messages: []
-                    });
-                }
-                console.log("joined ", roomId);
-                socket.join(roomId);
-                socket.emit("joined", roomId);
-                socket.activeRoom = roomId;
-            } catch (e) {
-                console.error(e);
-            }
+            await joinToComments(socket,roomId)
         });
-
 
         socket.on("set online", async (data) => {
             // set online
-            let resultOnline = await OnlineSchema.findOneAndUpdate({}, {
-                "$addToSet": {
-                    "onlineUsers": data.id
-                }
-            }, {
-                returnOriginal: false
-            })
-            // console.log(resultOnline);
-            io.to(data.roomId).emit("user online", resultOnline ? resultOnline.onlineUsers : [])
-
+            await setOnline(io, data);
         })
 
         // join to private chats
         socket.on("chat join", async (data) => {
-            try {
-                let result = await chatCollection.findOne({
-                    "_id": ObjectId(data.roomId)
-                });
-                // if chat does not exist create new
-                if (!result) {
-                    await chatCollection.insertOne({
-                        "_id": ObjectId(data.roomId),
-                        "itemId": data.itemId,
-                        "ownerId": data.ownerId,
-                        "user2": data.userId,
-                        // "user1": {
-                        //     "id": data.ownerId,
-                        //     "username": data.userName1.trim(),
-                        //     "image": data.ownerImage,
-                        //     "fcm": data.ownerFCM,
-                        // },
-                        // "user2": {
-                        //     "id": data.userId,
-                        //     "username": data.userName2.trim(),
-                        //     "image": data.userImage,
-                        //     "fcm": data.userFCM,
-                        // },
-                        "messages": [],
-                    });
-
-
-                }
-                socket.join(data.roomId);
-                socket.emit("chat joined", data.roomId);
-                socket.activeRoom = data.roomId;
-            } catch (e) {
-                console.error(e);
-            }
+            await joinToPrivateChats(socket, data)
         });
 
         // create and get private chat messages
         socket.on("chat message", async (message, itemId, fcmToken) => {
             //console.log(message, " ", itemId);
-            message.id = new ObjectId()
-
-            await chatCollection.updateOne({
-                "_id": ObjectId(socket.activeRoom)
-            }, {
-                "$push": {
-                    "messages": message
-                }
-            });
-            await itemCollection.updateOne({
-                "_id": ObjectId(itemId)
-            }, {
-                "$addToSet": {
-                    "chats": socket.activeRoom
-                }
-            })
-            // for user 1
-            await userCollection.updateOne({
-                "_id": ObjectId(message.from)
-            }, {
-                "$addToSet": {
-                    "chats": socket.activeRoom
-                }
-            })
-            //for user 2
-            await userCollection.updateOne({
-                "_id": ObjectId(message.to)
-            }, {
-                "$addToSet": {
-                    "chats": socket.activeRoom
-                }
-            })
+            await createAndGetPrivateMessages(socket, message, itemId)
             // firebase cloud messaging here
             const options = {
                 priority: "high",
@@ -324,73 +199,13 @@ if (cluster.isMaster) {
         // get messages from private chats
         socket.on("get chats", async (data) => {
 
-            chatCollection.updateMany({
-                    "_id": ObjectId(socket.activeRoom) || ObjectId(data.itemId),
-
-                }, {
-                    $set: {
-                        "messages.$[elem].isSeen": true
-                    }
-                }, {
-                    "arrayFilters": [{
-                        "elem.to": data.userId
-                    }],
-                    "multi": true
-                }, {
-                    returnOriginal: false
-                }, )
-                .then(() => {
-                    chatCollection.findOne({
-                        "_id": ObjectId(socket.activeRoom) || ObjectId(data.itemId)
-                    }).then(chats => io.to(socket.id).emit("message chats", chats.messages));
-                })
+            await getMessagesFromPrivate(socket, io, data);
 
         })
 
         // create and get messages from comments
         socket.on("message", async (message) => {
-            message.id = new ObjectId()
-            // console.log(message);
-            await itemCollection.updateOne({
-                "_id": ObjectId(socket.activeRoom)
-            }, {
-                "$push": {
-                    "comments": message.id
-                }
-            })
-            //.then((data)=>//console.log(data));
-            await collection.updateOne({
-                "_id": socket.activeRoom
-            }, {
-                "$push": {
-                    "messages": message
-                }
-            });
-            var user = await userCollection.findOne({
-                "_id": ObjectId(message.userId)
-            })
-            // console.log("user: ", user, " ", message.userId);
-            if (user)
-                io.to(socket.activeRoom).emit("message", {
-                    "id": message.id,
-                    "userName": user.userName,
-                    "address": user.address,
-                    "image": user.image,
-                    "postedTime": message.postedTime,
-                    "thumb": message.thumb,
-                    "content": message.content
-                });
-            else {
-                io.to(socket.activeRoom).emit("message", {
-                    "id": message.id,
-                    "userName": "O'chirilgan Profil",
-                    "address": "",
-                    "image": "/images/app-images/images.jpeg",
-                    "postedTime": message.postedTime,
-                    "thumb": message.thumb,
-                    "content": message.content
-                });
-            }
+            await createAndGetComments(socket,io,message);
         });
 
         // get messages from comments
@@ -400,7 +215,7 @@ if (cluster.isMaster) {
                 "_id": socket.activeRoom || data
             })
             var messages = [];
-            messages = await getMessages(comments.messages);
+            messages = await getComments(comments.messages);
             // .then((messages) => {
             io.to(socket.id).emit("message comments", messages);
             // })

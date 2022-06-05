@@ -24,7 +24,7 @@ const consumeMessage = (queue) => {
                 modem.open("/dev/ttyUSB0", options, function (err, result) {
                     if (err) {
                         console.log("error in open modem", err);
-                        channel.nack(msg);
+                        channel.ack(msg);
                     }
                     if (result) {
                         // console.log("modem open", result);

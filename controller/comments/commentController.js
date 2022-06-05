@@ -71,8 +71,8 @@ exports.putThumb = async (req, res) => {
     const {
         value
     } = req.body;
-    //console.log(req.params);
-    value ?
+    console.log(req.params,  value);
+    value ==="true" ?
         connection.collection.updateOne({
             "_id": itemId,
             "messages.id": ObjectId(commentId)
@@ -80,8 +80,8 @@ exports.putThumb = async (req, res) => {
             $addToSet: {
                 "messages.$.thumb": userId
             }
-        }).then((data) => {
-
+        },{returnOriginal: false}).then((data) => {
+            console.log("pushed thumb",data);
             res.status(200).json({
                 error: null,
                 errorCode: "0",
@@ -103,7 +103,7 @@ exports.putThumb = async (req, res) => {
                 "messages.$.thumb": userId
             }
         }).then((data) => {
-
+            console.log("pulled thumb", data);
             res.status(200).json({
                 error: null,
                 errorCode: "0",
