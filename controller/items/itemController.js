@@ -145,7 +145,7 @@ exports.getItemsByLocationStartsWith = async (req, res) => {
                 $options: 'i'
             },
             "status": {
-                $nin: ["unpaid", "paid"]
+                $nin: ["unpaid"]//, "paid"
             }
         }).sort({
             "postTime": -1
@@ -493,7 +493,7 @@ exports.getGlobalItems = async (req, res) => {
         .sort({
             "postTime": -1
         })
-        .limit(30)
+        .limit(40)
         .then((data) => {
             return res.status(200).json({
                 error: null,
