@@ -145,7 +145,8 @@ exports.getItemsByLocationStartsWith = async (req, res) => {
                 $options: 'i'
             },
             "status": {
-                $nin: ["unpaid"]//, "paid"
+                $ne: "unpaid"
+                // $nin: ["unpaid", "paid"]
             }
         }).sort({
             "postTime": -1
