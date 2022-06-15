@@ -133,7 +133,24 @@ exports.sendToTopicFunction = async (data, topic) => {
             data: JSON.stringify(data),
             type: "topic",
             click_action: "FLUTTER_NOTIFICATION_CLICK",
-        }
+        },
+        // Apple specific settings
+        "apns": {
+            headers: {
+                'apns-priority': '10',
+            },
+            payload: {
+                aps: {
+                    sound: 'default',
+                }
+            },
+        },
+        "android": {
+            priority: 'high',
+            notification: {
+                sound: 'default',
+            }
+        },
 
     };
     // console.log("data ", topic);
@@ -168,7 +185,24 @@ exports.sendToTopic = async (req, res) => {
             data: JSON.stringify(data),
             type: "topic",
             click_action: "FLUTTER_NOTIFICATION_CLICK",
-        }
+        },
+        // Apple specific settings
+        "apns": {
+            headers: {
+                'apns-priority': '10',
+            },
+            payload: {
+                aps: {
+                    sound: 'default',
+                }
+            },
+        },
+        "android": {
+            priority: 'high',
+            notification: {
+                sound: 'default',
+            }
+        },
 
     };
     admin.messaging().sendToTopic(String(topic).split(' ')[0].toLowerCase(), payload)

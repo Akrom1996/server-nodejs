@@ -4,7 +4,9 @@ const express = require("express")
 require('dotenv').config();
 
 
-const {collection}  = require("./module/database")
+const {
+    collection
+} = require("./module/database")
 const {
     admin
 } = require('./controller/firebase/getToken')
@@ -152,7 +154,7 @@ if (cluster.isMaster) {
         // join to comments
         socket.on("join", async (roomId) => {
             //console.log("join ", roomId);
-            await joinToComments(socket,roomId)
+            await joinToComments(socket, roomId)
         });
 
         socket.on("set online", async (data) => {
@@ -184,7 +186,23 @@ if (cluster.isMaster) {
                     type: "message",
                     click_action: "FLUTTER_NOTIFICATION_CLICK",
                 },
-
+                // Apple specific settings
+                apns: {
+                    headers: {
+                        'apns-priority': '10',
+                    },
+                    payload: {
+                        aps: {
+                            sound: 'default',
+                        }
+                    },
+                },
+                android: {
+                    priority: 'high',
+                    notification: {
+                        sound: 'default',
+                    }
+                },
             };
             //if fcm token user is not online send message notification
             let usersOnline = await OnlineSchema.findOne({});
@@ -206,7 +224,7 @@ if (cluster.isMaster) {
 
         // create and get messages from comments
         socket.on("message", async (message) => {
-            await createAndGetComments(socket,io,message);
+            await createAndGetComments(socket, io, message);
         });
 
         // get messages from comments
