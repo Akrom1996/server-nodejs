@@ -127,30 +127,14 @@ exports.sendToTopicFunction = async (data, topic) => {
     var payload = {
         "notification": {
             title: topic,
+            sound:"default",
             body: "Yangi e'lon berildi. Bilidirishnomalarni tekshiring"
         },
         "data": {
             data: JSON.stringify(data),
             type: "topic",
             click_action: "FLUTTER_NOTIFICATION_CLICK",
-        },
-        // Apple specific settings
-        "apns": {
-            headers: {
-                'apns-priority': '10',
-            },
-            payload: {
-                aps: {
-                    sound: 'default',
-                }
-            },
-        },
-        "android": {
-            priority: 'high',
-            notification: {
-                sound: 'default',
-            }
-        },
+        }
 
     };
     // console.log("data ", topic);
@@ -179,30 +163,14 @@ exports.sendToTopic = async (req, res) => {
     var payload = {
         "notification": {
             title: topic,
+            sound:"default",
             body: "Yangi e'lon berildi"
         },
         "data": {
             data: JSON.stringify(data),
             type: "topic",
             click_action: "FLUTTER_NOTIFICATION_CLICK",
-        },
-        // Apple specific settings
-        "apns": {
-            headers: {
-                'apns-priority': '10',
-            },
-            payload: {
-                aps: {
-                    sound: 'default',
-                }
-            },
-        },
-        "android": {
-            priority: 'high',
-            notification: {
-                sound: 'default',
-            }
-        },
+        }
 
     };
     admin.messaging().sendToTopic(String(topic).split(' ')[0].toLowerCase(), payload)

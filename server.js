@@ -180,29 +180,14 @@ if (cluster.isMaster) {
                 notification: {
                     title: "message",
                     body: message.content,
+                    sound: "default",
                     image: `http://${process.env.HOST}:${process.env.MINIO_PORT}/p2p-market/images/app-images/logo.png` //9bf98691-8225-4e3c-93f0-75b61d9ebbc1.jpg`
                 },
                 data: {
                     type: "message",
                     click_action: "FLUTTER_NOTIFICATION_CLICK",
                 },
-                // Apple specific settings
-                apns: {
-                    headers: {
-                        'apns-priority': '10',
-                    },
-                    payload: {
-                        aps: {
-                            sound: 'default',
-                        }
-                    },
-                },
-                android: {
-                    priority: 'high',
-                    notification: {
-                        sound: 'default',
-                    }
-                },
+                
             };
             //if fcm token user is not online send message notification
             let usersOnline = await OnlineSchema.findOne({});
