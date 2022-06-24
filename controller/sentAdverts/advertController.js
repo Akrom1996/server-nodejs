@@ -63,7 +63,10 @@ exports.sendPrevious = async (req, res) => {
         results.forEach(async (result) => {
             console.log(result.timeStamp);
             if (result.timeStamp.split('T')[0] !== new Date().toISOString().split('T')[0]) {
-                await sendMessage(result.phoneNumber, req.body.message)
+                await publishMessage({
+                    message: req.body.message,
+                    phoneNumber: result.phoneNumber
+                }, 'advert-task')
                 storedNumbers.push(result.phoneNumber)
             }
         })
