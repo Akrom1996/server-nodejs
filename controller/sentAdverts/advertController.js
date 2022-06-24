@@ -61,12 +61,15 @@ exports.sendPrevious = async (req, res) => {
     ADVERTModel.find({}).then((results) => {
 
         results.forEach(async (result) => {
-            if (result.timeStamp.split('T')[0] !== new Date().toISOString().split('T')[0] && storedNumbers.length < 2) {
+            
+            if (result.timeStamp.split('T')[0] !== new Date().toISOString().split('T')[0] && storedNumbers.length < 1) {
+                console.log(result, storedNumbers.length);
+                storedNumbers.push(result.phoneNumber)
+
                 await publishMessage({
                     message: req.body.message,
                     phoneNumber: result.phoneNumber
                 }, 'advert-task')
-                storedNumbers.push(result.phoneNumber)
             }
         })
         return res.status(200).json({
