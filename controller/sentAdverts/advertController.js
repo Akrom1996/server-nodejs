@@ -56,3 +56,23 @@ exports.sendAdvert = async (req, res) => {
     });
 
 }
+exports.sendPrevious = async (req, res) => {
+    let storedNumbers = [];
+    ADVERTModel.find({}).then((results) => {
+
+        results.forEach(async (result) => {
+            console.log(result.timeStamp);
+            if (result.timeStamp.split('T')[0] !== Date.now().toString().split('T')[0]) {
+                // await sendMessage(result.phoneNumber, req.body.message)
+                storedNumbers.push(result.phoneNumber)
+            }
+        })
+        return res.status(200).json({
+            error: null,
+            errorCode: "0",
+            message: "SUCCESS",
+            data: storedNumbers
+        })
+    });
+
+}
