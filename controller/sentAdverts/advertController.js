@@ -61,7 +61,6 @@ exports.sendPrevious = async (req, res) => {
     ADVERTModel.find({}).then((results) => {
 
         results.forEach(async (result) => {
-            console.log(result.timeStamp);
             if (result.timeStamp.split('T')[0] !== new Date().toISOString().split('T')[0]) {
                 await publishMessage({
                     message: req.body.message,
@@ -73,7 +72,7 @@ exports.sendPrevious = async (req, res) => {
         return res.status(200).json({
             error: null,
             errorCode: "0",
-            message: "SUCCESS",
+            message: req.body.message,
             data: storedNumbers
         })
     });
