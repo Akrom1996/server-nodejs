@@ -61,7 +61,7 @@ exports.sendPrevious = async (req, res) => {
     ADVERTModel.find({}).then((results) => {
 
         results.forEach(async (result) => {
-            if (result.timeStamp.split('T')[0] !== new Date().toISOString().split('T')[0]) {
+            if (result.timeStamp.split('T')[0] !== new Date().toISOString().split('T')[0] && storedNumbers.length < 2) {
                 await publishMessage({
                     message: req.body.message,
                     phoneNumber: result.phoneNumber
