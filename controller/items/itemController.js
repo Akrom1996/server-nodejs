@@ -638,7 +638,7 @@ exports.favouriteItems = async (req, res) => {
     var element = [];
     for (let i = skip; i < skip + 15; i++) {
         if (items[i] == null) break;
-        element.push(items[i])
+        element.unshift(items[i])
     }
 
     // items.forEach(async (element) => {
@@ -647,8 +647,6 @@ exports.favouriteItems = async (req, res) => {
                 $in: [...element]
             },
 
-        }).sort({
-            "postTime": -1
         })
         .exec((err, result) => {
             if (err) {
