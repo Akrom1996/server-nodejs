@@ -588,6 +588,7 @@ exports.uploadItemImages = async (req, res) => {
             try {
                 return await sendToTopicFunction(item._id, title);
             } catch (error) {
+                console.log("notification topic error: ", error);
                 return;
             }
 
@@ -682,9 +683,9 @@ exports.deleteItemById = async (req, res) => {
     //console.log(itemId);
     itemModel.findByIdAndDelete({
         _id: req.params.itemId
-    }).then((data) => {
+    }).then(async (data) => {
         if (data.images.length > 0) {
-            deleteProfileOrItemImage(data.images)
+           await deleteProfileOrItemImage(data.images)
         }
         User.updateMany({}, {
                 $pull: {
