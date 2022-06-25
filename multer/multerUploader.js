@@ -30,7 +30,7 @@ function checkFileType(file, cb) {
     if (extname) {
         return cb(null, true);
     } else {
-        return cb("E`lon joylashda muammo bor. Qoidalarga ko'ra .jpeg, .jpg, .png, .gif turidagi va 10 MB gacha rasmlarni joylashingiz mumkin.");
+        return cb("E`lon joylashda muammo bor. Qoidalarga ko'ra .jpeg, .jpg, .png, .gif, .heic turidagi va 10 MB gacha rasmlarni joylashingiz mumkin.");
     }
 }
 
@@ -82,5 +82,5 @@ const uploadMultiImages = (req,res, next)=>{
 }
 
 module.exports = {
-    uploadAvatar, uploadMultiImages
+    uploadAvatar, uploadMultiImages,singleMulter
 }

@@ -18,7 +18,7 @@ const {
     complainModel
 } = require("../../module/complain");
 const {
-    uploadAvatar
+    singleMulter
 } = require("../../multer/multerUploader");
 
 
@@ -403,25 +403,23 @@ exports.uploadProfileImage = async (req, res) => {
     // console.log(req.query);
     try {
         if (req.query.oldImagePath !== "null") await deleteProfileOrItemImage([req.query.oldImagePath]) // delete old image on updating user image
-        // upload(req, res, function (error) {
-        //     if (error instanceof Multer.MulterError) {
-        //         // A Multer error occurred when uploading.
-        //         return res.status(500).json({
-        //             error: "error",
-        //             errorCode: "1",
-        //             message: "Joylashda muammo sodir bo'ldi"
-        //         })
-        //     } else if (error) {
-        //         // An unknown error occurred when uploading.
-        //         //console.log(error)
-        //         return res.status(500).json({
-        //             error: "error",
-        //             errorCode: "1",
-        //             message: "Noma'lum xatolik sodir bo'ldi"
-        //         })
-        //     }
-
-        uploadAvatar(req, res, next);
+        singleMulter(req, res, function (error) {
+            if (error instanceof Multer.MulterError) {
+                // A Multer error occurred when uploading.
+                return res.status(500).json({
+                    error: "error",
+                    errorCode: "1",
+                    message: "Joylashda muammo sodir bo'ldi"
+                })
+            } else if (error) {
+                // An unknown error occurred when uploading.
+                //console.log(error)
+                return res.status(500).json({
+                    error: "error",
+                    errorCode: "1",
+                    message: "Noma'lum xatolik sodir bo'ldi"
+                })
+            }
         // Everything went fine.
         //console.log(req.file);
         let file_name;
@@ -468,7 +466,7 @@ exports.uploadProfileImage = async (req, res) => {
                 });
 
             })
-        // })
+        })
 
     } catch (error) {
         return res.status(400).json({
