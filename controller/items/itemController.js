@@ -602,7 +602,7 @@ exports.uploadItemImages = async (req, res) => {
                 message: "SUCCESS",
             });
         })).catch((err) => {
-        console.log(err);
+        console.log("status 400: ", err);
         return res.status(400).json({
             error: err,
             errorCode: "1",

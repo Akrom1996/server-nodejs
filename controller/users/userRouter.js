@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const path = require("path")
+// const path = require("path")
 const {
     registrate,
     getUserInfo,
@@ -18,22 +18,15 @@ const {
 const Multer = require("multer");
 const {
     ensureToken
-} = require('../../security/jwt')
+} = require('../../security/jwt');
+const { uploadAvatar } = require('../../multer/multerUploader');
 // Saving User Email  
 // router.post('/saveEmail', saveEmail)
 //check user
 router.get("/checkUser/:phoneNumber", checkUserForExistance);
 // User Registration
 router.post('/registrate',
-    Multer({
-        storage: Multer.memoryStorage(),
-        limits: {
-            fileSize: 10000000
-        },
-        fileFilter: function (req, file, cb) {
-            checkFileType(file, cb);
-        }
-    }).single("upload"), registrate);
+    uploadAvatar, registrate);
 // User delete
 router.delete('/deleteUser/:id/:type', ensureToken, deleteUser);
 // User Image delete
@@ -61,19 +54,6 @@ router.post('/upload-profile-image/:phoneNumber', /*ensureToken, */ uploadProfil
 //     }
 // }).array("uploads", 10), uploadItemImages);
 
-function checkFileType(file, cb) {
-    // Allowed ext
-    const filetypes = /jpeg|jpg|png|gif/;
-    // Check ext
-    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-    // Check mime
-    // const mimetype = filetypes.test(file.mimetype);
-    if (extname) {
-        return cb(null, true);
-    } else {
-        cb("E`lon joylashda muammo bor. Qoidalarga ko'ra .jpeg, .jpg, .png, .gif turidagi va 10 MB gacha rasmlarni joylashingiz mumkin.");
-    }
-}
 
 
 module.exports = router;

@@ -16,7 +16,10 @@ const {
 } = require("../firebase/notificationController")
 const {
     complainModel
-} = require("../../module/complain")
+} = require("../../module/complain");
+const {
+    uploadAvatar
+} = require("../../multer/multerUploader");
 
 
 function deleteProfileOrItemImage(images) {
@@ -399,73 +402,73 @@ function checkFileType(file, cb) {
 exports.uploadProfileImage = async (req, res) => {
     // console.log(req.query);
     try {
-        if (req.query.oldImagePath !=="null") await deleteProfileOrItemImage([req.query.oldImagePath]) // delete old image on updating user image
-        upload(req, res, function (error) {
-            if (error instanceof Multer.MulterError) {
-                // A Multer error occurred when uploading.
-                return res.status(500).json({
-                    error: "error",
-                    errorCode: "1",
-                    message: "Joylashda muammo sodir bo'ldi"
-                })
-            } else if (error) {
-                // An unknown error occurred when uploading.
-                //console.log(error)
-                return res.status(500).json({
-                    error: "error",
-                    errorCode: "1",
-                    message: "Noma'lum xatolik sodir bo'ldi"
-                })
-            }
+        if (req.query.oldImagePath !== "null") await deleteProfileOrItemImage([req.query.oldImagePath]) // delete old image on updating user image
+        // upload(req, res, function (error) {
+        //     if (error instanceof Multer.MulterError) {
+        //         // A Multer error occurred when uploading.
+        //         return res.status(500).json({
+        //             error: "error",
+        //             errorCode: "1",
+        //             message: "Joylashda muammo sodir bo'ldi"
+        //         })
+        //     } else if (error) {
+        //         // An unknown error occurred when uploading.
+        //         //console.log(error)
+        //         return res.status(500).json({
+        //             error: "error",
+        //             errorCode: "1",
+        //             message: "Noma'lum xatolik sodir bo'ldi"
+        //         })
+        //     }
 
+        uploadAvatar(req, res, next);
+        // Everything went fine.
+        //console.log(req.file);
+        let file_name;
+        const {
+            phoneNumber
+        } = req.params;
 
-            // Everything went fine.
-            //console.log(req.file);
-            let file_name;
-            const {
-                phoneNumber
-            } = req.params;
-
-            file_name = "/images/profile-images/" + uuid() + path.extname(req.file.originalname);
-            minioClient.putObject("p2p-market",
-                file_name, req.file.buffer,
-                async (error, etag) => {
-                    if (error) {
+        file_name = "/images/profile-images/" + uuid() + path.extname(req.file.originalname);
+        minioClient.putObject("p2p-market",
+            file_name, req.file.buffer,
+            async (error, etag) => {
+                if (error) {
+                    return res.status(400).json({
+                        error: error,
+                        errorCode: "1",
+                        message: "BAD_REQUEST"
+                    })
+                }
+                //console.log(file_name);
+                await userModel.findOneAndUpdate({
+                    "phoneNumber": phoneNumber
+                }, {
+                    "image": file_name,
+                    "userName": req.query.userName,
+                }, {
+                    upsert: true,
+                    returnOriginal: false,
+                }, (err, results) => {
+                    if (err) {
                         return res.status(400).json({
-                            error: error,
+                            error: err,
                             errorCode: "1",
                             message: "BAD_REQUEST"
                         })
                     }
-                    //console.log(file_name);
-                    await userModel.findOneAndUpdate({
-                        "phoneNumber": phoneNumber
-                    }, {
-                        "image": file_name,
-                        "userName": req.query.userName,
-                    }, {
-                        upsert: true,
-                        returnOriginal: false,
-                    }, (err, results) => {
-                        if (err) {
-                            return res.status(400).json({
-                                error: err,
-                                errorCode: "1",
-                                message: "BAD_REQUEST"
-                            })
-                        }
-                        //console.log(results);
+                    //console.log(results);
 
-                        return res.status(200).json({
-                            error: null,
-                            errorCode: "0",
-                            message: "SUCCESS",
-                            data: results
-                        });
+                    return res.status(200).json({
+                        error: null,
+                        errorCode: "0",
+                        message: "SUCCESS",
+                        data: results
                     });
+                });
 
-                })
-        })
+            })
+        // })
 
     } catch (error) {
         return res.status(400).json({
