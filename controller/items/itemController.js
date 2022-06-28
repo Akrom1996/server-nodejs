@@ -81,7 +81,7 @@ exports.getItemsByLocation = async (req, res) => {
         await itemModel.find({
                 "location": currentLocation,
                 "status": {
-                    $nin: ["unpaid"] //, "paid"
+                    $nin: ["unpaid","paid"] //, 
                 }
             })
             .skip(Number(skip))
