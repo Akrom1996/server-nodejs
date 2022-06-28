@@ -9,6 +9,10 @@ const {
     chatCollection
 } = require('../../module/database');
 
+const {
+    ErrorResponse,
+    SuccessResponse
+} = require("../../response/Response")
 // const client = new MongoClient("mongodb://localhost:27017/myKarrot");
 // client.connect();
 // const db = client.db("myKarrot");
@@ -21,20 +25,15 @@ exports.getChats = async (req, res) => {
         })
         .then((data) => {
             //console.log(data)
-            return res.status(200).json({
-                error: null,
-                errorCode: "0",
-                message: "SUCCESS",
-                data: data
-            });
+            return res.status(200).json(
+                new SuccessResponse(null, "0", "SUCCESS", data)
+            );
         })
         .catch((err) => {
             //console.log(err.message);
-            return res.status(400).json({
-                error: err,
-                errorCode: "1",
-                message: "BAD_REQUEST",
-            });
+            return res.status(400).json(
+                new ErrorResponse(err, "1", "BAD_REQUEST")
+            );
         });
 }
 
@@ -42,79 +41,77 @@ exports.getChatsOfUser = async (req, res) => {
     const {
         id
     } = req.query;
-    var user = await userModel.findById(id) //.lean().populate('chats').then(data=>res.json(data));
-    // console.log("user chats: ", user);
-    if (user.chats.length > 0) {
-        var chats = [];
-        for (let i = 0; i < user.chats.length; i++) {
-            chats.push(ObjectId(user.chats[i]))
+    userModel.findById(id)
+    .then(user=>{
+        if (!user) {
+            return res.status(400).json(new ErrorResponse("BAD_REQUEST", "1", "Foydalanuvchi mavjud emas"))
         }
-        Chat.find({
-            "_id": {
-                $in: chats
+        if (user.chats.length > 0) {
+            var chats = [];
+            for (let i = 0; i < user.chats.length; i++) {
+                chats.push(ObjectId(user.chats[i]))
             }
-        }).then(async (results) => {
-            var result = []
-            let nullCounter = 0;
-            if(results.length == 0){
-                return res.status(200).json({
-                    error: null,
-                    errorCode: "0",
-                    message: "SUCCESS",
-                    data: []
-                });
-            }
-            for (let i = 0; i < results.length; i++) {
-                // console.log(results[i]);
-                var ownerData = await userModel.findById(results[i].toJSON().ownerId);
-                var userData = await userModel.findById(results[i].toJSON().user2);
-                if (!ownerData || !userData) {
-                    nullCounter++;
-                } else {
-                    result.push({
-                        "id": results[i].id,
-                        "itemId": results[i].itemId,
-                        "owner": {
-                            "id": ownerData.id,
-                            "userName": ownerData.userName,
-                            "image": ownerData.image,
-                            "fcm": ownerData.fcmToken
-                        },
-                        "user": {
-                            "id": userData.id,
-                            "userName": userData.userName,
-                            "image": userData.image,
-                            "fcm": userData.fcmToken
-                        },
-                        "messages": results[i].messages
-                    })
+            Chat.find({
+                "_id": {
+                    $in: chats
                 }
-                if (result.length == results.length - nullCounter) {
-                    return res.status(200).json({
-                        error: null,
-                        errorCode: "0",
-                        message: "SUCCESS",
-                        data: result
-
-                    });
+            }).then(async (results) => {
+                var result = []
+                let nullCounter = 0;
+                if (results.length == 0) {
+                    return res.status(200).json(
+                        new SuccessResponse(null, "0", "SUCCESS", [])
+                    );
                 }
-            }
-        }).catch(err => {
-            return res.status(400).json({
-                error: err,
-                errorCode: "1",
-                message: "BAD_REQUEST",
-            });
-        })
-
-    } else {
-        return res.status(200).json({
-            error: null,
-            errorCode: "0",
-            message: "SUCCESS",
-            data: []
-        });
-    }
+                for (let i = 0; i < results.length; i++) {
+                    // console.log(results[i]);
+                    var ownerData = await userModel.findById(results[i].toJSON().ownerId);
+                    var userData = await userModel.findById(results[i].toJSON().user2);
+                    if (!ownerData || !userData) {
+                        nullCounter++;
+                    } else {
+                        result.push({
+                            "id": results[i].id,
+                            "itemId": results[i].itemId,
+                            "owner": {
+                                "id": ownerData.id,
+                                "userName": ownerData.userName,
+                                "image": ownerData.image,
+                                "fcm": ownerData.fcmToken
+                            },
+                            "user": {
+                                "id": userData.id,
+                                "userName": userData.userName,
+                                "image": userData.image,
+                                "fcm": userData.fcmToken
+                            },
+                            "messages": results[i].messages
+                        })
+                    }
+                    if (result.length == results.length - nullCounter) {
+                        return res.status(200).json(
+                            new SuccessResponse(null, "0", "SUCCESS", result)
+                        );
+                    }
+                }
+            }).catch(err => {
+                return res.status(400).json(
+                    new ErrorResponse(err, "1", "BAD_REQUEST")
+                );
+            })
+    
+        } else {
+            return res.status(200).json(
+                new SuccessResponse(null, "0", "SUCCESS", [])
+            );
+        }
+    })
+    .catch(error=>{
+        return res.status(400).json(new ErrorResponse(error.message, "1", "BAD_REQUEST"))
+    })
+    //.lean().populate('chats').then(data=>res.json(data));
+    // console.log("user chats: ", user);
+   
 }
 
 exports.getChatsOfUserToSell = async (req, res) => {
@@ -128,12 +125,9 @@ exports.getChatsOfUserToSell = async (req, res) => {
     }).then(async (results) => {
         var result = [];
         if (results.length == 0) {
-            return res.status(200).json({
-                error: null,
-                errorCode: "0",
-                message: "SUCCESS",
-                data: []
-            });
+            return res.status(200).json(
+                new SuccessResponse(null, "0", "SUCCESS", [])
+            );
         }
         let nullCounter = 0;
         for (let i = 0; i < results.length; i++) {
@@ -153,20 +147,15 @@ exports.getChatsOfUserToSell = async (req, res) => {
                 }
                 // console.log("result ", result);
                 if (result.length == results.length - nullCounter)
-                    return res.status(200).json({
-                        error: null,
-                        errorCode: "0",
-                        message: "SUCCESS",
-                        data: result
-                    });
+                    return res.status(200).json(
+                        new SuccessResponse(null, "0", "SUCCESS", result)
+                    );
             })
         }
     }).catch(err => {
-        return res.status(400).json({
-            error: err,
-            errorCode: "1",
-            message: "BAD_REQUEST",
-        });
+        return res.status(400).json(
+            new ErrorResponse(err, "1", "BAD_REQUEST")
+        );
     })
 
 }

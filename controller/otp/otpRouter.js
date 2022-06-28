@@ -9,6 +9,9 @@ const {
     publishMessage
 } = require("../../mq/rabbit")
 
+const {
+    ErrorResponse
+} = require("../../response/Response")
 const getToken = async () => {
     var responseData;
     const options = {
@@ -140,11 +143,9 @@ router.post("/send-otp", async (req, res) => {
 
         } else {
             // console.log("more than 3");
-            return res.status(400).json({
-                error: "error",
-                errorCode: "1",
-                message: "Bugungi mahfiy bir martalik kodlar olish soni tugadi. Iltimos ertaga yana urunib ko'ring."
-            })
+            return res.status(400).json(
+                new ErrorResponse("error", "1", "Bugungi mahfiy bir martalik kodlar olish soni tugadi. Iltimos ertaga yana urunib ko'ring.")
+               )
         }
     }
 
@@ -154,7 +155,8 @@ router.post("/send-otp", async (req, res) => {
         phoneNumber: phoneNumber
     }, 'sms-task');
     // consumeMessage()
-    return res.status(200).json({
+    return res.status(200).json(
+        {
         error: null,
         errorCode: "0",
         message: "SUCCESS",

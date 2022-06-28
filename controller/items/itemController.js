@@ -10,10 +10,11 @@ const User = require("../../module/User");
 const {
     sendToTopicFunction
 } = require("../firebase/notificationController");
-const {
-    query
-} = require("express");
 
+const {
+    ErrorResponse,
+    SuccessResponse
+} = require("../../response/Response")
 
 function deleteProfileOrItemImage(images) {
     return new Promise((resolve, reject) => {
@@ -50,31 +51,20 @@ exports.getItemInfo = async (req, res) => {
         await itemModel.findById(
             itemId, (err, results) => {
                 if (err) {
-                    return res.status(400).json({
-                        error: err.message,
-                        errorCode: "1",
-                        message: "BAD_REQUEST"
-                    })
+                    return res.status(400).json(
+                        new ErrorResponse(err.message, "1", "BAD_REQUEST")
+                    )
                 } else if (results === null) {
-                    return res.status(403).json({
-                        error: "BAD_REQUEST",
-                        errorCode: "1",
-                        message: "Ushbu jihoz tarmoqda mavjud emas yoki o'chirilgan"
-                    })
+                    return res.status(403).json(
+                        new ErrorResponse("BAD_REQUEST", "1", "Ushbu jihoz tarmoqda mavjud emas yoki o'chirilgan")
+                    )
                 }
-                return res.status(200).json({
-                    error: null,
-                    errorCode: "0",
-                    message: "SUCCESS",
-                    data: results
-                });
+                return res.status(200).json(
+                    new SuccessResponse(null, "0", "SUCCESS", results)
+                );
             })
     } catch (error) {
-        return res.status(400).json({
-            error: error,
-            errorCode: "1",
-            message: "BAD_REQUEST"
-        })
+        return res.status(400).json(new ErrorResponse(error, "1", "BAD_REQUEST"))
     }
 }
 
@@ -91,7 +81,7 @@ exports.getItemsByLocation = async (req, res) => {
         await itemModel.find({
                 "location": currentLocation,
                 "status": {
-                    $nin: ["unpaid", "paid"]
+                    $nin: ["unpaid"] //, "paid"
                 }
             })
             .skip(Number(skip))
@@ -100,31 +90,20 @@ exports.getItemsByLocation = async (req, res) => {
                 "postTime": -1
             }).exec((err, results) => {
                 if (err) {
-                    return res.status(400).json({
-                        error: err.message,
-                        errorCode: "1",
-                        message: "BAD_REQUEST"
-                    })
+                    return res.status(400).json(new ErrorResponse(err.message, "1", "BAD_REQUEST"))
                 } else if (results === null) {
-                    return res.status(403).json({
-                        error: "BAD_REQUEST",
-                        errorCode: "1",
-                        message: "Ushbu jihoz tarmoqda mavjud emas"
-                    })
+                    return res.status(403).json(
+                        new ErrorResponse("BAD_REQUEST", "1", "Ushbu jihoz tarmoqda mavjud emas")
+                    )
                 }
-                return res.status(200).json({
-                    error: null,
-                    errorCode: "0",
-                    message: "SUCCESS",
-                    data: results
-                });
+                return res.status(200).json(
+                    new SuccessResponse(null, "0", " SUCCESS", results)
+                );
             })
     } catch (error) {
-        return res.status(400).json({
-            error: error,
-            errorCode: "1",
-            message: "BAD_REQUEST"
-        })
+        return res.status(400).json(
+            new ErrorResponse(error, "1", "BAD_REQUEST")
+        )
     }
 }
 
@@ -152,31 +131,18 @@ exports.getItemsByLocationStartsWith = async (req, res) => {
             "postTime": -1
         }).exec((err, results) => {
             if (err) {
-                return res.status(400).json({
-                    error: err.message,
-                    errorCode: "1",
-                    message: "BAD_REQUEST"
-                })
+                return res.status(400).json(new ErrorResponse(err.message, "1", "BAD_REQUEST"))
             } else if (results === null) {
-                return res.status(403).json({
-                    error: "BAD_REQUEST",
-                    errorCode: "1",
-                    message: "Ushbu jihoz tarmoqda mavjud emas"
-                })
+                return res.status(403).json(new ErrorResponse("BAD_REQUEST", "1", "Ushbu turdagi jihozlar tarmoqda mavjud emas"))
             }
-            return res.status(200).json({
-                error: null,
-                errorCode: "0",
-                message: "SUCCESS",
-                data: results
-            });
+            return res.status(200).json(
+                new SuccessResponse(null, "0", "Success", results)
+            );
         })
     } catch (error) {
-        return res.status(400).json({
-            error: error,
-            errorCode: "1",
-            message: "BAD_REQUEST"
-        })
+        return res.status(400).json(
+            new ErrorResponse(error, "1", "BAD_REQUEST")
+        )
     }
 }
 
@@ -213,19 +179,12 @@ exports.getItemsByCategory = async (req, res) => {
             })
             .limit(14)
             .then((results) => {
-                return res.status(200).json({
-                    error: null,
-                    errorCode: "0",
-                    message: "SUCCESS",
-                    data: results
-                });
+                return res.status(200).json(new SuccessResponse(null, "0", "Success", results));
             })
             .catch((error) => {
-                return res.status(400).json({
-                    error: error,
-                    errorCode: "1",
-                    message: "BAD_REQUEST"
-                });
+                return res.status(400).json(
+                    new ErrorResponse(error, "1", "BAD_REQUEST")
+                );
             })
     } else {
         itemModel.find({
@@ -238,19 +197,10 @@ exports.getItemsByCategory = async (req, res) => {
             .skip(Number(skip))
             .limit(15)
             .then((results) => {
-                return res.status(200).json({
-                    error: null,
-                    errorCode: "0",
-                    message: "SUCCESS",
-                    data: results
-                });
+                return res.status(200).json(new SuccessResponse(null, "0", "Success", results));
             })
             .catch((error) => {
-                return res.status(400).json({
-                    error: error,
-                    errorCode: "1",
-                    message: "BAD_REQUEST"
-                });
+                return res.status(400).json(new ErrorResponse(error, "1", "BAD_REQUEST"));
             })
 
     }
@@ -271,18 +221,12 @@ exports.getItemsById = async (req, res) => {
             "postTime": -1
         })
         .then((results) => {
-            return res.status(200).json({
-                error: null,
-                errorCode: "0",
-                message: "SUCCESS",
-                data: results
-            });
+            return res.status(200).json(new SuccessResponse(null, "0", "Success", results));
+
         }).catch((error) => {
-            return res.status(400).json({
-                error: error,
-                errorCode: "1",
-                message: "BAD_REQUEST"
-            });
+            return res.status(400).json(
+                new ErrorResponse(error, "1", "BAD_REQUEST")
+            )
         })
 }
 
@@ -296,31 +240,19 @@ exports.getItemsOfUser = async (req, res) => {
             "user": userId
         }, (err, results) => {
             if (err) {
-                return res.status(400).json({
-                    error: err.message,
-                    errorCode: "1",
-                    message: "BAD_REQUEST"
-                })
+                return res.status(400).json(
+                    new ErrorResponse(err.message, "1", "BAD_REQUEST")
+                )
             } else if (results === null) {
-                return res.status(403).json({
-                    error: "BAD_REQUEST",
-                    errorCode: "1",
-                    message: "Ushbu jihoz tarmoqda mavjud emas"
-                })
+                return res.status(403).json(new ErrorResponse("BAD_REQUEST", "1", "Ushbu jihoz tarmoqda mavjud emas"))
             }
-            return res.status(200).json({
-                error: null,
-                errorCode: "0",
-                message: "SUCCESS",
-                data: results
-            });
+            return res.status(200).json(new SuccessResponse(null, "0", "Success", results));
+
         })
     } catch (error) {
-        return res.status(400).json({
-            error: error,
-            errorCode: "1",
-            message: "BAD_REQUEST"
-        })
+        return res.status(400).json(
+            new ErrorResponse(error, "1", "BAD_REQUEST")
+        )
     }
 }
 
@@ -348,55 +280,33 @@ exports.updatePosition = async (req, res) => {
                 "postTime": postTime
             }, (err, results) => {
                 if (err) {
-                    return res.status(400).json({
-                        error: err,
-                        errorCode: "1",
-                        message: "BAD_REQUEST"
-                    })
+                    return res.status(400).json(
+                        new ErrorResponse(err.message, "1", "BAD_REQUEST")
+                    )
                 } else if (results === null) {
-                    return res.status(403).json({
-                        error: "BAD_REQUEST",
-                        errorCode: "1",
-                        message: "Ushbu jihoz tarmoqda mavjud emas"
-                    })
+                    return res.status(403).json(new ErrorResponse("BAD_REQUEST", "1", "Ushbu jihoz tarmoqda mavjud emas"))
                 }
-                return res.status(200).json({
-                    error: null,
-                    errorCode: "0",
-                    message: "SUCCESS",
-                    data: results
-                });
+                return res.status(200).json(new SuccessResponse(null, "0", "Success", results));
+
             })
         } else
             await itemModel.findByIdAndUpdate(itemId, {
                 "position": position
             }, (err, results) => {
                 if (err) {
-                    return res.status(400).json({
-                        error: err,
-                        errorCode: "1",
-                        message: "BAD_REQUEST"
-                    })
+                    return res.status(400).json(
+                        new ErrorResponse(err.message, "1", "BAD_REQUEST")
+                    )
                 } else if (results === null) {
-                    return res.status(403).json({
-                        error: "BAD_REQUEST",
-                        errorCode: "1",
-                        message: "Ushbu jihoz tarmoqda mavjud emas"
-                    })
+                    return res.status(403).json(new ErrorResponse("BAD_REQUEST", "1", "Ushbu jihoz tarmoqda mavjud emas"))
                 }
-                return res.status(200).json({
-                    error: null,
-                    errorCode: "0",
-                    message: "SUCCESS",
-                    data: results
-                });
+                return res.status(200).json(new SuccessResponse(null, "0", "Success", results));
+
             })
     } catch (error) {
-        return res.status(400).json({
-            error: error,
-            errorCode: "1",
-            message: "BAD_REQUEST"
-        })
+        return res.status(400).json(
+            new ErrorResponse(error, "1", "BAD_REQUEST")
+        )
     }
 }
 
@@ -441,17 +351,12 @@ exports.incDecLikes = async (req, res) => {
             })
         ]).then((results) => {
             //console.log(results);
-            return res.status(200).json({
-                error: null,
-                errorCode: "0",
-                message: "SUCCESS",
-            });
+            return res.status(200).json(new SuccessResponse(null, "0", "Success", null));
+
         }).catch((err) => {
-            return res.status(400).json({
-                error: err,
-                errorCode: "1",
-                message: "BAD_REQUEST"
-            });
+            return res.status(400).json(
+                new ErrorResponse(err, "1", "BAD_REQUEST")
+            )
         })
     } else if (type === "views") {
         await itemModel.findByIdAndUpdate(itemId, {
@@ -461,24 +366,14 @@ exports.incDecLikes = async (req, res) => {
             },
             (err, results) => {
                 if (err) {
-                    return res.status(400).json({
-                        error: err,
-                        errorCode: "1",
-                        message: "BAD_REQUEST"
-                    })
+                    return res.status(400).json(
+                        new ErrorResponse(err.message, "1", "BAD_REQUEST")
+                    )
                 } else if (results === null) {
-                    return res.status(403).json({
-                        error: "BAD_REQUEST",
-                        errorCode: "1",
-                        message: "Ushbu jihoz tarmoqda mavjud emas"
-                    })
+                    return res.status(403).json(new ErrorResponse("BAD_REQUEST", "1", "Ushbu jihoz tarmoqda mavjud emas"))
                 }
-                return res.status(200).json({
-                    error: null,
-                    errorCode: "0",
-                    message: "SUCCESS",
-                    data: results
-                });
+                return res.status(200).json(new SuccessResponse(null, "0", "Success", results));
+
             }
         )
     }
@@ -495,19 +390,13 @@ exports.getGlobalItems = async (req, res) => {
             "postTime": -1
         })
         .limit(40)
-        .then((data) => {
-            return res.status(200).json({
-                error: null,
-                errorCode: "0",
-                message: "SUCCESS",
-                data: data
-            });
+        .then((results) => {
+            return res.status(200).json(new SuccessResponse(null, "0", "Success", results));
+
         }).catch((error) => {
-            return res.status(400).json({
-                error: error,
-                errorCode: "1",
-                message: "BAD_REQUEST"
-            })
+            return res.status(400).json(
+                new ErrorResponse(error, "1", "BAD_REQUEST")
+            )
         })
 }
 
@@ -515,14 +404,21 @@ exports.getGlobalItems = async (req, res) => {
 exports.uploadItemImages = async (req, res) => {
     console.log(req.params);
     //check
-    var results = await User.findOne({
-        phoneNumber: req.params.phoneNumber
-    })
-    var items = await itemModel.find({
-        "_id": {
-            $in: [...results.items]
-        }
-    });
+    var results;
+    try {
+        results = await User.findOne({
+            phoneNumber: req.params.phoneNumber
+        })
+        var items = await itemModel.find({
+            "_id": {
+                $in: [...results.items]
+            }
+        });
+    } catch (error) {
+        return res.status(400).json(new ErrorResponse(error, "3","BAD_REQUEST"))
+    }
+    
+   
 
     let counter = 0;
     items.forEach((element) => {
@@ -596,18 +492,13 @@ exports.uploadItemImages = async (req, res) => {
         .then((data) => {
             // //console.log(data);
             // //console.log(item);
-            return res.status(200).json({
-                error: null,
-                errorCode: "0",
-                message: "SUCCESS",
-            });
+            return res.status(200).json(new SuccessResponse(null, "0", "Success", null));
+
         })).catch((err) => {
         console.log("status 400: ", err);
-        return res.status(400).json({
-            error: err,
-            errorCode: "1",
-            message: "BAD_REQUEST"
-        })
+        return res.status(400).json(
+            new ErrorResponse(err, "1", "BAD_REQUEST")
+        )
     });
 }
 
@@ -628,12 +519,8 @@ exports.favouriteItems = async (req, res) => {
     else if (favourites) items = user.likedItems;
     else items = user.boughts;
     if (items.length === 0 || items.length < skip) {
-        return res.status(200).json({
-            error: null,
-            errorCode: "0",
-            message: "SUCCESS",
-            data: [],
-        });
+        return res.status(200).json(new SuccessResponse(null, "0", "Success", []));
+
     }
     var element = [];
     for (let i = skip; i < skip + 15; i++) {
@@ -648,24 +535,18 @@ exports.favouriteItems = async (req, res) => {
             },
 
         })
-        .exec((err, result) => {
+        .exec((err, results) => {
             if (err) {
-                return res.status(400).json({
-                    error: err,
-                    errorCode: "1",
-                    message: "BAD_REQUEST"
-                })
+                return res.status(400).json(
+                    new ErrorResponse(err, "1", "BAD_REQUEST")
+                )
             }
             // results.push(result);
             // count++;
             // if (count === items.length) {
             // console.log(result);
-            return res.status(200).json({
-                error: null,
-                errorCode: "0",
-                message: "SUCCESS",
-                data: result
-            });
+            return res.status(200).json(new SuccessResponse(null, "0", "Success", results));
+
             // }
 
         })
@@ -683,7 +564,7 @@ exports.deleteItemById = async (req, res) => {
         _id: req.params.itemId
     }).then(async (data) => {
         if (data.images.length > 0) {
-           await deleteProfileOrItemImage(data.images)
+            await deleteProfileOrItemImage(data.images)
         }
         User.updateMany({}, {
                 $pull: {
@@ -696,20 +577,14 @@ exports.deleteItemById = async (req, res) => {
             })
             .then((data) => {
                 //console.log("user likes", data);
-                return res.status(200).json({
-                    error: null,
-                    errorCode: "0",
-                    message: "SUCCESS",
-                    data: data,
-                });
+                return res.status(200).json(new SuccessResponse(null, "0", "Success", data));
+
             })
             .catch((error) => console.log(error));
     }).catch((err) => {
-        return res.status(400).json({
-            error: err.message,
-            errorCode: "1",
-            message: "BAD_REQUEST"
-        });
+        return res.status(400).json(
+            new ErrorResponse(err, "3", "BAD_REQUEST")
+        )
     })
 }
 

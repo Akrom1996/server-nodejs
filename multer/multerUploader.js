@@ -1,6 +1,10 @@
 const multer = require("multer");
 const path = require("path")
 
+const {
+    ErrorResponse,
+    SuccessResponse
+} = require("../response/Response")
 const singleMulter = multer({
     storage: multer.memoryStorage(),
     limits: {
@@ -39,19 +43,15 @@ const uploadAvatar =  (req, res, next) => {
         if (err instanceof multer.MulterError) {
             // A Multer error occurred when uploading.
             console.log("error in multer")
-            return res.status(400).json({
-                error: err,
-                errorCode: "1",
-                message: "Yuklashda xatolik sodir bo'ldi"
-            })
+            return res.status(400).json(
+                new ErrorResponse(err,"1","Yuklashda xatolik sodir bo'ldi")
+                )
         } else if (err) {
             // An unknown error occurred when uploading.
             console.log("error in uploading, ", err)
-            return res.status(400).json({
-                error: err,
-                errorCode: "1",
-                message: "Yuklashda xatolik sodir bo'ldi"
-            })
+            return res.status(400).json(
+                new ErrorResponse(err, "1","Yuklashda xatolik sodir bo'ldi")
+                )
         }
         // Everything went fine. 
         next()
@@ -62,19 +62,15 @@ const uploadMultiImages = (req,res, next)=>{
         if (err instanceof multer.MulterError) {
             // A Multer error occurred when uploading.
             console.log("error in multer")
-            return res.status(400).json({
-                error: err,
-                errorCode: "1",
-                message: "Yuklashda xatolik sodir bo'ldi"
-            })
+            return res.status(400).json(
+                new ErrorResponse(err,"1","Yuklashda xatolik sodir bo'ldi")
+                )
         } else if (err) {
             // An unknown error occurred when uploading.
             console.log("error in uploading, ", err)
-            return res.status(400).json({
-                error: err,
-                errorCode: "1",
-                message: "Yuklashda xatolik sodir bo'ldi"
-            })
+            return res.status(400).json(
+                new ErrorResponse(err,"1","Yuklashda xatolik sodir bo'ldi")
+                )
         }
         // Everything went fine. 
         next()

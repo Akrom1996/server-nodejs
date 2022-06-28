@@ -6,35 +6,32 @@ const {
 const {
     minioClient
 } = require('../../module/minio');
-const {
-    ObjectId
-} = require('mongodb')
 const uuid = require("uuid").v4;
 const path = require("path")
+
+const {
+    ErrorResponse,
+    SuccessResponse
+} = require("../../response/Response")
 
 exports.getNotifications = async (req, res) => {
 
     adminNotificationModel
         .find()
         .sort({
-            "createdAt":-1
+            "createdAt": -1
         })
         .then((data) => {
 
-            return res.status(200).json({
-                error: null,
-                errorCode: "0",
-                message: "SUCCESS",
-                data: data
-            });
+            return res.status(200).json(
+                new SuccessResponse(null, "0", "SUCCESS", data)
+            );
         })
         .catch((err) => {
             //console.log(err.message);
-            return res.status(400).json({
-                error: err,
-                errorCode: "1",
-                message: "BAD_REQUEST",
-            });
+            return res.status(400).json(
+                new ErrorResponse(err, "1", "BAD_REQUEST")
+            );
         });
 }
 
@@ -45,9 +42,9 @@ exports.postNotification = async (req, res) => {
         minioClient.putObject("p2p-market", file_name, req.file.buffer, function (error, etag) {
             if (error) {
                 //console.log(error);
-                return res.status(500).json({
-                    error
-                })
+                return res.status(500).json(
+                    new ErrorResponse(error, "0", "E`lon joylashda muammo bor. Qoidalarga ko'ra .jpeg, .jpg, .png, .gif turidagi va 10 MB gacha rasmlarni joylashingiz mumkin.")
+                )
             }
         });
     }
@@ -61,20 +58,15 @@ exports.postNotification = async (req, res) => {
     comment.save()
         .then((result) => {
 
-            return res.status(200).json({
-                error: null,
-                errorCode: "0",
-                data: result,
-                message: "SUCCESS",
-            });
+            return res.status(200).json(
+                new SuccessResponse(null, "0", "SUCCESS", result)
+            );
         })
         .catch((err) => {
             //console.log(err);
-            return res.status(400).json({
-                error: err,
-                errorCode: "1",
-                message: "BAD_REQUEST"
-            })
+            return res.status(400).json(
+                new ErrorResponse(err, "1", "BAD_REQUEST")
+            )
         });
 
 
@@ -94,18 +86,14 @@ exports.putView = async (req, res) => {
             }
         }).then((data) => {
 
-            res.status(200).json({
-                error: null,
-                errorCode: "0",
-                message: "SUCCESS",
-            });
+            return res.status(200).json(
+                new SuccessResponse(null, "0", "SUCCESS", null)
+            );
         })
-        .catch(error => {
+        .catch((error) => {
 
-            res.status(400).json({
-                error: err,
-                errorCode: "1",
-                message: "BAD_REQUEST"
-            });
+            return res.status(400).json(
+                new ErrorResponse(error, "1", "BAD_REQUEST")
+            );
         })
 }

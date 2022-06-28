@@ -3,6 +3,12 @@ const {
     admin
 } = require('../../controller/firebase/getToken')
 
+
+const {
+    ErrorResponse,
+    SuccessResponse
+} = require("../../response/Response")
+
 exports.fcmFunc = async (data) => {
     // console.log(data);
     const fcm = fcmModel(data);
@@ -47,30 +53,16 @@ exports.saveFCM = async (req, res) => {
         //update if user exists
         if (userFCM) {
             userFCM.fcmId = id;
-            userFCM.save().then((result) => res.status(200).json({
-                error: null,
-                errorCode: "0",
-                message: "SUCCESS",
-                data: result,
-
-            }));
+            userFCM.save().then((result) => res.status(200).json(
+                new SuccessResponse(null, "0", "SUCCESS", result)
+            ));
         }
         // save
         else {
-            fcm.save().then((result) => res.status(200).json({
-                error: null,
-                errorCode: "0",
-                message: "SUCCESS",
-                data: result,
-
-            }))
+            fcm.save().then((result) => res.status(200).json(new SuccessResponse(null, "0", "SUCCESS", result)))
         }
     }).catch((error) => {
-        return res.status(400).json({
-            error: error.message,
-            errorCode: "1",
-            message: "BAD_REQUEST"
-        })
+        return res.status(400).json(new ErrorResponse(error, "1", "BAD_REQUEST"))
     })
 }
 
@@ -82,19 +74,10 @@ exports.subscribe = async (req, res) => {
     admin.messaging().subscribeToTopic(fcmToken, topic)
         .then((result) => {
             //console.log(`${fcmToken.substring(0,20)}... successfully subscribed to ${topic}`);
-            return res.status(200).json({
-                error: null,
-                errorCode: "0",
-                message: "SUCCESS",
-                data: result,
-            })
+            return res.status(200).json(new SuccessResponse(null, "0", "SUCCESS", result))
         }).catch((error) => {
             //console.log(error);
-            return res.status(400).json({
-                error: error.message,
-                errorCode: "1",
-                message: "BAD_REQUEST"
-            })
+            return res.status(400).json(new ErrorResponse(error, "1", "BAD_REQUEST"))
         })
 }
 
@@ -107,19 +90,10 @@ exports.unsubscribe = async (req, res) => {
     admin.messaging().unsubscribeFromTopic(fcmToken, topic)
         .then((result) => {
             //console.log(`${fcmToken.substring(0,10)}... successfully unsubscribed from ${topic}`);
-            return res.status(200).json({
-                error: null,
-                errorCode: "0",
-                message: "SUCCESS",
-                data: result,
-            })
+            return res.status(200).json(new SuccessResponse(null, "0", "SUCCESS", result))
         }).catch((error) => {
             //console.log(error);
-            return res.status(400).json({
-                error: error.message,
-                errorCode: "1",
-                message: "BAD_REQUEST"
-            })
+            return res.status(400).json(new ErrorResponse(error, "1", "BAD_REQUEST"))
         })
 }
 
@@ -127,7 +101,7 @@ exports.sendToTopicFunction = async (data, topic) => {
     var payload = {
         "notification": {
             title: topic,
-            sound:"default",
+            sound: "default",
             body: "Yangi e'lon berildi. Bilidirishnomalarni tekshiring"
         },
         "data": {
@@ -163,7 +137,7 @@ exports.sendToTopic = async (req, res) => {
     var payload = {
         "notification": {
             title: topic,
-            sound:"default",
+            sound: "default",
             body: "Yangi e'lon berildi"
         },
         "data": {
@@ -176,18 +150,9 @@ exports.sendToTopic = async (req, res) => {
     admin.messaging().sendToTopic(String(topic).split(' ')[0].toLowerCase(), payload)
         .then((result) => {
             //console.log(`successfully send to ${result}`);
-            return res.status(200).json({
-                error: null,
-                errorCode: "0",
-                message: "SUCCESS",
-                data: result,
-            })
+            return res.status(200).json(new SuccessResponse(null, "0", "SUCCESS", result))
         }).catch((error) => {
             //console.log(error);
-            return res.status(400).json({
-                error: error.message,
-                errorCode: "1",
-                message: "BAD_REQUEST"
-            })
+            return res.status(400).json(new ErrorResponse(error, "1", "BAD_REQUEST"))
         })
 }

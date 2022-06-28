@@ -1,12 +1,13 @@
 const connection = require("../../module/database");
-const userModel = require('../../module/User');
-const mongoose = require("mongoose");
 require('dotenv').config();
 const Item = require("../../module/Item");
 const {
     ObjectId
 } = require('mongodb')
-
+const {
+    ErrorResponse,
+    SuccessResponse
+} = require("../../response/Response")
 exports.getComments = async (req, res) => {
     //console.log(req.params);
     // LOOK UP THE POST
@@ -23,11 +24,9 @@ exports.getComments = async (req, res) => {
         })
         .catch((err) => {
             //console.log(err.message);
-            return res.status(400).json({
-                error: err,
-                errorCode: "1",
-                message: "BAD_REQUEST",
-            });
+            return res.status(400).json(
+                new ErrorResponse(err, "1", "BAD_REQUEST")
+            )
         });
 }
 
@@ -54,11 +53,9 @@ exports.postComment = async (req, res) => {
         })
         .catch((err) => {
             //console.log(err);
-            return res.status(400).json({
-                error: err,
-                errorCode: "1",
-                message: "BAD_REQUEST"
-            })
+            return res.status(400).json(
+                new ErrorResponse(err, "1", "BAD_REQUEST")
+            )
         });
 }
 
@@ -71,8 +68,8 @@ exports.putThumb = async (req, res) => {
     const {
         value
     } = req.body;
-    console.log(req.params,  value);
-    value ==="true" ?
+    console.log(req.params, value);
+    value === "true" ?
         connection.collection.updateOne({
             "_id": itemId,
             "messages.id": ObjectId(commentId)
@@ -80,21 +77,19 @@ exports.putThumb = async (req, res) => {
             $addToSet: {
                 "messages.$.thumb": userId
             }
-        },{returnOriginal: false}).then((data) => {
-            console.log("pushed thumb",data);
-            res.status(200).json({
-                error: null,
-                errorCode: "0",
-                message: "SUCCESS",
-            });
+        }, {
+            returnOriginal: false
+        }).then((data) => {
+            console.log("pushed thumb", data);
+            return res.status(200).json(
+                new SuccessResponse(null, "0", "SUCCESS", null)
+            );
         })
         .catch(error => {
 
-            res.status(400).json({
-                error: err,
-                errorCode: "1",
-                message: "BAD_REQUEST"
-            });
+            return res.status(400).json(
+
+                new ErrorResponse(error, "1", "BAD_REQUEST"));
         }) : connection.collection.updateOne({
             "_id": itemId,
             "messages.id": ObjectId(commentId)
@@ -104,18 +99,11 @@ exports.putThumb = async (req, res) => {
             }
         }).then((data) => {
             console.log("pulled thumb", data);
-            res.status(200).json({
-                error: null,
-                errorCode: "0",
-                message: "SUCCESS",
-            });
+            return res.status(200).json(
+                new SuccessResponse(null, "0", "SUCCESS", null)
+            );
         })
         .catch(error => {
-
-            res.status(400).json({
-                error: err,
-                errorCode: "1",
-                message: "BAD_REQUEST"
-            });
+            res.status(400).json(new ErrorResponse(error, "1", "BAD_REQUEST"));
         });
 }

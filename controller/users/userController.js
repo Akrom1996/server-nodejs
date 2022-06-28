@@ -9,8 +9,11 @@ require('dotenv').config();
 const Multer = require("multer");
 const Item = require("../../module/Item");
 const jwt = require("jsonwebtoken")
-const fcmModel = require("../../module/notification.js")
 
+const {
+    ErrorResponse,
+    SuccessResponse
+} = require("../../response/Response")
 const {
     fcmFunc
 } = require("../firebase/notificationController")
@@ -42,18 +45,11 @@ exports.checkUserForExistance = async (req, res) => {
         "phoneNumber": req.params.phoneNumber
     }, (err, result) => {
         if (err) {
-            return res.status(400).json({
-                error: err.message,
-                errorCode: "1",
-                message: "BAD_REQUEST"
-            })
+            return res.status(400).json(
+                new ErrorResponse(err.message, "1", "BAD_REQUEST")
+            )
         }
-        return res.status(200).json({
-            error: null,
-            errorCode: "1",
-            message: "Success",
-            data: result
-        })
+        return res.status(200).json(new SuccessResponse(null, "0", "SUCCESS", result))
 
     })
 }
@@ -67,11 +63,9 @@ exports.registrate = async (req, res) => {
         "phoneNumber": req.body.phoneNumber
     }, (err) => {
         if (err) {
-            return res.status(400).json({
-                error: err.message,
-                errorCode: "1",
-                message: "BAD_REQUEST"
-            })
+            return res.status(400).json(
+                new ErrorResponse(err.message, "1", "BAD_REQUEST")
+            )
         }
 
 
@@ -97,11 +91,9 @@ exports.registrate = async (req, res) => {
             data: result[0],
         })
     }).catch((error) => {
-        return res.status(400).json({
-            error: error,
-            errorCode: "2",
-            message: "BAD_REQUEST"
-        });
+        return res.status(400).json(
+            new ErrorResponse(error, "2", "BAD_REQUEST")
+        );
     })
 
 }
@@ -145,18 +137,13 @@ exports.deleteUser = async (req, res) => {
 
 
     ]).then((results) => {
-        return res.status(200).json({
-            error: null,
-            errorCode: "0",
-            message: "SUCCESS",
-            data: results
-        });
+        return res.status(200).json(
+            new SuccessResponse(null, "0", "SUCCESS", results)
+        );
     }).catch((err) => {
-        return res.status(400).json({
-            error: err.message,
-            errorCode: "1",
-            message: "BAD_REQUEST"
-        });
+        return res.status(400).json(
+            new ErrorResponse(err.message, "1", "BAD_REQUEST")
+        );
     })
 }
 exports.deleteUserImage = async (req, res) => {
@@ -171,18 +158,11 @@ exports.deleteUserImage = async (req, res) => {
         }),
         await deleteProfileOrItemImage([req.body.image]),
     ]).then((results) => {
-        return res.status(200).json({
-            error: null,
-            errorCode: "0",
-            message: "SUCCESS",
-            data: results[0]
-        });
+        return res.status(200).json( new SuccessResponse(null, "0","SUCCESS",results[0]));
     }).catch((err) => {
-        return res.status(400).json({
-            error: err.message,
-            errorCode: "1",
-            message: "BAD_REQUEST"
-        });
+        return res.status(400).json(
+            new ErrorResponse(err.message, "1", "BAD_REQUEST")
+        );
     })
 }
 
@@ -204,24 +184,13 @@ exports.getUserInfo = async (req, res) => {
         "phoneNumber": phoneNumber
     }, (err, results) => {
         if (err) {
-            return res.status(400).json({
-                error: err.message,
-                errorCode: "1",
-                message: "BAD_REQUEST"
-            })
+            return res.status(400).json(new ErrorResponse(err.message, "1", "BAD_REQUEST"))
         } else if (results === null) {
-            return res.status(400).json({
-                error: "BAD_REQUEST",
-                errorCode: "1",
-                message: "Ushbu foydalanuvchi tarmoqda mavjud emas"
-            })
+            return res.status(400).json(
+                new ErrorResponse("BAD_REQUEST", "1", "Ushbu foydalanuvchi tarmoqda mavjud emas")
+            )
         }
-        return res.status(200).json({
-            error: null,
-            errorCode: "0",
-            message: "SUCCESS",
-            data: results
-        });
+        return res.status(200).json( new SuccessResponse(null, "0","SUCCESS",results));
     })
     // })
 }
@@ -242,24 +211,13 @@ exports.getUserById = async (req, res) => {
         "_id": req.params.userId
     }, (err, results) => {
         if (err) {
-            return res.status(400).json({
-                error: err.message,
-                errorCode: "1",
-                message: "BAD_REQUEST"
-            })
+            return res.status(400).json(
+                new ErrorResponse(err.message, "1", "BAD_REQUEST")
+            )
         } else if (results === null) {
-            return res.status(403).json({
-                error: "BAD_REQUEST",
-                errorCode: "1",
-                message: "Ushbu foydalanuvchi tarmoqda mavjud emas"
-            })
+            return res.status(403).json(new ErrorResponse("BAD_REQUEST", "1", "Ushbu foydalanuvchi tarmoqda mavjud emas"))
         }
-        return res.status(200).json({
-            error: null,
-            errorCode: "0",
-            message: "SUCCESS",
-            data: results
-        });
+        return res.status(200).json( new SuccessResponse(null, "0","SUCCESS",results));
     })
 
     // })
@@ -280,24 +238,15 @@ exports.updateUserInfo = async (req, res) => {
     }).then((results) => {
         // console.log(results);
         if (results === null) {
-            return res.status(403).json({
-                error: "BAD_REQUEST",
-                errorCode: "1",
-                message: "Ushbu foydalanuvchi tarmoqda mavjud emas"
-            })
+            return res.status(403).json(
+                new ErrorResponse("BAD_REQUEST", "1", "Ushbu foydalanuvchi tarmoqda mavjud emas")
+            )
         }
-        return res.status(200).json({
-            error: null,
-            errorCode: "0",
-            message: "SUCCESS",
-            data: results
-        });
+        return res.status(200).json( new SuccessResponse(null, "0","SUCCESS",results));
     }).catch((error) => {
-        return res.status(400).json({
-            error: error,
-            errorCode: "1",
-            message: "BAD_REQUEST"
-        });
+        return res.status(400).json(
+            new ErrorResponse(error, "1", "BAD_REQUEST")
+        );
     })
 }
 
@@ -321,18 +270,9 @@ exports.updateToken = async (req, res) => {
 
         .then((results) => {
             //console.log(results);
-            return res.status(200).json({
-                error: null,
-                errorCode: "0",
-                message: "SUCCESS",
-                data: results
-            });
+            return res.status(200).json( new SuccessResponse(null, "0","SUCCESS",results));
         }).catch((error) => {
-            return res.status(400).json({
-                error: error,
-                errorCode: "1",
-                message: "BAD_REQUEST"
-            })
+            return res.status(400).json(new ErrorResponse(error, "1", "BAD_REQUEST"))
         })
 }
 
@@ -360,44 +300,35 @@ exports.updateManner = async (req, res) => {
         ])
         .then((results) => {
             //console.log(results);
-            return res.status(200).json({
-                error: null,
-                errorCode: "0",
-                message: "SUCCESS",
-                data: results
-            });
+            return res.status(200).json(new SuccessResponse(null, "0", "SUCCESS", results));
         }).catch((error) => {
-            return res.status(400).json({
-                error: error,
-                errorCode: "1",
-                message: "BAD_REQUEST"
-            })
+            return res.status(400).json(new ErrorResponse(error, "1", "BAD_REQUEST"))
         })
 }
-var upload = Multer({
-    storage: Multer.memoryStorage(),
-    limits: {
-        fileSize: 10000000
-    },
-    fileFilter: function (req, file, cb) {
-        checkFileType(file, cb);
-    }
-}).single("upload");
+// var upload = Multer({
+//     storage: Multer.memoryStorage(),
+//     limits: {
+//         fileSize: 10000000
+//     },
+//     fileFilter: function (req, file, cb) {
+//         checkFileType(file, cb);
+//     }
+// }).single("upload");
 
 
-function checkFileType(file, cb) {
-    // Allowed ext
-    const filetypes = /jpeg|jpg|png|gif/;
-    // Check ext
-    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-    // Check mime
-    // const mimetype = filetypes.test(file.mimetype);
-    if (extname) {
-        return cb(null, true);
-    } else {
-        cb("E`lon joylashda muammo bor. Qoidalarga ko'ra .jpeg, .jpg, .png, .gif turidagi va 10 MB gacha rasmlarni joylashingiz mumkin.");
-    }
-}
+// function checkFileType(file, cb) {
+//     // Allowed ext
+//     const filetypes = /jpeg|jpg|png|gif/;
+//     // Check ext
+//     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+//     // Check mime
+//     // const mimetype = filetypes.test(file.mimetype);
+//     if (extname) {
+//         return cb(null, true);
+//     } else {
+//         cb("E`lon joylashda muammo bor. Qoidalarga ko'ra .jpeg, .jpg, .png, .gif turidagi va 10 MB gacha rasmlarni joylashingiz mumkin.");
+//     }
+// }
 
 exports.uploadProfileImage = async (req, res) => {
     // console.log(req.query);
@@ -406,78 +337,53 @@ exports.uploadProfileImage = async (req, res) => {
         singleMulter(req, res, function (error) {
             if (error instanceof Multer.MulterError) {
                 // A Multer error occurred when uploading.
-                return res.status(500).json({
-                    error: "error",
-                    errorCode: "1",
-                    message: "Joylashda muammo sodir bo'ldi"
-                })
+                return res.status(500).json(
+                    new ErrorResponse("error", "1", "Joylashda muammo sodir bo'ldi")
+                )
             } else if (error) {
                 // An unknown error occurred when uploading.
                 //console.log(error)
-                return res.status(500).json({
-                    error: "error",
-                    errorCode: "1",
-                    message: "Noma'lum xatolik sodir bo'ldi"
-                })
+                return res.status(500).json(new ErrorResponse("error", "1", "Joylashda muammo sodir bo'ldi"))
             }
-        // Everything went fine.
-        //console.log(req.file);
-        let file_name;
-        const {
-            phoneNumber
-        } = req.params;
+            // Everything went fine.
+            //console.log(req.file);
+            let file_name;
+            const {
+                phoneNumber
+            } = req.params;
 
-        file_name = "/images/profile-images/" + uuid() + path.extname(req.file.originalname);
-        minioClient.putObject("p2p-market",
-            file_name, req.file.buffer,
-            async (error, etag) => {
-                if (error) {
-                    return res.status(400).json({
-                        error: error,
-                        errorCode: "1",
-                        message: "BAD_REQUEST"
-                    })
-                }
-                //console.log(file_name);
-                await userModel.findOneAndUpdate({
-                    "phoneNumber": phoneNumber
-                }, {
-                    "image": file_name,
-                    "userName": req.query.userName,
-                }, {
-                    upsert: true,
-                    returnOriginal: false,
-                }, (err, results) => {
-                    if (err) {
-                        return res.status(400).json({
-                            error: err,
-                            errorCode: "1",
-                            message: "BAD_REQUEST"
-                        })
+            file_name = "/images/profile-images/" + uuid() + path.extname(req.file.originalname);
+            minioClient.putObject("p2p-market",
+                file_name, req.file.buffer,
+                async (error, etag) => {
+                    if (error) {
+                        return res.status(400).json(new ErrorResponse(error, "1", "BAD_REQUEST"))
                     }
-                    //console.log(results);
+                    //console.log(file_name);
+                    await userModel.findOneAndUpdate({
+                        "phoneNumber": phoneNumber
+                    }, {
+                        "image": file_name,
+                        "userName": req.query.userName,
+                    }, {
+                        upsert: true,
+                        returnOriginal: false,
+                    }, (err, results) => {
+                        if (err) {
+                            return res.status(400).json(
+                                new ErrorResponse(err.message, "1", "BAD_REQUEST"))
+                        }
+                        //console.log(results);
 
-                    return res.status(200).json({
-                        error: null,
-                        errorCode: "0",
-                        message: "SUCCESS",
-                        data: results
+                        return res.status(200).json(new SuccessResponse(null, "0", "SUCCESS", results));
                     });
-                });
 
-            })
+                })
         })
 
     } catch (error) {
-        return res.status(400).json({
-            error: error,
-            errorCode: "1",
-            message: "BAD_REQUEST"
-        })
+        return res.status(400).json(new ErrorResponse(error, "1", "BAD_REQUEST"))
     }
-
-
-
 }
 
 exports.getStats = async (req, res) => {
@@ -504,17 +410,10 @@ exports.getStats = async (req, res) => {
         }
 
     ]).then(result => {
-        res.status(200).json({
-            error: null,
-            errorCode: "0",
-            message: "SUCCESS",
-            data: result
-        })
+        res.status(200).json(
+            new SuccessResponse(null, "0", "SUCCESS", result)
+        )
     }).catch((err) => {
-        return res.status(400).json({
-            error: err,
-            errorCode: "1",
-            message: "BAD_REQUEST"
-        })
+        return res.status(400).json(new ErrorResponse(err.message, "1", "BAD_REQUEST"))
     })
 }

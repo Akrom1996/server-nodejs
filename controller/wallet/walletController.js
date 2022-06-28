@@ -8,6 +8,7 @@ const {
     error
 } = require("winston");
 
+const {ErrorResponse, SuccessResponse} = require("../../response/Response")
 const createNewBalance = async (id) => {
     let wallet = new WalletModel({
         "_id": new ObjectId(id),
@@ -42,23 +43,16 @@ exports.getBalance = async (req, res) => {
                 currentBalance: walletData.history[0].current_amount
             })
         } else {
-            createNewBalance(id).then((result) => res.status(200).json({
-                    error: null,
-                    errorCode: "0",
-                    message: "SUCCESS",
-                    data: result
-                }))
+            createNewBalance(id).then((result) => res.status(200).json( new SuccessResponse(null, "0","SUCCESS",result)))
                 .catch((err) => {
                     console.log(err);
                     throw err
                 });
         }
     }).catch(error => {
-        return res.status(400).json({
-            error: error,
-            errorCode: "2",
-            message: "BAD_REQUEST"
-        });
+        return res.status(400).json(
+            new ErrorResponse(error.message, "2", "BAD_REQUEST")
+            );
     })
 }
 
@@ -98,22 +92,13 @@ exports.updateBalance = async (req, res) => {
             });
 
         } else {
-            createNewBalance(id).then((result) => res.status(200).json({
-                    error: null,
-                    errorCode: "0",
-                    message: "SUCCESS",
-                    data: result
-                }))
+            createNewBalance(id).then((result) => res.status(200).json( new SuccessResponse(null, "0","SUCCESS",result)))
                 .catch((err) => {
                     console.log(err);
                     throw err
                 });
         }
     }).catch(error => {
-        return res.status(400).json({
-            error: error,
-            errorCode: "2",
-            message: "BAD_REQUEST"
-        });
+        return res.status(400).json(new ErrorResponse(error, "2", "BAD_REQUEST"));
     })
 }

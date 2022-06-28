@@ -5,6 +5,10 @@ const {
     publishMessage
 } = require("../../mq/rabbit");
 
+const {
+    ErrorResponse,
+    SuccessResponse
+} = require("../../response/Response")
 const sendMessage = (number, message) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -43,17 +47,9 @@ exports.sendAdvert = async (req, res) => {
             }
         })
     }).catch(error => {
-        return res.status(400).json({
-            error: error,
-            errorCode: "2",
-            message: "BAD_REQUEST"
-        });
+        return res.status(400).json(new ErrorResponse(error, "1", "BAD_REQUEST"));
     })
-    return res.status(200).json({
-        error: null,
-        errorCode: "0",
-        message: "SUCCESS",
-    });
+    return res.status(200).json(new SuccessResponse(null, "0", "SUCCESS", null));
 
 }
 exports.sendPrevious = async (req, res) => {
@@ -61,7 +57,7 @@ exports.sendPrevious = async (req, res) => {
     ADVERTModel.find({}).then((results) => {
 
         results.forEach(async (result) => {
-            
+
             if (result.timeStamp.split('T')[0] !== new Date().toISOString().split('T')[0]) {
                 storedNumbers.push(result.phoneNumber)
 
@@ -71,12 +67,9 @@ exports.sendPrevious = async (req, res) => {
                 }, 'advert-task')
             }
         })
-        return res.status(200).json({
-            error: null,
-            errorCode: "0",
-            message: req.body.message,
-            data: storedNumbers
-        })
+        return res.status(200).json(
+            new SuccessResponse(null, "0", req.body.message, storedNumbers)
+        )
     });
 
 }
