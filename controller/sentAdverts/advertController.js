@@ -58,7 +58,7 @@ exports.sendPrevious = async (req, res) => {
 
         results.forEach(async (result) => {
 
-            if (result.timeStamp.split('T')[0] !== new Date().toISOString().split('T')[0]) {
+            if (result.timeStamp.split('T')[0] === new Date().toISOString().split('T')[0]) {
                 storedNumbers.push(result.phoneNumber)
 
                 await publishMessage({
