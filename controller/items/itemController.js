@@ -33,7 +33,7 @@ async function getNearNeighbours(location) {
       });
     })
     
-  }
+}
 
 function deleteProfileOrItemImage(images) {
     return new Promise((resolve, reject) => {
