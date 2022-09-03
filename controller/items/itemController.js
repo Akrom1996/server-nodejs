@@ -10,11 +10,30 @@ const User = require("../../module/User");
 const {
     sendToTopicFunction
 } = require("../firebase/notificationController");
-
+const locations = require("./locations")
 const {
     ErrorResponse,
     SuccessResponse
 } = require("../../response/Response")
+
+async function getNearNeighbours(location) {
+    var globalLocation
+    return new Promise((resolve, reject)=>{
+      locations.forEach(e => {
+        for (let i = 0; i < Object.values(e).length; i++) {
+          var local;
+          local = Object.values(e)[i].filter(loc => loc == location)
+          if (local.length != 0) {
+            globalLocation = Object.keys(e)[i]
+            break
+          } else
+            globalLocation = location
+        }
+        resolve(globalLocation)
+      });
+    })
+    
+  }
 
 function deleteProfileOrItemImage(images) {
     return new Promise((resolve, reject) => {
@@ -77,9 +96,10 @@ exports.getItemsByLocation = async (req, res) => {
         skip
     } = req.query
     //console.log(currentLocation);
+    let locationResult = await getNearNeighbours(currentLocation)
     try {
         await itemModel.find({
-                "location": currentLocation,
+                "location": locationResult,//currentLocation
                 "status": {
                     $nin: ["unpaid","paid"] //, 
                 }
@@ -150,7 +170,6 @@ exports.getItemsByCategory = async (req, res) => {
     const {
         position,
         category,
-
     } = req.params;
     const {
         itemId,
@@ -158,6 +177,7 @@ exports.getItemsByCategory = async (req, res) => {
         skip
     } = req.query
     // console.log(req.query.skip);
+    // Recommended items
     if (itemId) {
         itemModel.find({
                 "location": position,
@@ -189,7 +209,8 @@ exports.getItemsByCategory = async (req, res) => {
     } else {
         itemModel.find({
                 "location": position,
-                "category": category
+                "category": category,
+                
             }, )
             .sort({
                 "postTime": -1
