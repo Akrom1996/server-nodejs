@@ -35,12 +35,14 @@ exports.getBalance = async (req, res) => {
     } = req.params;
     WalletModel.findById(id).then((walletData) => {
         if (walletData) {
+            let current_amount = walletData.history[0].current_amount
+            walletData.currentBalance = current_amount
+            console.log(walletData);
             return res.status(200).json({
                 error: null,
                 errorCode: "0",
                 message: "SUCCESS",
-                data: walletData,
-                currentBalance: walletData.history[0].current_amount
+                data: walletData
             })
         } else {
             createNewBalance(id).then((result) => res.status(200).json( new SuccessResponse(null, "0","SUCCESS",result)))
@@ -79,12 +81,12 @@ exports.updateBalance = async (req, res) => {
             // }
             walletData.history.unshift(newHistory);
             walletData.save().then(result => {
+                result.currentBalance =newHistory.current_amount
                 return res.status(200).json({
                     error: null,
                     errorCode: "0",
                     message: "SUCCESS",
-                    data: result,
-                    currentBalance: newHistory.current_amount
+                    data: result
                 })
             }).catch(err => {
                 console.log(err);
