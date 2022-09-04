@@ -136,9 +136,10 @@ exports.getItemsByLocationStartsWith = async (req, res) => {
         value
     } = req.query
     //console.log(currentLocation);
+    let locationResult = await getNearNeighbours(currentLocation)
     try {
         await itemModel.find({
-            "location": currentLocation,
+            "location": locationResult,//currentLocation,
             "title": {
                 $regex: value, //value + ".*",/^value/
                 $options: 'i'
@@ -177,10 +178,11 @@ exports.getItemsByCategory = async (req, res) => {
         skip
     } = req.query
     // console.log(req.query.skip);
+    let locationResult = await getNearNeighbours(position)
     // Recommended items
     if (itemId) {
         itemModel.find({
-                "location": position,
+                "location": locationResult,//position,
                 $or: [{
                     "category": category,
                 }, {
@@ -208,7 +210,7 @@ exports.getItemsByCategory = async (req, res) => {
             })
     } else {
         itemModel.find({
-                "location": position,
+                "location": locationResult,//position,
                 "category": category,
                 
             }, )
@@ -287,6 +289,7 @@ exports.updatePosition = async (req, res) => {
         postTime
     } = req.body;
     // console.log(postTime);
+    let locationResult = await getNearNeighbours(position)
     try {
         if (toUser) {
             await User.findByIdAndUpdate(toUser, {
@@ -312,7 +315,7 @@ exports.updatePosition = async (req, res) => {
             })
         } else
             await itemModel.findByIdAndUpdate(itemId, {
-                "position": position
+                "position": locationResult,//position
             }, (err, results) => {
                 if (err) {
                     return res.status(400).json(
@@ -481,7 +484,8 @@ exports.uploadItemImages = async (req, res) => {
 
     var input = req.body;
     input.images = file_name;
-    input.location = req.params.currentLocation;
+    let locationResult = await getNearNeighbours(req.params.currentLocation)
+    input.location = locationResult;//req.params.currentLocation;
 
     // var uploadedFilePath = []
     // req.files.map((file) => uploadedFilePath.push(file.originalname));
