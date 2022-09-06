@@ -141,8 +141,38 @@ module.exports = [{
         "Uchkurgan",
         "Uychi",
         "Yangikurgan",
+        "Касансай"
+        "Kosonsoy"
+        "Косонсой"
+        "Мингбулак"
+        "Mingbuloq"
+        "Мингбулоқ"
+        "Наманган"
+        "Namangan"
+        "Наманган"
+        "Нарын"
+        "Norin"
+        "Норин"
+        "Хаккулабад"
+        "Пап"
+        "Pop"
+        "Поп"
+        "Туракурган"
+        "To'raqo'rg'on"
+        "Тўрақўрғон"
+        "Уйчи"
+        "Учкурган"
+        "Uchqo'rg'on"
+        "Учқўрғон"
+        "Чартак"
+        "Chortoq"
+        "Чортоқ"
+        "Чуст"
+        "Янгикурган"
     ],
-    "Tashkent": ["Zafar",
+    //shu yerdan boshlab
+    "Tashkent": [
+        "Zafar",
         "Gazalkent",
         "Buka",
         "Chinaz",
