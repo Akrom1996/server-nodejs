@@ -550,7 +550,7 @@ exports.favouriteItems = async (req, res) => {
     var element = [];
     for (let i = skip; i < skip + 15; i++) {
         if (items[i] == null) break;
-        element.unshift(items[i])
+        element.push(items[i])
     }
 
     // items.forEach(async (element) => {
