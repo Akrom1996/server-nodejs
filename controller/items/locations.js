@@ -1,19 +1,19 @@
 module.exports = [{
     "Andijan": [
-        "Andijan", 
-        "Asaka", 
-        "Baliqchi", 
-        "Boz", 
-        "Buloqboshi", 
-        "Izboskan", 
-        "Jalalkuduk", 
+        "Andijan",
+        "Asaka",
+        "Baliqchi",
+        "Boz",
+        "Buloqboshi",
+        "Izboskan",
+        "Jalalkuduk",
         "Khodjaobod",
         "Khanabad",
-        "Kurgontepa", 
-        "Marhamat", 
-        "Oltinkol", 
-        "Pakhtaabad", 
-        "Shakhrikhan", 
+        "Kurgontepa",
+        "Marhamat",
+        "Oltinkol",
+        "Pakhtaabad",
+        "Shakhrikhan",
         "Ulugnor",
         "Kuyganyor",
         "Bo'z",
@@ -61,7 +61,7 @@ module.exports = [{
         "Ханабад"
     ],
     "Fergana": [
-         "Altyariq",
+        "Altyariq",
         "Baghdad",
         "Ibrat",
         "Dangara",
@@ -141,36 +141,35 @@ module.exports = [{
         "Uchkurgan",
         "Uychi",
         "Yangikurgan",
-        "Касансай"
-        "Kosonsoy"
-        "Косонсой"
-        "Мингбулак"
-        "Mingbuloq"
-        "Мингбулоқ"
-        "Наманган"
-        "Namangan"
-        "Наманган"
-        "Нарын"
-        "Norin"
-        "Норин"
-        "Хаккулабад"
-        "Пап"
-        "Pop"
-        "Поп"
-        "Туракурган"
-        "To'raqo'rg'on"
-        "Тўрақўрғон"
-        "Уйчи"
-        "Учкурган"
-        "Uchqo'rg'on"
-        "Учқўрғон"
-        "Чартак"
-        "Chortoq"
-        "Чортоқ"
-        "Чуст"
-        "Янгикурган"
+        "Касансай",
+        "Kosonsoy",
+        "Косонсой",
+        "Мингбулак",
+        "Mingbuloq",
+        "Мингбулоқ",
+        "Наманган",
+        "Namangan",
+        "Наманган",
+        "Нарын",
+        "Norin",
+        "Норин",
+        "Хаккулабад",
+        "Пап",
+        "Pop",
+        "Поп",
+        "Туракурган",
+        "To'raqo'rg'on",
+        "Тўрақўрғон",
+        "Уйчи",
+        "Учкурган",
+        "Uchqo'rg'on",
+        "Учқўрғон",
+        "Чартак",
+        "Chortoq",
+        "Чортоқ",
+        "Чуст",
+        "Янгикурган",
     ],
-    //shu yerdan boshlab
     "Tashkent": [
         "Zafar",
         "Gazalkent",
@@ -197,8 +196,63 @@ module.exports = [{
         "Uchtepa",
         "Yakkasaray",
         "Yunusabad",
+        "Аккурган",
+        "Oqqo'rg'on",
+        "Оққўрғон",
+        "Ахангаран",
+        "Ohangaron",
+        "Оҳангарон",
+        "Бекабад",
+        "Bekobod",
+        "Бекобод",
+        "Бостанлык",
+        "Bo'stonliq",
+        "Бўстонлиқ",
+        "Газалкент",
+        "Бука",
+        "Bo'ka",
+        "Бўка",
+        "Зангиата",
+        "Zangiota",
+        "Зангиота",
+        "Эшангузар",
+        "Кибрай",
+        "Қибрай",
+        "Куйичирчик",
+        "Quyichirchiq",
+        "Қуйичирчиқ",
+        "Дустабад",
+        "Паркент",
+        "Пскент",
+        "Пискент",
+        "Ташкент",
+        "Toshkent",
+        "Тошкент",
+        "Келес",
+        "Уртачирчик",
+        "O'rtachirchiq",
+        "Ўртачирчиқ",
+        "Нурафшон",
+        "Чиназ",
+        "Chinoz",
+        "Чиноз",
+        "Юкоричирчик",
+        "Yuqorichirchiq",
+        "Юқоричирчиқ",
+        "Янгиюл",
+        "Yangiyo'l",
+        "Янгийўл",
+        "Алмалык",
+        "Olmaliq",
+        "Олмалиқ",
+        "Ангрен",
+        "Angren",
+        "Чирчик",
+        "Chirchiq",
+        "Чирчиқ"
     ],
-    "Sirdaryo": ["Sardoba",
+    "Sirdaryo": [
+        "Sardoba",
         "Bayaut",
         "Dehkonobod",
         "Khavast",
@@ -206,8 +260,34 @@ module.exports = [{
         "Saikhun",
         "Pakhtaabad",
         "Sirdaryo",
+        "Акалтын",
+        "Oqoltin",
+        "Оқолтин",
+        "Баяут",
+        "Boyovut",
+        "Боёвут",
+        "Гулистан",
+        "Guliston",
+        "Гулистон",
+        "Мирзаабад",
+        "Mirzaobod",
+        "Мирзаобод",
+        "Сайхунабад",
+        "Sayxunobod",
+        "Сайхунобод",
+        "Сардоба",
+        "Сирдарё",
+        "Сырдарья",
+        "Хаваст",
+        "Xovos",
+        "Ховос",
+        "Ширин",
+        "Shirin",
+        "Янгиер",
+        "Yangiyer"
     ],
-    "Jizzakh": ["Goliblar",
+    "Jizzakh": [
+        "Goliblar",
         "Usmat",
         "Dustlik",
         "Yangikishlok",
