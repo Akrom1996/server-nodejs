@@ -1,7 +1,9 @@
 const connection = require("../../module/database");
 const {
     minioClient
-} = require('../../module/minio');
+} = require('../../module/minio');.sort({
+                "postTime": -1
+            })
 const path = require("path")
 const uuid = require("uuid").v4;
 const itemModel = require('../../module/Item');
@@ -559,6 +561,9 @@ exports.favouriteItems = async (req, res) => {
                 $in: [...element]
             },
 
+        })
+        .sort({
+                "postTime": -1
         })
         .exec((err, results) => {
             if (err) {
