@@ -1,9 +1,7 @@
 const connection = require("../../module/database");
 const {
     minioClient
-} = require('../../module/minio');.sort({
-                "postTime": -1
-            })
+} = require('../../module/minio');
 const path = require("path")
 const uuid = require("uuid").v4;
 const itemModel = require('../../module/Item');
