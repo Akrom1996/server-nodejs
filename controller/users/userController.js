@@ -61,18 +61,22 @@ exports.registrate = async (req, res) => {
     var user = new userModel(req.body);
     const users = await userModel.find({
         "phoneNumber": req.body.phoneNumber
-    }, (err) => {
+    }, (err, result) => {
+
         if (err) {
             return res.status(400).json(
                 new ErrorResponse(err.message, "1", "BAD_REQUEST")
             )
-        }
-
-
+        } 
     })
+    if (users.length > 0) {
+        return res.status(400).json(new ErrorResponse("BAD_REQUEST", "1", "Ushbu raqam tarmoqda ro'yxatdan o'tgan!"))
+    }
+
     //console.log("users ", users);
     // if (users === undefined || users.length == 0) {
     // var userResult = await 
+
     let userResult;
     let notification;
     Promise.all([
@@ -158,7 +162,7 @@ exports.deleteUserImage = async (req, res) => {
         }),
         await deleteProfileOrItemImage([req.body.image]),
     ]).then((results) => {
-        return res.status(200).json( new SuccessResponse(null, "0","SUCCESS",results[0]));
+        return res.status(200).json(new SuccessResponse(null, "0", "SUCCESS", results[0]));
     }).catch((err) => {
         return res.status(400).json(
             new ErrorResponse(err.message, "1", "BAD_REQUEST")
@@ -190,7 +194,7 @@ exports.getUserInfo = async (req, res) => {
                 new ErrorResponse("BAD_REQUEST", "1", "Ushbu foydalanuvchi tarmoqda mavjud emas")
             )
         }
-        return res.status(200).json( new SuccessResponse(null, "0","SUCCESS",results));
+        return res.status(200).json(new SuccessResponse(null, "0", "SUCCESS", results));
     })
     // })
 }
@@ -217,7 +221,7 @@ exports.getUserById = async (req, res) => {
         } else if (results === null) {
             return res.status(403).json(new ErrorResponse("BAD_REQUEST", "1", "Ushbu foydalanuvchi tarmoqda mavjud emas"))
         }
-        return res.status(200).json( new SuccessResponse(null, "0","SUCCESS",results));
+        return res.status(200).json(new SuccessResponse(null, "0", "SUCCESS", results));
     })
 
     // })
@@ -242,7 +246,7 @@ exports.updateUserInfo = async (req, res) => {
                 new ErrorResponse("BAD_REQUEST", "1", "Ushbu foydalanuvchi tarmoqda mavjud emas")
             )
         }
-        return res.status(200).json( new SuccessResponse(null, "0","SUCCESS",results));
+        return res.status(200).json(new SuccessResponse(null, "0", "SUCCESS", results));
     }).catch((error) => {
         return res.status(400).json(
             new ErrorResponse(error, "1", "BAD_REQUEST")
@@ -270,7 +274,7 @@ exports.updateToken = async (req, res) => {
 
         .then((results) => {
             //console.log(results);
-            return res.status(200).json( new SuccessResponse(null, "0","SUCCESS",results));
+            return res.status(200).json(new SuccessResponse(null, "0", "SUCCESS", results));
         }).catch((error) => {
             return res.status(400).json(new ErrorResponse(error, "1", "BAD_REQUEST"))
         })
