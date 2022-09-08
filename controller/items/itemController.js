@@ -22,7 +22,7 @@ async function getNearNeighbours(location) {
       locations.forEach(e => {
         for (let i = 0; i < Object.values(e).length; i++) {
           var local;
-          local = Object.values(e)[i].filter(loc => loc.replace(/`|’|ʻ/g,"'").toUpperCase() == location.toUpperCase())
+          local = Object.values(e)[i].filter(loc => loc.replace("`","'").replace("’","'").replace("ʻ","'").toUpperCase() == location.toUpperCase())
           if (local.length != 0) {
             globalLocation = Object.keys(e)[i]
             break
