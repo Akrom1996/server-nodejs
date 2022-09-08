@@ -18,6 +18,7 @@ const {
 
 async function getNearNeighbours(location) {
     var globalLocation
+    if(location === null || location === undefined) return "Andijan";
     return new Promise((resolve, reject)=>{
       locations.forEach(e => {
         for (let i = 0; i < Object.values(e).length; i++) {
