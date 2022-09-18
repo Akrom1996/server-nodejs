@@ -62,7 +62,7 @@ router.post("/send-message-from-db", async (req, res) => {
 
     await Item.find().then(async (result) => {
         for (let j = 0; j < 5; j++) {
-            let caption = `#${result[j].title.replace(" ", "")} #${result[j].location}\n${result[j].description}\n${result[j].price}\n`
+            let caption = `#${result[j].title.replace(" ", "")} #${result[j].location}\n\n${result[j].description}\n\n${result[j].price}\nBarcha turdagi e'lonlaringizni tez va bepul joylashda 'Mandarin market' ilovasidan foydalaning.\nIlova uchun 👉 https://mandarinmarket.page.link/NEAo\n Kanalga ulanish uchun 👉 https://t.me/+gN5bCUJUHWZhYzA9`
             let obj = {}
             obj.media = []
             for (let i = 0; i < result[j].images.length; i++) { //
