@@ -8,6 +8,9 @@ require('dotenv').config();
 const {
     minioClient
 } = require('../module/minio');
+const {
+    SuccessResponse
+} = require("../response/Response");
 const getObjectFromMinio = async (fileName) => {
     let size = 0
     return new Promise((resolve, reject) => {
@@ -61,8 +64,9 @@ const sendMessageToBot = async (body) => {
 router.post("/send-message-from-db", async (req, res) => {
 
     await Item.find().then(async (result) => {
-        for (let j = 0; j < 5; j++) {
-            let caption = `#${result[j].title.replace(" ", "")} #${result[j].location}\n\n${result[j].description}\n\n${result[j].price}\nBarcha turdagi e'lonlaringizni tez va bepul joylashda 'Mandarin market' ilovasidan foydalaning.\nIlova uchun 👉 https://mandarinmarket.page.link/NEAo\n Kanalga ulanish uchun 👉 https://t.me/+gN5bCUJUHWZhYzA9`
+        let counter = 0;
+        for (let j = 0; j < Math.floor(result.length*0.1); j++) {
+            let caption = `#${result[j].title.replace(" ", "")} #${result[j].location}\n\n${result[j].description}\n${result[j].price}\n\nBarcha turdagi e'lonlaringizni tez va bepul joylashda 'Mandarin market' ilovasidan foydalaning.\nIlova uchun 👉 https://mandarinmarket.page.link/NEAo\n Kanalga ulanish uchun 👉 https://t.me/+gN5bCUJUHWZhYzA9`
             let obj = {}
             obj.media = []
             for (let i = 0; i < result[j].images.length; i++) { //
@@ -75,6 +79,10 @@ router.post("/send-message-from-db", async (req, res) => {
                 obj.media.push(imageObj)
             }
             await sendMessageToBot(obj).catch(error => console.log(error))
+            counter = j
+        }
+        if (counter === Math.floor(result.length*0.1)) {
+            return res.status(200).json(new SuccessResponse("0", "0", "Successfully send data to telegram"))
         }
 
     }).catch(err => {
