@@ -36,45 +36,49 @@ router.post("/send-message-from-db", async (req, res) => {
     let obj = {}
     await Item.find().then(async (result) => {
         obj.media = []
-        let caption = `#${result[0].title.replace(" ", "")} #${result[0].location}\n${result[0].description}\n${result[0].price}\n}`
-        for (let i = 0; i < result[0].images.length; i++) { //
-            let imageObj
+        for (let j = 0; j < 5; j++) {
+            let caption = `#${result[j].title.replace(" ", "")} #${result[j].location}\n${result[j].description}\n${result[j].price}\n`
+            for (let i = 0; i < result[j].images.length; i++) { //
+                let imageObj
                 if (i == 0) {
-                    imageObj = Object.fromEntries(Object.entries(new BotImageObjFirst("photo", `http://mandarinstorage.ngrok.io/p2p-market${result[0].images[i]}`, caption)))
+                    imageObj = Object.fromEntries(Object.entries(new BotImageObjFirst("photo", `http://mandarinstorage.ngrok.io/p2p-market${result[j].images[i]}`, caption)))
                 } else {
-                    imageObj = Object.fromEntries(Object.entries(new BotImageObjOther("photo", `http://mandarinstorage.ngrok.io/p2p-market${result[0].images[i]}`)))
+                    imageObj = Object.fromEntries(Object.entries(new BotImageObjOther("photo", `http://mandarinstorage.ngrok.io/p2p-market${result[j].images[i]}`)))
                 }
                 obj.media.push(imageObj)
-        }
-        let tBotUrl = `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMediaGroup?chat_id=${process.env.CHANNEL_ID}`
-    
-        request.post({
-            url: tBotUrl,
-            json: true, // very important
-            body: obj
-        }, function (error, response, body) {
-            if (!error && response.statusCode == 200) {
-                console.log("body ", body);
-                return res.status(200).json({
-                    data: body
-                })
-            } else if (error) {
-                console.log("error ", error)
-                return res.status(400).json({
-                    "error": error
-                })
-            } else {
-                console.log("response ", response.body)
-                return res.status(response.statusCode).json(
-                    JSON.parse(response.body)
-                )
             }
-        })
+            let tBotUrl = `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMediaGroup?chat_id=${process.env.CHANNEL_ID}`
+
+            request.post({
+                url: tBotUrl,
+                json: true, // very important
+                body: obj
+            }, function (error, response, body) {
+                if (!error && response.statusCode == 200) {
+                    console.log("body ", body);
+                    return res.status(200).json({
+                        data: body
+                    })
+                } else if (error) {
+                    console.log("error ", error)
+                    return res.status(400).json({
+                        "error": error
+                    })
+                } else {
+                    console.log("response ", response.body)
+                    return res.status(response.statusCode).json(
+                        JSON.parse(response.body)
+                    )
+                }
+            })
+        }
+
     }).catch(err => {
         console.log(err)
         return res.status(400).json({
-        err: err
-    })})
+            err: err
+        })
+    })
 })
 class BotImage {
     constructor(type, media) {
