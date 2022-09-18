@@ -62,21 +62,21 @@ router.post("/send-message-from-db", async (req, res) => {
     await Item.find().then(async (result) => {
         let counter = 0;
         for (let j = 0; j < Math.floor(result.length * 0.1); j++) {
-            let caption = `#${result[j].title.replace(" ", "")} #${result[j].location}\n\n${result[j].description}\n${result[j].price}\n\nBarcha turdagi e'lonlaringizni tez va bepul joylashda 'Mandarin market' ilovasidan foydalaning.\nIlova uchun 👉 https://mandarinmarket.page.link/NEAo\n Kanalga ulanish uchun 👉 https://t.me/+gN5bCUJUHWZhYzA9`
-            let obj = {}
-            obj.media = []
-            for (let i = 0; i < result[j].images.length; i++) { //
-                let imageObj
-                if (i == 0) {
-                    imageObj = Object.fromEntries(Object.entries(new BotImageObjFirst("photo", `http://mandarinstorage.ngrok.io/p2p-market${result[j].images[i]}`, caption)))
-                } else {
-                    imageObj = Object.fromEntries(Object.entries(new BotImageObjOther("photo", `http://mandarinstorage.ngrok.io/p2p-market${result[j].images[i]}`)))
-                }
-                obj.media.push(imageObj)
-            }
             setTimeout(() => {
-                counter++
-                await sendMessageToBot(obj).then(() => counter++).catch(error => console.log(error))
+                let caption = `#${result[j].title.replace(" ", "")} #${result[j].location}\n\n${result[j].description}\n${result[j].price}\n\nBarcha turdagi e'lonlaringizni tez va bepul joylashda 'Mandarin market' ilovasidan foydalaning.\nIlova uchun 👉 https://mandarinmarket.page.link/NEAo\n Kanalga ulanish uchun 👉 https://t.me/+gN5bCUJUHWZhYzA9`
+                let obj = {}
+                obj.media = []
+                for (let i = 0; i < result[j].images.length; i++) { //
+                    let imageObj
+                    if (i == 0) {
+                        imageObj = Object.fromEntries(Object.entries(new BotImageObjFirst("photo", `http://mandarinstorage.ngrok.io/p2p-market${result[j].images[i]}`, caption)))
+                    } else {
+                        imageObj = Object.fromEntries(Object.entries(new BotImageObjOther("photo", `http://mandarinstorage.ngrok.io/p2p-market${result[j].images[i]}`)))
+                    }
+                    obj.media.push(imageObj)
+                }
+
+                await sendMessageToBot(obj).then((data) => counter++).catch(error => console.log(error))
             }, 2000);
         }
         if (counter === Math.floor(result.length * 0.1)) {
