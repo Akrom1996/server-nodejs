@@ -47,14 +47,16 @@ const sendMessageToBot = async (body) => {
                 // console.log("body ", body);
                 setTimeout(() => {
                     resolve(body)
-                }, 1000)
+                }, 2000)
                 
             } else if (error) {
                 console.log("error ", error)
                 reject(error)
             } else {
                 console.log("response ", response.body)
-                resolve(body)
+                setTimeout(() => {
+                    resolve(body)
+                }, 2000)
             }
         })
     })
@@ -77,8 +79,8 @@ router.post("/send-message-from-db", async (req, res) => {
                 }
                 obj.media.push(imageObj)
             }
-            await sendMessageToBot(obj).catch(error => console.log(error))
-            counter ++
+            await sendMessageToBot(obj).then(()=>counter ++).catch(error => console.log(error))
+            
         }
         if (counter === Math.floor(result.length * 0.1)) {
             return res.status(200).json(new SuccessResponse("0", "0", "Successfully send data to telegram"))
