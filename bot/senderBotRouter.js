@@ -32,27 +32,14 @@ const getObjectFromMinio = async (fileName) => {
 
 }
 
-router.post("/send-message-from-db", async (req, res) => {
-    let obj = {}
-    await Item.find().then(async (result) => {
-        obj.media = []
-        for (let j = 0; j < 5; j++) {
-            let caption = `#${result[j].title.replace(" ", "")} #${result[j].location}\n${result[j].description}\n${result[j].price}\n`
-            for (let i = 0; i < result[j].images.length; i++) { //
-                let imageObj
-                if (i == 0) {
-                    imageObj = Object.fromEntries(Object.entries(new BotImageObjFirst("photo", `http://mandarinstorage.ngrok.io/p2p-market${result[j].images[i]}`, caption)))
-                } else {
-                    imageObj = Object.fromEntries(Object.entries(new BotImageObjOther("photo", `http://mandarinstorage.ngrok.io/p2p-market${result[j].images[i]}`)))
-                }
-                obj.media.push(imageObj)
-            }
-            let tBotUrl = `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMediaGroup?chat_id=${process.env.CHANNEL_ID}`
-
-            request.post({
+const sendMessageToBot = async (body) => {
+    return new Promise((resolve, reject) => {
+        let tBotUrl = `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMediaGroup?chat_id=${process.env.CHANNEL_ID}`
+        try {
+            resolve(request.post({
                 url: tBotUrl,
                 json: true, // very important
-                body: obj
+                body: body
             }, function (error, response, body) {
                 if (!error && response.statusCode == 200) {
                     // console.log("body ", body);
@@ -67,10 +54,33 @@ router.post("/send-message-from-db", async (req, res) => {
                 } else {
                     console.log("response ", response.body)
                     return res.status(response.statusCode).json(
-                        JSON.parse(response.body)
+                        response.body
                     )
                 }
-            })
+            }))
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+
+router.post("/send-message-from-db", async (req, res) => {
+
+    await Item.find().then(async (result) => {
+        for (let j = 0; j < 5; j++) {
+            let caption = `#${result[j].title.replace(" ", "")} #${result[j].location}\n${result[j].description}\n${result[j].price}\n`
+            let obj = {}
+            obj.media = []
+            for (let i = 0; i < result[j].images.length; i++) { //
+                let imageObj
+                if (i == 0) {
+                    imageObj = Object.fromEntries(Object.entries(new BotImageObjFirst("photo", `http://mandarinstorage.ngrok.io/p2p-market${result[j].images[i]}`, caption)))
+                } else {
+                    imageObj = Object.fromEntries(Object.entries(new BotImageObjOther("photo", `http://mandarinstorage.ngrok.io/p2p-market${result[j].images[i]}`)))
+                }
+                obj.media.push(imageObj)
+            }
+            await sendMessageToBot(obj).catch(error=>console.log(error))
         }
 
     }).catch(err => {
