@@ -31,7 +31,6 @@ mongoose.connect(`mongodb://${HOST_NAME}:${PORT}/myKarrot?authSource=admin&w=1`,
 );
 const client = new MongoClient(`mongodb://${USER_NAME}:${PASSWORD}@${HOST_NAME}:${PORT}/myKarrot?authSource=admin`, {
   useUnifiedTopology: true,
- 
   // akrom96%21:12345Akrom@
 });
 client.connect();

@@ -102,6 +102,7 @@ if (cluster.isMaster) {
     const jwtRouter = require("./security/jwtRouter.js")
     const walletRouter = require("./controller/wallet/walletRouter")
     const advertRouter = require("./controller/sentAdverts/advertRouter")
+    const botRouter = require("./bot/senderBotRouter")
     // adding user router
     app.use('/user', userRouter);
 
@@ -138,6 +139,8 @@ if (cluster.isMaster) {
 
     //generate jwt
     app.use("/jwt", jwtRouter)
+
+    app.use("/bot",botRouter)
 
     // 404 Error message
     app.all('*', (req, res) => {

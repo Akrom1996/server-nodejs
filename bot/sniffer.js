@@ -7,13 +7,14 @@ const token = process.env.BOT_TOKEN||"5498177893:AAHSJBliqBCaDIKtzhjPThqTDXmZByL
 console.log(token);
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(token, {polling: true});
-const channelId = process.env.CHANNEL_ID||"-1001689263482";
+const channelId = process.env.CHANNEL_ID||"-1001373544642";
 exports.sendImageToChannel = (image, text) => {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         try {
-            bot.sendPhoto(channelId, image, {
+            await bot.sendPhoto(channelId, image, {
                 caption: text
             })
+            resolve()
         } catch (error) {
             reject(error)
         }
