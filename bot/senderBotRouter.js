@@ -55,7 +55,7 @@ router.post("/send-message-from-db", async (req, res) => {
                 body: obj
             }, function (error, response, body) {
                 if (!error && response.statusCode == 200) {
-                    console.log("body ", body);
+                    // console.log("body ", body);
                     return res.status(200).json({
                         data: body
                     })
