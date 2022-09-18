@@ -38,26 +38,22 @@ const getObjectFromMinio = async (fileName) => {
 const sendMessageToBot = async (body) => {
     return new Promise((resolve, reject) => {
         let tBotUrl = `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMediaGroup?chat_id=${process.env.CHANNEL_ID}`
-        try {
-            request.post({
-                url: tBotUrl,
-                json: true, // very important
-                body: body
-            }, function (error, response, body) {
-                if (!error && response.statusCode == 200) {
-                    // console.log("body ", body);
-                    resolve(body)
-                } else if (error) {
-                    console.log("error ", error)
-                    reject(error)
-                } else {
-                    console.log("response ", response.body)
-                    resolve(body)
-                }
-            })
-        } catch (error) {
-            reject(error)
-        }
+        request.post({
+            url: tBotUrl,
+            json: true, // very important
+            body: body
+        }, function (error, response, body) {
+            if (!error && response.statusCode == 200) {
+                // console.log("body ", body);
+                resolve(body)
+            } else if (error) {
+                console.log("error ", error)
+                reject(error)
+            } else {
+                console.log("response ", response.body)
+                resolve(body)
+            }
+        })
     })
 }
 
@@ -65,7 +61,7 @@ router.post("/send-message-from-db", async (req, res) => {
 
     await Item.find().then(async (result) => {
         let counter = 0;
-        for (let j = 0; j < Math.floor(result.length*0.1); j++) {
+        for (let j = 0; j < Math.floor(result.length * 0.1); j++) {
             let caption = `#${result[j].title.replace(" ", "")} #${result[j].location}\n\n${result[j].description}\n${result[j].price}\n\nBarcha turdagi e'lonlaringizni tez va bepul joylashda 'Mandarin market' ilovasidan foydalaning.\nIlova uchun 👉 https://mandarinmarket.page.link/NEAo\n Kanalga ulanish uchun 👉 https://t.me/+gN5bCUJUHWZhYzA9`
             let obj = {}
             obj.media = []
@@ -79,11 +75,13 @@ router.post("/send-message-from-db", async (req, res) => {
                 obj.media.push(imageObj)
             }
             await sendMessageToBot(obj).catch(error => console.log(error))
-            counter = j
+            setTimeout(() => {
+                counter = j
+            }, 1000)
         }
-        if (counter === Math.floor(result.length*0.1)) {
+        // if (counter === Math.floor(result.length * 0.1)) {
             return res.status(200).json(new SuccessResponse("0", "0", "Successfully send data to telegram"))
-        }
+        // }
 
     }).catch(err => {
         console.log(err)
