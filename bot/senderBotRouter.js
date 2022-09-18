@@ -76,7 +76,7 @@ router.post("/send-message-from-db", async (req, res) => {
                     obj.media.push(imageObj)
                 }
 
-                sendMessageToBot(obj).then((data) => counter++).catch(error => console.log(error))
+                await sendMessageToBot(obj).then((data) => counter++).catch(error => console.log(error))
             }, 2000);
         }
         if (counter === Math.floor(result.length * 0.1)) {
