@@ -18,22 +18,25 @@ const {
 
 async function getNearNeighbours(location) {
     var globalLocation
-    if(location === null || location === undefined) return "Andijan";
-    return new Promise((resolve, reject)=>{
-      locations.forEach(e => {
-        for (let i = 0; i < Object.values(e).length; i++) {
-          var local;
-          local = Object.values(e)[i].filter(loc => loc.replace("`","'").replace("’","'").replace("ʻ","'").toUpperCase() == location.toUpperCase())
-          if (local.length != 0) {
-            globalLocation = Object.keys(e)[i]
-            break
-          } else
-            globalLocation = location
-        }
-        resolve(globalLocation)
-      });
+    if (location === null || location === undefined) return "Andijan";
+    return new Promise((resolve, reject) => {
+        locations.forEach(e => {
+            for (let i = 0; i < Object.values(e).length; i++) {
+                var local;
+                local = Object.values(e)[i].filter(loc => {
+                    // console.log(loc.replace(/[^a-zA-Z]+/, '').toUpperCase())
+                    return loc.replace(/[^a-zA-Z]+/, '').toUpperCase() == location.replace(/[^a-zA-Z]+/, '').toUpperCase()
+                })
+                if (local.length != 0) {
+                    globalLocation = Object.keys(e)[i]
+                    break
+                } else
+                    globalLocation = location
+            }
+            resolve(globalLocation)
+        });
     })
-    
+
 }
 
 function deleteProfileOrItemImage(images) {
@@ -100,9 +103,9 @@ exports.getItemsByLocation = async (req, res) => {
     let locationResult = await getNearNeighbours(currentLocation)
     try {
         await itemModel.find({
-                "location": locationResult,//currentLocation
+                "location": locationResult, //currentLocation
                 "status": {
-                    $nin: ["unpaid","paid"] //, 
+                    $nin: ["unpaid", "paid"] //, 
                 }
             })
             .skip(Number(skip))
@@ -140,7 +143,7 @@ exports.getItemsByLocationStartsWith = async (req, res) => {
     let locationResult = await getNearNeighbours(currentLocation)
     try {
         await itemModel.find({
-            "location": locationResult,//currentLocation,
+            "location": locationResult, //currentLocation,
             "title": {
                 $regex: value, //value + ".*",/^value/
                 $options: 'i'
@@ -183,7 +186,7 @@ exports.getItemsByCategory = async (req, res) => {
     // Recommended items
     if (itemId) {
         itemModel.find({
-                "location": locationResult,//position,
+                "location": locationResult, //position,
                 $or: [{
                     "category": category,
                 }, {
@@ -211,9 +214,9 @@ exports.getItemsByCategory = async (req, res) => {
             })
     } else {
         itemModel.find({
-                "location": locationResult,//position,
+                "location": locationResult, //position,
                 "category": category,
-                
+
             }, )
             .sort({
                 "postTime": -1
@@ -316,7 +319,7 @@ exports.updatePosition = async (req, res) => {
             })
         } else
             await itemModel.findByIdAndUpdate(itemId, {
-                "position": locationResult,//position
+                "position": locationResult, //position
             }, (err, results) => {
                 if (err) {
                     return res.status(400).json(
@@ -440,10 +443,10 @@ exports.uploadItemImages = async (req, res) => {
             }
         });
     } catch (error) {
-        return res.status(400).json(new ErrorResponse(error, "3","BAD_REQUEST"))
+        return res.status(400).json(new ErrorResponse(error, "3", "BAD_REQUEST"))
     }
-    
-   
+
+
 
     let counter = 0;
     items.forEach((element) => {
@@ -486,7 +489,7 @@ exports.uploadItemImages = async (req, res) => {
     var input = req.body;
     input.images = file_name;
     let locationResult = await getNearNeighbours(req.params.currentLocation)
-    input.location = locationResult;//req.params.currentLocation;
+    input.location = locationResult; //req.params.currentLocation;
 
     // var uploadedFilePath = []
     // req.files.map((file) => uploadedFilePath.push(file.originalname));
@@ -562,7 +565,7 @@ exports.favouriteItems = async (req, res) => {
 
         })
         .sort({
-                "postTime": -1
+            "postTime": -1
         })
         .exec((err, results) => {
             if (err) {

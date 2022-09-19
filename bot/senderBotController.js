@@ -1,4 +1,5 @@
 const Item = require("../module/Item")
+const User = require("../module/User")
 const ensureToken = require("../security/jwt")
 const formData = require("form-data")
 const request = require("request");
@@ -41,7 +42,7 @@ exports.sendMessageFromDB = async (req, res) => {
             let caption = `#${result[j].title.split(" ")[0]} #${result[j].location}\n\n${result[j].description}\n${result[j].price}\n\nBarcha turdagi e'lonlaringizni tez va bepul joylashda 'Mandarin market' ilovasidan foydalaning.\nIlova uchun 👉 https://mandarinmarket.page.link/NEAo\n Kanalga ulanish uchun 👉 https://t.me/+gN5bCUJUHWZhYzA9`
             let obj = {}
             obj.media = []
-
+            const user = await User.findById(result[j].user)
             for (let i = 0; i < result[j].images.length; i++) { //
                 let imageObj
                 if (i == 0) {
@@ -51,24 +52,23 @@ exports.sendMessageFromDB = async (req, res) => {
                 }
                 obj.media.push(imageObj)
             }
-            if(result[j].images.length == 0){
+            if (result[j].images.length == 0) {
                 console.log("image is empty")
                 let imageObj
                 imageObj = Object.fromEntries(Object.entries(new BotImageObjFirst("photo", "https://www.vectorstock.com/royalty-free-vector/photo-icon-vector-21180230", caption)))
                 obj.media.push(imageObj)
             }
-           await new Promise( resolve => setTimeout(
-                resolve( 
-                    
+            await new Promise(resolve => setTimeout(
+                resolve, 3000)).then(()=>{
                     sendMessageToBot(obj)
-                .then((data) => {
-                    console.log(`sending to tBot, ${counter}`);
-                    return counter++
-                })
-                .catch(error => console.log(error)))
-                , 3000)
-                );
-//             await sendMessageToBot(obj).then((data) => counter++).catch(error => console.log(error))
+                    .then((data) => {
+                        console.log(`sending to tBot, ${counter}`);
+                        return counter++
+                    })
+                    .catch(error => console.log(error))
+                });
+           
+            //             await sendMessageToBot(obj).then((data) => counter++).catch(error => console.log(error))
 
         }
         if (counter === Math.floor(result.length * 0.2) - 15) {
