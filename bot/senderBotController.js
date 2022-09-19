@@ -39,7 +39,7 @@ const sendMessageToBot = async (body) => {
 exports.sendMessageFromDB = async (req, res) => {
     await Item.find().then(async (result) => {
         let counter = 0;
-        for (let j = 0; j < Math.floor(result.length * 0.2); j++) {
+        for (let j = 15; j < result.length; j++) {
             let caption = `#${result[j].title.split(" ")[0]} #${result[j].location}\n\n${result[j].description}\n${result[j].price}\n\nBarcha turdagi e'lonlaringizni tez va bepul joylashda 'Mandarin market' ilovasidan foydalaning.\nIlova uchun 👉 https://mandarinmarket.page.link/NEAo\n Kanalga ulanish uchun 👉 https://t.me/+gN5bCUJUHWZhYzA9`
             let obj = {}
             obj.media = []
@@ -60,7 +60,7 @@ exports.sendMessageFromDB = async (req, res) => {
                 obj.media.push(imageObj)
             }
             await new Promise(resolve => setTimeout(
-                resolve, 3000)).then(async ()=>{
+                resolve, 8000)).then(async ()=>{
                     await sendMessageToBot(obj)
                     .then((data) => counter++)
                     .catch(error => console.log(error))
@@ -69,7 +69,7 @@ exports.sendMessageFromDB = async (req, res) => {
             //             await sendMessageToBot(obj).then((data) => counter++).catch(error => console.log(error))
 
         }
-        if (counter === Math.floor(result.length * 0.2)) {
+        if (counter === result.length-15) {
             return res.status(200).json(new SuccessResponse("0", "0", "Successfully send data to telegram"))
         }
     }).catch(err => {
