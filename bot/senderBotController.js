@@ -39,8 +39,8 @@ const sendMessageToBot = async (body) => {
 exports.sendMessageFromDB = async (req, res) => {
     await Item.find().then(async (result) => {
         let counter = 0;
-        for (let j = 15; j < result.length; j++) {
-            let caption = `#${result[j].title.split(" ")[0]} #${result[j].location}\n\n${result[j].description}\n${result[j].price}\n\nBarcha turdagi e'lonlaringizni tez va bepul joylashda 'Mandarin market' ilovasidan foydalaning.\nIlova uchun 👉 https://mandarinmarket.page.link/NEAo\n Kanalga ulanish uchun 👉 https://t.me/+gN5bCUJUHWZhYzA9`
+        for (let j = 0; j < 15; j++) {
+            let caption = `#${result[j].title.split(" ")[0]} #${result[j].location}\n${result[j].position!=="null"?result[j].position:""}\n\n${result[j].description}\n${result[j].price}\nAloqa uchun: ${user.phoneNumber}\n\nBarcha turdagi e'lonlaringizni tez va bepul joylashda 'Mandarin market' ilovasidan foydalaning.\nIlova uchun 👉 https://mandarinmarket.page.link/NEAo\n Kanalga ulanish uchun 👉 https://t.me/+gN5bCUJUHWZhYzA9`
             let obj = {}
             obj.media = []
             const user = await User.findById(result[j].user)
@@ -60,16 +60,16 @@ exports.sendMessageFromDB = async (req, res) => {
                 obj.media.push(imageObj)
             }
             await new Promise(resolve => setTimeout(
-                resolve, 8000)).then(async ()=>{
-                    await sendMessageToBot(obj)
+                resolve, 8000)).then(async () => {
+                await sendMessageToBot(obj)
                     .then((data) => counter++)
                     .catch(error => console.log(error))
-                });
-           
+            });
+
             //             await sendMessageToBot(obj).then((data) => counter++).catch(error => console.log(error))
 
         }
-        if (counter === result.length-15) {
+        if (counter === 15) {
             return res.status(200).json(new SuccessResponse("0", "0", "Successfully send data to telegram"))
         }
     }).catch(err => {
