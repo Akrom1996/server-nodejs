@@ -58,7 +58,9 @@ exports.sendMessageFromDB = async (req, res) => {
                 obj.media.push(imageObj)
             }
            await new Promise( resolve => setTimeout(
-                resolve( sendMessageToBot(obj)
+                resolve( 
+                    console.log(`sending to tBot, ${counter}`)
+                    sendMessageToBot(obj)
                 .then((data) => counter++)
                 .catch(error => console.log(error)))
                 , 3000)
