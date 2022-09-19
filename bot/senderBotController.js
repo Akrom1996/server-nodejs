@@ -40,10 +40,10 @@ exports.sendMessageFromDB = async (req, res) => {
     await Item.find().then(async (result) => {
         let counter = 0;
         for (let j = 0; j < 15; j++) {
+            const user = await User.findById(result[j].user)
             let caption = `#${result[j].title.split(" ")[0]} #${result[j].location}\n${result[j].position!=="null"?result[j].position:""}\n\n${result[j].description}\n${result[j].price}\nAloqa uchun: ${user.phoneNumber}\n\nBarcha turdagi e'lonlaringizni tez va bepul joylashda 'Mandarin market' ilovasidan foydalaning.\nIlova uchun 👉 https://mandarinmarket.page.link/NEAo\n Kanalga ulanish uchun 👉 https://t.me/+gN5bCUJUHWZhYzA9`
             let obj = {}
             obj.media = []
-            const user = await User.findById(result[j].user)
             for (let i = 0; i < result[j].images.length; i++) { //
                 let imageObj
                 if (i == 0) {
@@ -65,9 +65,6 @@ exports.sendMessageFromDB = async (req, res) => {
                     .then((data) => counter++)
                     .catch(error => console.log(error))
             });
-
-            //             await sendMessageToBot(obj).then((data) => counter++).catch(error => console.log(error))
-
         }
         if (counter === 15) {
             return res.status(200).json(new SuccessResponse("0", "0", "Successfully send data to telegram"))
