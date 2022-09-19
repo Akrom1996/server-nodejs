@@ -59,9 +59,12 @@ exports.sendMessageFromDB = async (req, res) => {
             }
            await new Promise( resolve => setTimeout(
                 resolve( 
-                    console.log(`sending to tBot, ${counter}`)
+                    
                     sendMessageToBot(obj)
-                .then((data) => counter++)
+                .then((data) => {
+                    console.log(`sending to tBot, ${counter}`);
+                    return counter++
+                })
                 .catch(error => console.log(error)))
                 , 3000)
                 );
