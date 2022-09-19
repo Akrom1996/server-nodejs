@@ -55,9 +55,9 @@ const sendMessageToBot = async (body) => {
                     resolve(body)
                 }
             })
-        }, 2000);
+        }, 2000))
         
-    }))
+    })
 }
 
 router.post("/send-message-from-db", async (req, res) => {
