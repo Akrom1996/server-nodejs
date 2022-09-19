@@ -36,28 +36,25 @@ const getObjectFromMinio = async (fileName) => {
 }
 
 const sendMessageToBot = async (body) => {
-    return new Promise((resolve, reject) => {
-        let tBotUrl = `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMediaGroup?chat_id=${process.env.CHANNEL_ID}`
-        resolve(setTimeout(() => {
-            request.post({
-                url: tBotUrl,
-                json: true, // very important
-                body: body
-            }, function (error, response, body) {
-                if (!error && response.statusCode == 200) {
-                    // console.log("body ", body);
-                    resolve(body)
-                } else if (error) {
-                    console.log("error ", error)
-                    reject(error)
-                } else {
-                    console.log("response ", response.body)
-                    resolve(body)
-                }
-            })
-        }, 2000))
-        
+  return new Promise((resolve, reject) => {
+    let tBotUrl = `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMediaGroup?chat_id=${process.env.CHANNEL_ID}`
+    request.post({
+      url: tBotUrl,
+      json: true, // very important
+      body: body
+    }, function (error, response, body) {
+      if (!error && response.statusCode == 200) {
+        // console.log("body ", body);
+        resolve(body)
+      } else if (error) {
+        console.log("error ", error)
+        reject(error)
+      } else {
+        console.log("response ", response.body)
+        resolve(body)
+      }
     })
+  })
 }
 
 router.post("/send-message-from-db", async (req, res) => {
@@ -77,7 +74,7 @@ router.post("/send-message-from-db", async (req, res) => {
                 }
                 obj.media.push(imageObj)
             }
-            await sendMessageToBot(obj).then((data) => counter++).catch(error => console.log(error))
+setTimeout(async () => await sendMessageToBot(obj).then((data) => counter++).catch(error => console.log(error)), 2000)
 
         }
         if (counter === Math.floor(result.length * 0.1)) {
