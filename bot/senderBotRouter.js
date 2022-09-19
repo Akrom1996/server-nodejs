@@ -38,7 +38,7 @@ const getObjectFromMinio = async (fileName) => {
 const sendMessageToBot = async (body) => {
     return new Promise((resolve, reject) => {
         let tBotUrl = `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMediaGroup?chat_id=${process.env.CHANNEL_ID}`
-        setTimeout(() => {
+        resolve(setTimeout(() => {
             request.post({
                 url: tBotUrl,
                 json: true, // very important
@@ -56,6 +56,7 @@ const sendMessageToBot = async (body) => {
                 }
             })
         }, 2000);
+        )
     })
 }
 
