@@ -61,7 +61,7 @@ exports.sendMessageFromDB = async (req, res) => {
             await sendMessageToBot(obj).then((data) => counter++).catch(error => console.log(error))
 
         }
-        if (counter === Math.floor(result.length * 0.1)) {
+        if (counter === Math.floor(result.length * 0.2) - 15) {
             return res.status(200).json(new SuccessResponse("0", "0", "Successfully send data to telegram"))
         }
     }).catch(err => {
