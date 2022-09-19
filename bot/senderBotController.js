@@ -57,8 +57,13 @@ exports.sendMessageFromDB = async (req, res) => {
                 imageObj = Object.fromEntries(Object.entries(new BotImageObjFirst("photo", "https://www.vectorstock.com/royalty-free-vector/photo-icon-vector-21180230", caption)))
                 obj.media.push(imageObj)
             }
-            await new Promise(r => setTimeout(r, 4000));
-            await sendMessageToBot(obj).then((data) => counter++).catch(error => console.log(error))
+            await new Promise(async resolve => setTimeout(
+                resolve(await sendMessageToBot(obj)
+                .then((data) => counter++)
+                .catch(error => console.log(error)))
+                , 3000)
+                );
+//             await sendMessageToBot(obj).then((data) => counter++).catch(error => console.log(error))
 
         }
         if (counter === Math.floor(result.length * 0.2) - 15) {
