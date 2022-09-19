@@ -57,8 +57,8 @@ exports.sendMessageFromDB = async (req, res) => {
                 imageObj = Object.fromEntries(Object.entries(new BotImageObjFirst("photo", "https://www.vectorstock.com/royalty-free-vector/photo-icon-vector-21180230", caption)))
                 obj.media.push(imageObj)
             }
-            await new Promise(async resolve => setTimeout(
-                resolve(await sendMessageToBot(obj)
+           await new Promise( resolve => setTimeout(
+                resolve( sendMessageToBot(obj)
                 .then((data) => counter++)
                 .catch(error => console.log(error)))
                 , 3000)
