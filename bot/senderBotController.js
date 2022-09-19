@@ -37,7 +37,7 @@ const sendMessageToBot = async (body) => {
 exports.sendMessageFromDB = async (req, res) => {
     await Item.find().then(async (result) => {
         let counter = 0;
-        for (let j = 0; j < Math.floor(result.length * 0.1); j++) {
+        for (let j = 15; j < Math.floor(result.length * 0.2); j++) {
             let caption = `#${result[j].title.replace(" ", "")} #${result[j].location}\n\n${result[j].description}\n${result[j].price}\n\nBarcha turdagi e'lonlaringizni tez va bepul joylashda 'Mandarin market' ilovasidan foydalaning.\nIlova uchun 👉 https://mandarinmarket.page.link/NEAo\n Kanalga ulanish uchun 👉 https://t.me/+gN5bCUJUHWZhYzA9`
             let obj = {}
             obj.media = []
@@ -52,6 +52,7 @@ exports.sendMessageFromDB = async (req, res) => {
                 obj.media.push(imageObj)
             }
             if(result[j].images.length == 0){
+                console.log("image is empty")
                 let imageObj
                 imageObj = Object.fromEntries(Object.entries(new BotImageObjFirst("photo", "https://www.vectorstock.com/royalty-free-vector/photo-icon-vector-21180230", caption)))
                 obj.media.push(imageObj)
