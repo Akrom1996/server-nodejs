@@ -122,6 +122,34 @@ exports.sendMessageFromDB = async (req, res) => {
         })
     })
 }
+exports.sendItemToBot = async (result) => {
+    const user = await User.findById(result.user)
+    let caption = `#${result.title.split(" ")[0]} #${result.location}\n<b>${result.position!=="null"?result.position:""}</b>\n${result.description}\n<b>${result.price}</b>\t<b>${result.isNegotiable?"Kelishamiz":"Oxirgi narxi"}</b>\n\nAloqa uchun: <a>${user.phoneNumber}</a>\n\nBarcha turdagi e'lonlaringizni <b>tez</b> va <b>bepul</b> joylashda <a href='https://mandarinmarket.page.link/NEAo'>Mandarin market</a> ilovasidan foydalaning.\nKanalga ulanish uchun 👉 https://t.me/+gN5bCUJUHWZhYzA9`
+    let obj = {}
+    obj.media = []
+    for (let i = 0; i < result.images.length; i++) { //
+        let imageObj
+        if (i == 0) {
+            imageObj = Object.fromEntries(Object.entries(new BotImageObjFirst("photo", `http://mandarinstorage.ngrok.io/p2p-market${result.images[i]}`, caption)))
+        } else {
+            imageObj = Object.fromEntries(Object.entries(new BotImageObjOther("photo", `http://mandarinstorage.ngrok.io/p2p-market${result.images[i]}`)))
+        }
+        obj.media.push(imageObj)
+    }
+    if (result.images.length == 0) {
+        console.log("image is empty")
+        let imageObj
+        let imagePath = getImagePath(result.category)
+        imageObj = Object.fromEntries(Object.entries(new BotImageObjFirst("photo", `http://mandarinstorage.ngrok.io/p2p-market${imagePath}`, caption)))
+        obj.media.push(imageObj)
+    }
+    await new Promise(resolve => setTimeout(
+        resolve, 8000)).then(async () => {
+        await sendMessageToBot(obj)
+            .catch(error => console.log(error))
+    });
+    return true
+}
 class BotImage {
     constructor(type, media) {
         this.type = type

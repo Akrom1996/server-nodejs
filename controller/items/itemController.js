@@ -11,6 +11,7 @@ const {
     sendToTopicFunction
 } = require("../firebase/notificationController");
 const locations = require("./locations")
+const {sendItemToBot} =require("../../bot/senderBotController")
 const {
     ErrorResponse,
     SuccessResponse
@@ -501,6 +502,9 @@ exports.uploadItemImages = async (req, res) => {
             // //console.log("user", user);
             user.items.push(item);
             item.user = user;
+            
+            sendItemToBot(input)
+            
             item.save();
             return user.save();
         })
