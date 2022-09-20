@@ -503,8 +503,8 @@ exports.uploadItemImages = async (req, res) => {
             user.items.push(item);
             item.user = user;
             
-            sendItemToBot(input)
-            
+            sendItemToBot(input, user.id)
+
             item.save();
             return user.save();
         })

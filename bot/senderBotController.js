@@ -122,8 +122,8 @@ exports.sendMessageFromDB = async (req, res) => {
         })
     })
 }
-exports.sendItemToBot = async (result) => {
-    const user = await User.findById(result.user)
+exports.sendItemToBot = async (result, userId) => {
+    const user = await User.findById(userId)
     let caption = `#${result.title.split(" ")[0]} #${result.location}\n<b>${result.position!=="null"?result.position:""}</b>\n${result.description}\n<b>${result.price}</b>\t<b>${result.isNegotiable?"Kelishamiz":"Oxirgi narxi"}</b>\n\nAloqa uchun: <a>${user.phoneNumber}</a>\n\nBarcha turdagi e'lonlaringizni <b>tez</b> va <b>bepul</b> joylashda <a href='https://mandarinmarket.page.link/NEAo'>Mandarin market</a> ilovasidan foydalaning.\nKanalga ulanish uchun 👉 https://t.me/+gN5bCUJUHWZhYzA9`
     let obj = {}
     obj.media = []
