@@ -84,7 +84,7 @@ const getImagePath = (category) => {
 exports.sendMessageFromDB = async (req, res) => {
     await Item.find().then(async (result) => {
         let counter = 0;
-        for (let j = 0; j < 10; j++) {
+        for (let j = 0; j < result.length; j++) {
             const user = await User.findById(result[j].user)
             let caption = `#${result[j].title.split(" ")[0]} #${result[j].location}\n<b>${result[j].position!=="null"?result[j].position:""}</b>\n${result[j].description}\n<b>${result[j].price}</b>\t<b>${result[j].isNegotiable?"Kelishamiz":"Oxirgi narxi"}</b>\n\nAloqa uchun: <a>${user.phoneNumber}</a>\n\nBarcha turdagi e'lonlaringizni <b>tez</b> va <b>bepul</b> joylashda <a href='https://mandarinmarket.page.link/NEAo'>Mandarin market</a> ilovasidan foydalaning.\nKanalga ulanish uchun 👉 https://t.me/+gN5bCUJUHWZhYzA9`
             let obj = {}
@@ -112,7 +112,7 @@ exports.sendMessageFromDB = async (req, res) => {
                     .catch(error => console.log(error))
             });
         }
-        if (counter === 10) {
+        if (counter === result.length) {
             return res.status(200).json(new SuccessResponse("0", "0", "Successfully send data to telegram"))
         }
     }).catch(err => {
