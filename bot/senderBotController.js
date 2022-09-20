@@ -12,7 +12,20 @@ const {
 } = require("../response/Response");
 
 
-
+const types = [
+    "Elektronika",
+    "Avtomobil",
+    "Biznes",
+    "Uy-jihozlari",
+    "Maishiy texnika",
+    "Oziq-ovqatlar",
+    "Uy-joy",
+    "Qurilish mat.",
+    "Ishlab chiq. uskunalari",
+    "Ishchi-Xodim",
+    "Go'zallik",
+    "Kiyimlar"
+]
 const sendMessageToBot = async (body) => {
     return new Promise((resolve, reject) => {
         let tBotUrl = `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMediaGroup?chat_id=${process.env.CHANNEL_ID}`
@@ -35,13 +48,60 @@ const sendMessageToBot = async (body) => {
         })
     })
 }
-
+const getImagePath = (category) => {
+    let path
+    switch (category) {
+        case "Elektronika":
+            path = "/images/app-images/tv.png"
+            break;
+        case "Avtomobil":
+            path = "/images/app-images/car.jpg"
+            break;
+        case "Biznes":
+            path = "/images/app-images/business.jpg"
+            break;
+        case "Uy-jihozlari":
+            path = "/images/app-images/sofa.jpg"
+            break;
+        case "Maishiy texnika":
+            path = "/images/app-images/fridge.jpg"
+            break;
+        case "Uy-jihozlari":
+            path = "/images/app-images/fridge.jpg"
+            break;
+        case "Oziq-ovqatlar":
+            path = "/images/app-images/food.jpg"
+            break;
+        case "Uy-joy":
+            path = "/images/app-images/real-estate.jpg"
+            break;
+        case "Qurilish mat.":
+            path = "/images/app-images/material.jpg"
+            break;
+        case "Ishlab chiq. uskunalari":
+            path = "/images/app-images/manufacturing.jpg"
+            break;
+        case "Ishchi-Xodim":
+            path = "/images/app-images/staff.jpg"
+            break;
+        case "Go'zallik":
+            path = "/images/app-images/cosmetic.jpg"
+            break;
+        case "Kiyimlar":
+            path = "/images/app-images/clothes.jpg"
+            break;
+        default:
+            path = "/images/app-images/car.jpg"
+            break;
+    }
+    return path
+}
 exports.sendMessageFromDB = async (req, res) => {
     await Item.find().then(async (result) => {
         let counter = 0;
         for (let j = 0; j < 15; j++) {
             const user = await User.findById(result[j].user)
-            let caption = `#${result[j].title.split(" ")[0]} #${result[j].location}\n${result[j].position!=="null"?result[j].position:""}\n${result[j].description}\n${result[j].price}\n\nAloqa uchun: ${user.phoneNumber}\n\nBarcha turdagi e'lonlaringizni tez va bepul joylashda 'Mandarin market' ilovasidan foydalaning.\nIlova uchun 👉 https://mandarinmarket.page.link/NEAo\n Kanalga ulanish uchun 👉 https://t.me/+gN5bCUJUHWZhYzA9`
+            let caption = `#${result[j].title.split(" ")[0]} #${result[j].location}\n${result[j].position!=="null"?result[j].position:""}\n${result[j].description}\n${result[j].price} ${result[j].isNegotiable?"Kelishamiz":"Oxirgi narxi"}\n\nAloqa uchun: ${user.phoneNumber}\n\nBarcha turdagi e'lonlaringizni tez va bepul joylashda 'Mandarin market' ilovasidan foydalaning.\nIlova uchun 👉 https://mandarinmarket.page.link/NEAo\n Kanalga ulanish uchun 👉 https://t.me/+gN5bCUJUHWZhYzA9`
             let obj = {}
             obj.media = []
             for (let i = 0; i < result[j].images.length; i++) { //
@@ -56,7 +116,8 @@ exports.sendMessageFromDB = async (req, res) => {
             if (result[j].images.length == 0) {
                 console.log("image is empty")
                 let imageObj
-                imageObj = Object.fromEntries(Object.entries(new BotImageObjFirst("photo", "https://www.vectorstock.com/royalty-free-vector/photo-icon-vector-21180230", caption)))
+                let imagePath = getImagePath(result[j].category)
+                imageObj = Object.fromEntries(Object.entries(new BotImageObjFirst("photo", `http://mandarinstorage.ngrok.io/p2p-market${imagePath}`, caption)))
                 obj.media.push(imageObj)
             }
             await new Promise(resolve => setTimeout(
