@@ -86,7 +86,7 @@ exports.sendMessageFromDB = async (req, res) => {
         let counter = 0;
         for (let j = 0; j < result.length; j++) {
             const user = await User.findById(result[j].user)
-            let caption = `#${result[j].title} #${result[j].location}\n<b>${result[j].position!=="null"?result[j].position:""}</b>\n${result[j].description}\n<b>${result[j].price}</b>\t<b>${result[j].isNegotiable?"Kelishamiz":"Oxirgi narxi"}</b>\n\nAloqa uchun: <a href='tel:${user.phoneNumber.replace(/[^0-9.]/g, '')}'>${user.phoneNumber}</a>\n\nBarcha turdagi e'lonlaringizni <b>tez</b> va <b>bepul</b> joylashda <a href='https://mandarinmarket.page.link/NEAo'>Mandarin market</a> ilovasidan foydalaning.\nKanalga ulanish uchun 👉 https://t.me/+gN5bCUJUHWZhYzA9`
+            let caption = `#${result[j].title} #${result[j].location}\n<b>${result[j].position!=="null"?result[j].position:""}</b>\n${result[j].description}\n<b>${result[j].price}</b>\t<b>${result[j].isNegotiable?"Kelishamiz":"Oxirgi narxi"}</b>\n\nAloqa uchun: <u><a href='tel:${user.phoneNumber.replace(/[^0-9.]/g, '')}'>${user.phoneNumber}</a></u>\n\nBarcha turdagi e'lonlaringizni <b>tez</b> va <b>bepul</b> joylashda <a href='https://mandarinmarket.page.link/NEAo'>Mandarin market</a> ilovasidan foydalaning.\nKanalga ulanish uchun 👉 https://t.me/+gN5bCUJUHWZhYzA9`
             let obj = {}
             obj.media = []
             for (let i = 0; i < result[j].images.length; i++) { //
