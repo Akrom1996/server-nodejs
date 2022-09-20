@@ -86,7 +86,7 @@ exports.sendMessageFromDB = async (req, res) => {
         let counter = 0;
         for (let j = 0; j < 10; j++) {
             const user = await User.findById(result[j].user)
-            let caption = `#${result[j].title.split(" ")[0]} #${result[j].location}\n<b>${result[j].position!=="null"?result[j].position:""}</b>\n${result[j].description}\n<b>${result[j].price}</b>\t<b>${result[j].isNegotiable?"Kelishamiz":"Oxirgi narxi"}</b>\n\nAloqa uchun: <a>${user.phoneNumber}</a>\n\nBarcha turdagi e'lonlaringizni tez va bepul joylashda <a href='https://mandarinmarket.page.link/NEAo'>Mandarin market</b> ilovasidan foydalaning.\n Kanalga ulanish uchun 👉 https://t.me/+gN5bCUJUHWZhYzA9`
+            let caption = `#${result[j].title.split(" ")[0]} #${result[j].location}\n<b>${result[j].position!=="null"?result[j].position:""}</b>\n${result[j].description}\n<b>${result[j].price}</b>\t<b>${result[j].isNegotiable?"Kelishamiz":"Oxirgi narxi"}</b>\n\nAloqa uchun: <a>${user.phoneNumber}</a>\n\nBarcha turdagi e'lonlaringizni tez va bepul joylashda <a href='https://mandarinmarket.page.link/NEAo'>Mandarin market</a> ilovasidan foydalaning.\n Kanalga ulanish uchun 👉 https://t.me/+gN5bCUJUHWZhYzA9`
             let obj = {}
             obj.media = []
             for (let i = 0; i < result[j].images.length; i++) { //
