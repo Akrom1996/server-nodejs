@@ -86,7 +86,7 @@ exports.sendMessageFromDB = async (req, res) => {
         let counter = 0;
         for (let j = 0; j < result.length; j++) {
             const user = await User.findById(result[j].user)
-            let isNegotiable = result[j].isNegotiable?"Kelishamiz":"Oxirgi narxi"
+            let isNegotiable = result[j].isNegotiable === true ? "Kelishamiz" : "Oxirgi narxi"
             let newPhoneNumber = user.phoneNumber.replace(/[^0-9.]/g, '')
             let caption = `#${result[j].title} #${result[j].location}\n<b>${result[j].position!=="null"?result[j].position:""}</b>\n${result[j].description}\n<b>${result[j].price}</b>\t<b>${isNegotiable}</b>\n\nAloqa uchun: <a href='tel:+${newPhoneNumber}'>+${newPhoneNumber}</a>\n\nBarcha turdagi e'lonlaringizni <b>tez</b> va <b>bepul</b> joylashda <a href='https://mandarinmarket.page.link/NEAo'>Mandarin market</a> ilovasidan foydalaning.\nKanalga ulanish uchun 👉 https://t.me/+gN5bCUJUHWZhYzA9`
             let obj = {}
@@ -126,7 +126,7 @@ exports.sendMessageFromDB = async (req, res) => {
 }
 exports.sendItemToBot = async (result, userId) => {
     const user = await User.findById(userId)
-    let isNegotiable = result.isNegotiable?"Kelishamiz":"Oxirgi narxi"
+    let isNegotiable = result.isNegotiable === true ? "Kelishamiz" : "Oxirgi narxi"
     let newPhoneNumber = user.phoneNumber.replace(/[^0-9.]/g, '')
     console.log(`Aloqa uchun: <a href='tel:+${newPhoneNumber}'>+${newPhoneNumber}</a>`)
     let caption = `#${result.title} #${result.location}\n<b>${result.position!=="null"?result.position:""}</b>\n${result.description}\n<b>${result.price}</b>\t<b>${isNegotiable}</b>\n\nAloqa uchun: <a href='tel:+${newPhoneNumber}'>+${newPhoneNumber}</a>\n\nBarcha turdagi e'lonlaringizni <b>tez</b> va <b>bepul</b> joylashda <a href='https://mandarinmarket.page.link/NEAo'>Mandarin market</a> ilovasidan foydalaning.\nKanalga ulanish uchun 👉 https://t.me/+gN5bCUJUHWZhYzA9`
