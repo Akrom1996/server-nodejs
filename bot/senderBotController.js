@@ -126,7 +126,7 @@ exports.sendMessageFromDB = async (req, res) => {
 }
 exports.sendItemToBot = async (result, userId) => {
     const user = await User.findById(userId)
-    let isNegotiable = result.isNegotiable == true ? "Kelishamiz" : "Oxirgi narxi"
+    let isNegotiable = result.isNegotiable == "true" ? "Kelishamiz" : "Oxirgi narxi"
     let newPhoneNumber = user.phoneNumber.replace(/[^0-9.]/g, '')
     console.log(`Is negotiable ? ${isNegotiable}, from db ${result.isNegotiable}, ${typeof(result.isNegotiable)}`)
     let caption = `#${result.title} #${result.location}\n<b>${result.position!=="null"?result.position:""}</b>\n${result.description}\n<b>${result.price}</b>\t<b>${isNegotiable}</b>\n\nAloqa uchun: <a href='tel:+${newPhoneNumber}'>+${newPhoneNumber}</a>\n\nBarcha turdagi e'lonlaringizni <b>tez</b> va <b>bepul</b> joylashda <a href='https://mandarinmarket.page.link/NEAo'>Mandarin market</a> ilovasidan foydalaning.\nKanalga ulanish uchun 👉 https://t.me/+gN5bCUJUHWZhYzA9`
