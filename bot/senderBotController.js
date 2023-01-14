@@ -124,8 +124,9 @@ exports.sendMessageFromDB = async (req, res) => {
         })
     })
 }
-exports.sendItemToBot = async (result, userId) => {
-    const user = await User.findById(userId)
+exports.sendItemToBot = async (result) => {
+    const user = await User.findById(result.userId)
+    console.log(result)
     let isNegotiable = result.isNegotiable == "true" ? "Kelishamiz" : "Oxirgi narxi"
     let newPhoneNumber = user.phoneNumber.replace(/[^0-9.]/g, '')
     console.log(`Is negotiable ? ${isNegotiable}, from db ${result.isNegotiable}, ${typeof(result.isNegotiable)}`)

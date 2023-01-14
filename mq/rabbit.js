@@ -2,6 +2,8 @@ const {
     modem,
     options
 } = require('../controller/otp/sms')
+const {sendItemToBot} =require("../bot/senderBotController")
+
 const dotenv = require('dotenv');
 dotenv.config();
 const open = require('amqplib').connect(process.env.AMQP_SERVER);
@@ -24,7 +26,7 @@ const consumeMessage = (queue) => {
                 modem.open("/dev/ttyUSB0", options, function (err, result) {
                     if (err) {
                         console.log("error in open modem", err);
-                        channel.ack(msg,false,false);
+                        channel.ack(msg, false, false);
                     }
                     if (result) {
                         // console.log("modem open", result);
@@ -33,9 +35,9 @@ const consumeMessage = (queue) => {
                             false,
                             function (result) {
                                 // console.log("sendSMS: ", result);
-                                if(result.data.recipient != undefined){
+                                if (result.data.recipient != undefined) {
                                     modem.close(() => {
-                                        console.log("modem closed: sent sms to %s, otp is %s",result.data.recipient, otp)
+                                        console.log("modem closed: sent sms to %s, otp is %s", result.data.recipient, otp)
                                         try {
                                             channel.ack(msg);
                                         } catch (error) {
@@ -44,7 +46,7 @@ const consumeMessage = (queue) => {
 
                                     })
                                 }
-                            
+
                             });
                     }
                 });
@@ -68,7 +70,7 @@ const consumeMessageAdvert = (queue) => {
                 modem.open("/dev/ttyUSB0", options, function (err, result) {
                     if (err) {
                         console.log("error in open modem", err);
-                        channel.nack(msg,false,false);
+                        channel.nack(msg, false, false);
                     }
                     if (result) {
                         // console.log("modem open", result);
@@ -77,9 +79,9 @@ const consumeMessageAdvert = (queue) => {
                             false,
                             function (result) {
                                 // console.log("sendSMS: ", result);
-                                if(result.data.recipient != undefined){
+                                if (result.data.recipient != undefined) {
                                     modem.close(() => {
-                                        console.log("modem closed: sent sms to %s, message is %s",result.data.recipient, message)
+                                        console.log("modem closed: sent sms to %s, message is %s", result.data.recipient, message)
                                         try {
                                             channel.ack(msg);
                                         } catch (error) {
@@ -88,7 +90,7 @@ const consumeMessageAdvert = (queue) => {
 
                                     })
                                 }
-                            
+
                             });
                     }
                 });
@@ -98,8 +100,24 @@ const consumeMessageAdvert = (queue) => {
         });
     })).catch(error => console.warn(error));
 };
+
+const consumeForTelegram = (queue) => {
+    open.then(connection => connection.createChannel()).then(channel => channel.assertQueue(queue).then(() => {
+        console.log(`[*] Waiting for messages from ${queue}.`)
+        channel.prefetch(1)
+        return channel.consume(queue, (msg) => {
+            if(msg !== null){
+                sendItemToBot(JSON.parse(msg.content))
+            }
+        }, {
+            noAck: false
+        });
+    }))
+
+}
 module.exports = {
     publishMessage,
     consumeMessage,
-    consumeMessageAdvert
+    consumeMessageAdvert,
+    consumeForTelegram
 }

@@ -12,6 +12,7 @@ const {
 } = require("../firebase/notificationController");
 const locations = require("./locations")
 const {sendItemToBot} =require("../../bot/senderBotController")
+const {publishMessage} = require("../../mq/rabbit")
 const {
     ErrorResponse,
     SuccessResponse
@@ -371,7 +372,6 @@ exports.incDecLikes = async (req, res) => {
                 $addToSet: {
                     likedItems: itemId
                 }
-
             }) :
             await User.findByIdAndUpdate(userId, {
                 $pull: {
@@ -379,7 +379,7 @@ exports.incDecLikes = async (req, res) => {
                 }
             })
         ]).then((results) => {
-            //console.log(results);
+            console.log('update like', results);
             return res.status(200).json(new SuccessResponse(null, "0", "Success", null));
 
         }).catch((err) => {
@@ -494,17 +494,19 @@ exports.uploadItemImages = async (req, res) => {
 
     // var uploadedFilePath = []
     // req.files.map((file) => uploadedFilePath.push(file.originalname));
-    //console.log(req.params);
+    console.log(req.body);
+
     const item = new itemModel(input);
     item.save().then(() => User.findOne({
             "phoneNumber": req.params.phoneNumber
         }).then((user) => {
-            // //console.log("user", user);
+            console.log("user", user);
             user.items.push(item);
             item.user = user;
             
-            sendItemToBot(input, user.id)
-
+            // sendItemToBot(input, user.id)
+            input.userId = user.id;
+            publishMessage(input, 'bot')
             item.save();
             return user.save();
         })

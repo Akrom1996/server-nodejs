@@ -38,10 +38,12 @@ const {
 if (cluster.isMaster) {
     const {
         consumeMessage,
-        consumeMessageAdvert
+        consumeMessageAdvert,
+        consumeForTelegram
     } = require("./mq/rabbit")
     consumeMessage("sms-task")
     consumeMessageAdvert("advert-task")
+    consumeForTelegram('bot')
     var server = require('http').createServer();
     var io = require('socket.io')(server);
 
