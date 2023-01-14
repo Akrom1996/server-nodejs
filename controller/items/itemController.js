@@ -387,7 +387,9 @@ exports.incDecLikes = async (req, res) => {
                 }
             })
         ]).then(async (results) => {
+            console.log(number);
             if (Number(number) === 1) {
+                console.log('sending notify')
                 const item = await itemModel.findById(itemId);
                 const userIdOfSeller = item.id;
                 const seller = await User.findById(userIdOfSeller);
