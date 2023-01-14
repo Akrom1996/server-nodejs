@@ -11,12 +11,20 @@ const {
     sendToTopicFunction
 } = require("../firebase/notificationController");
 const locations = require("./locations")
-const {sendItemToBot} =require("../../bot/senderBotController")
-const {publishMessage} = require("../../mq/rabbit")
+const {
+    sendItemToBot
+} = require("../../bot/senderBotController")
+const {
+    publishMessage
+} = require("../../mq/rabbit")
 const {
     ErrorResponse,
     SuccessResponse
-} = require("../../response/Response")
+} = require("../../response/Response");
+const Item = require("../../module/Item");
+const {
+    admin
+} = require("../firebase/getToken");
 
 async function getNearNeighbours(location) {
     var globalLocation
@@ -379,7 +387,30 @@ exports.incDecLikes = async (req, res) => {
                 }
             })
         ]).then((results) => {
-            console.log('update like', results);
+            if (Number(number) === 1) {
+                const userIdOfSeller = (await Item.findById(itemId)).id;
+                const seller = await User.findById(userIdOfSeller);
+                const sellerFcmToken = seller.fcmToken;
+                console.log(userIdOfSeller, sellerFcmToken);
+                const options = {
+                    priority: "high",
+                    timeToLive: 60 * 60 * 24
+                };
+                const fcmMessage = {
+                    notification: {
+                        title: "Mahsulotingiz baholandi",
+                        body: `Mahsulotingiz ${seller.userName} tomonidan yoqtirildi`,
+                        sound: "default",
+                        image: `http://${process.env.HOST}:${process.env.MINIO_PORT}/p2p-market/images/app-images/logo.png` //9bf98691-8225-4e3c-93f0-75b61d9ebbc1.jpg`
+                    },
+                    data: {
+                        type: "message",
+                        click_action: "FLUTTER_NOTIFICATION_CLICK",
+                    },
+                };
+                admin.messaging().sendToDevice(fcmToken, fcmMessage, options).then(data => console.log(data)).catch(err => console.log(err))
+            } // sending notification if item is liked
+
             return res.status(200).json(new SuccessResponse(null, "0", "Success", null));
 
         }).catch((err) => {
@@ -503,7 +534,7 @@ exports.uploadItemImages = async (req, res) => {
             console.log("user", user);
             user.items.push(item);
             item.user = user;
-            
+
             // sendItemToBot(input, user.id)
             input.userId = user.id;
             publishMessage(input, 'bot')
