@@ -391,11 +391,11 @@ exports.incDecLikes = async (req, res) => {
                 const item = await itemModel.findById(itemId);
                 const userIdOfSeller = item.user;
                 // console.log(typeof userIdOfSeller, typeof userId);
-                // if (userIdOfSeller != userId) {
+                if (userIdOfSeller != userId) {
                     const seller = await User.findById(userIdOfSeller);
-                    if(!seller.items.filter(itemNId => itemNId === itemId)){
+                    // if(!seller.items.filter(itemNId => itemNId === itemId)){
 
-                    // }
+                    // // }
                     const sellerFcmToken = seller.fcmToken;
                     const options = {
                         priority: "high",
