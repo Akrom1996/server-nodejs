@@ -389,14 +389,9 @@ exports.incDecLikes = async (req, res) => {
         ]).then(async (results) => {
             if (Number(number) === 1) {
                 const item = await itemModel.findById(itemId);
-                console.log('item', item)
                 const userIdOfSeller = item.user;
-                console.log('item id', userIdOfSeller)
                 const seller = await User.findById(userIdOfSeller);
-                console.log('seller', seller)
                 const sellerFcmToken = seller.fcmToken;
-                console.log('sellerFcmToken', sellerFcmToken)
-                console.log(userIdOfSeller, sellerFcmToken);
                 const options = {
                     priority: "high",
                     timeToLive: 60 * 60 * 24
@@ -409,7 +404,7 @@ exports.incDecLikes = async (req, res) => {
                         image: `http://${process.env.HOST}:${process.env.MINIO_PORT}/p2p-market/images/app-images/logo.png` //9bf98691-8225-4e3c-93f0-75b61d9ebbc1.jpg`
                     },
                     data: {
-                        type: "message",
+                        type: "like notification",
                         click_action: "FLUTTER_NOTIFICATION_CLICK",
                     },
                 };
