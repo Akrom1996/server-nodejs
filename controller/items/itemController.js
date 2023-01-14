@@ -390,27 +390,28 @@ exports.incDecLikes = async (req, res) => {
             if (Number(number) === 1) {
                 const item = await itemModel.findById(itemId);
                 const userIdOfSeller = item.user;
-                const seller = await User.findById(userIdOfSeller);
-                const sellerFcmToken = seller.fcmToken;
-                const options = {
-                    priority: "high",
-                    timeToLive: 60 * 60 * 24
-                };
-                const fcmMessage = {
-                    notification: {
-                        title: "Mahsulotingiz baholandi",
-                        body: `Mahsulotingiz ${seller.userName} tomonidan yoqtirildi`,
-                        sound: "default",
-                        image: `http://${process.env.HOST}:${process.env.MINIO_PORT}/p2p-market/images/app-images/logo.png` //9bf98691-8225-4e3c-93f0-75b61d9ebbc1.jpg`
-                    },
-                    data: {
-                        type: "like notification",
-                        click_action: "FLUTTER_NOTIFICATION_CLICK",
-                    },
-                };
-                admin.messaging().sendToDevice(sellerFcmToken, fcmMessage, options).then(data => console.log(data)).catch(err => console.log(err))
-            } // sending notification if item is liked
-
+                if (userIdOfSeller !== userId) {
+                    const seller = await User.findById(userIdOfSeller);
+                    const sellerFcmToken = seller.fcmToken;
+                    const options = {
+                        priority: "high",
+                        timeToLive: 60 * 60 * 24
+                    };
+                    const fcmMessage = {
+                        notification: {
+                            title: "Mahsulotingiz baholandi",
+                            body: `Mahsulotingiz ${seller.userName} tomonidan yoqtirildi`,
+                            sound: "default",
+                            image: `http://${process.env.HOST}:${process.env.MINIO_PORT}/p2p-market/images/app-images/logo.png` //9bf98691-8225-4e3c-93f0-75b61d9ebbc1.jpg`
+                        },
+                        data: {
+                            type: "like notification",
+                            click_action: "FLUTTER_NOTIFICATION_CLICK",
+                        },
+                    };
+                    admin.messaging().sendToDevice(sellerFcmToken, fcmMessage, options).then(data => console.log(data)).catch(err => console.log(err))
+                } // sending notification if item is liked
+            }
             return res.status(200).json(new SuccessResponse(null, "0", "Success", null));
 
         }).catch((err) => {
