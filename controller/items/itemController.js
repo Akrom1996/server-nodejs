@@ -387,13 +387,15 @@ exports.incDecLikes = async (req, res) => {
                 }
             })
         ]).then(async (results) => {
-            console.log(number);
             if (Number(number) === 1) {
-                console.log('sending notify')
                 const item = await itemModel.findById(itemId);
+                console.log('item', item)
                 const userIdOfSeller = item.id;
+                console.log('item id', userIdOfSeller)
                 const seller = await User.findById(userIdOfSeller);
+                console.log('seller', seller)
                 const sellerFcmToken = seller.fcmToken;
+                console.log('sellerFcmToken', sellerFcmToken)
                 console.log(userIdOfSeller, sellerFcmToken);
                 const options = {
                     priority: "high",
@@ -411,7 +413,7 @@ exports.incDecLikes = async (req, res) => {
                         click_action: "FLUTTER_NOTIFICATION_CLICK",
                     },
                 };
-                admin.messaging().sendToDevice(fcmToken, fcmMessage, options).then(data => console.log(data)).catch(err => console.log(err))
+                admin.messaging().sendToDevice(sellerFcmToken, fcmMessage, options).then(data => console.log(data)).catch(err => console.log(err))
             } // sending notification if item is liked
 
             return res.status(200).json(new SuccessResponse(null, "0", "Success", null));
