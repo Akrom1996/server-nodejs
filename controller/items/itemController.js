@@ -403,8 +403,8 @@ exports.incDecLikes = async (req, res) => {
                     };
                     const fcmMessage = {
                         notification: {
-                            title: "Mahsulotingiz baholandi",
-                            body: `${item.title.split(' ')[0]} mahsulotingiz ${seller.userName} tomonidan yoqtirildi`,
+                            title: "E'loningiz baholandi",
+                            body: `E'loningiz ${seller.userName} tomonidan yoqtirildi`,
                             sound: "default",
                             image: `http://${process.env.HOST}:${process.env.MINIO_PORT}/p2p-market/images/app-images/logo.png` //9bf98691-8225-4e3c-93f0-75b61d9ebbc1.jpg`
                         },
