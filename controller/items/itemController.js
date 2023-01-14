@@ -390,7 +390,7 @@ exports.incDecLikes = async (req, res) => {
             if (Number(number) === 1) {
                 const item = await itemModel.findById(itemId);
                 console.log('item', item)
-                const userIdOfSeller = item.id;
+                const userIdOfSeller = item.user;
                 console.log('item id', userIdOfSeller)
                 const seller = await User.findById(userIdOfSeller);
                 console.log('seller', seller)
