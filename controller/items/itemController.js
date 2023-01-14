@@ -386,7 +386,7 @@ exports.incDecLikes = async (req, res) => {
                     likedItems: itemId
                 }
             })
-        ]).then((results) => {
+        ]).then(async (results) => {
             if (Number(number) === 1) {
                 const item = await itemModel.findById(itemId);
                 const userIdOfSeller = item.id;
