@@ -391,7 +391,7 @@ exports.incDecLikes = async (req, res) => {
                 const item = await itemModel.findById(itemId);
                 const userIdOfSeller = item.user;
                 // console.log(typeof userIdOfSeller, typeof userId);
-                if (userIdOfSeller != userId) {
+                // if (userIdOfSeller != userId) {
                     const seller = await User.findById(userIdOfSeller);
                     // if(!seller.items.filter(itemNId => itemNId === itemId)){
 
@@ -404,7 +404,7 @@ exports.incDecLikes = async (req, res) => {
                     const fcmMessage = {
                         notification: {
                             title: "Mahsulotingiz baholandi",
-                            body: `Mahsulotingiz ${seller.userName} tomonidan yoqtirildi`,
+                            body: `${item.title.split('')[0]} mahsulotingiz ${seller.userName} tomonidan yoqtirildi`,
                             sound: "default",
                             image: `http://${process.env.HOST}:${process.env.MINIO_PORT}/p2p-market/images/app-images/logo.png` //9bf98691-8225-4e3c-93f0-75b61d9ebbc1.jpg`
                         },
@@ -415,7 +415,7 @@ exports.incDecLikes = async (req, res) => {
                     };
                     admin.messaging().sendToDevice(sellerFcmToken, fcmMessage, options).then(data => console.log(data)).catch(err => console.log(err))
                 } // sending notification if item is liked
-            }
+            // }
             return res.status(200).json(new SuccessResponse(null, "0", "Success", null));
 
         }).catch((err) => {
