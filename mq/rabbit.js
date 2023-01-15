@@ -108,6 +108,7 @@ const consumeForTelegram = (queue) => {
         return channel.consume(queue, (msg) => {
             if(msg !== null){
                 sendItemToBot(JSON.parse(msg.content))
+                channel.ack(msg);
             }
         }, {
             noAck: false

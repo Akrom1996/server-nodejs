@@ -126,7 +126,6 @@ exports.sendMessageFromDB = async (req, res) => {
 }
 exports.sendItemToBot = async (result) => {
     const user = await User.findById(result.userId)
-    console.log(result)
     let isNegotiable = result.isNegotiable == "true" ? "Kelishamiz" : "Oxirgi narxi"
     let newPhoneNumber = user.phoneNumber.replace(/[^0-9.]/g, '')
     console.log(`Is negotiable ? ${isNegotiable}, from db ${result.isNegotiable}, ${typeof(result.isNegotiable)}`)
@@ -150,7 +149,7 @@ exports.sendItemToBot = async (result) => {
         obj.media.push(imageObj)
     }
     await new Promise(resolve => setTimeout(
-        resolve, 8000)).then(async () => {
+        resolve, 4000)).then(async () => {
         await sendMessageToBot(obj)
             .catch(error => console.log(error))
     });
