@@ -1,0 +1,30 @@
+version: '3.2'
+services:
+  sms-service:
+    image: rabbitmq:3-management
+    container_name: sms-rabbit
+    restart: unless-stopped
+    network_mode: bridge
+    ports:      
+      - "4369:4369"
+      - "5672:5672"
+      - "15672:15672"
+  redis-service:
+    image: redis
+    container_name: my-redis
+    restart: unless-stopped
+    network_mode: bridge
+    ports:
+      - "6379:6379"
+  mandarin-service:
+    build: ./
+    container_name: my-mandarin
+    restart: unless-stopped
+    network_mode: bridge
+    ports:
+      - "8080:8080"
+    depends_on:
+      sms-service:
+        condition: service_healthy
+      redis-service:
+        condition: service_healthy

@@ -105,9 +105,9 @@ const consumeForTelegram = (queue) => {
     open.then(connection => connection.createChannel()).then(channel => channel.assertQueue(queue).then(() => {
         console.log(`[*] Waiting for messages from ${queue}.`)
         channel.prefetch(1)
-        return channel.consume(queue, (msg) => {
+        return channel.consume(queue, async (msg) => {
             if(msg !== null){
-                sendItemToBot(JSON.parse(msg.content))
+                await sendItemToBot(JSON.parse(msg.content))
                 channel.ack(msg);
             }
         }, {
