@@ -9,6 +9,11 @@ services:
       - "4369:4369"
       - "5672:5672"
       - "15672:15672"
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      timeout: 10s
+      retries: 3
   redis-service:
     image: redis
     container_name: my-redis
@@ -16,6 +21,11 @@ services:
     network_mode: bridge
     ports:
       - "6379:6379"
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      interval: 3s
+      timeout: 3s
+      retries: 5
   mandarin-service:
     build: ./
     container_name: my-mandarin
