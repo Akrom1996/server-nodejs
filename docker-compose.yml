@@ -34,7 +34,7 @@ services:
     ports:
       - "8080:8080"
     devices:
-      - /dev/ttyUSB0:/dev/ttyUSB_Modem
+      - /dev/ttyUSB_Modem:/dev/ttyUSB0
     depends_on:
       sms-service:
         condition: service_healthy
