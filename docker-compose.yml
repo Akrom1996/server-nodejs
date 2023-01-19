@@ -33,8 +33,10 @@ services:
     network_mode: bridge
     ports:
       - "8080:8080"
-    # devices:
-    #   - /dev/ttyUSB_Modem:/dev/ttyUSB_Modem
+    volumes:
+      - /home/akrom/server/access.log:/usr/src/app/access.log
+    devices:
+      - /dev/ttyUSB0
     depends_on:
       sms-service:
         condition: service_healthy
