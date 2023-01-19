@@ -23,7 +23,7 @@ const consumeMessage = (queue) => {
                     phoneNumber,
                     otp
                 } = JSON.parse(msg.content)
-                modem.open("/dev/ttyUSB2", options, function (err, result) {
+                modem.open("/dev/ttyUSB0", options, function (err, result) {
                     if (err) {
                         console.log("error in open modem", err);
                         channel.ack(msg, false, false);
@@ -67,7 +67,7 @@ const consumeMessageAdvert = (queue) => {
                     phoneNumber,
                     message
                 } = JSON.parse(msg.content)
-                modem.open("/dev/ttyUSB2", options, function (err, result) {
+                modem.open("/dev/ttyUSB0", options, function (err, result) {
                     if (err) {
                         console.log("error in open modem", err);
                         channel.nack(msg, false, false);
